@@ -21,7 +21,6 @@ int main(int argc,const char* argv[]){
     	  if(arg=="Exit"){
     		  cout<<"your choice is : exit "<<endl;
     		  shell.Exit(0);
-
     	  }
 
     	  //------2--------
