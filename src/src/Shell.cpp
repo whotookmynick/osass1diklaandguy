@@ -5,63 +5,118 @@ using namespace std;
 
 int main(int argc,const char* argv[]){
     string arg = "";
-
+    string fileConfig= "";
+    string uniqueID="";
+    string sourceID ="";
+    string targetID ="";
+    string textMsg="";
+    Shell shell;
  GET_COMMAND:
 		while (true){
     	  cout << "enter command" <<endl;
     	  getline(cin,arg);
-    	  cout << "your choice : " <<arg<<endl;
+    	  //cout << "your choice : " <<arg<<endl;
 
+    	  //------1--------
     	  if(arg=="Exit"){
     		  cout<<"your choice is : exit "<<endl;
-    		  exit(0);
-    	  }else if(arg=="CreateNet"){
-    		  //TODO: get file name
+    		  shell.Exit(0);
+
+    	  }
+
+    	  //------2--------
+    	  else if(arg=="CreateNet"){
     		  cout<<"your choice is : CreateNet "<<endl;
     		  cout<<"pleas enter file configuration name : "<<endl;
+    		  getline(cin,fileConfig);
+    		  shell.createNet(fileConfig.c_str());
     		  goto GET_COMMAND;
 
-    	  }else if(arg== "KillNode"){
-    		  //TODO: get uniqueID)
+    	  }
+
+    	  //------3--------
+    	  else if(arg== "KillNode"){
     		  cout<<"your choice is : KillNode "<<endl;
     		  cout<<"pleas enter the node id you wan'a kill : "<<endl;
-    		  goto GET_COMMAND;
+    		  getline(cin,uniqueID);
+    		  if(uniqueID==""){
+    		   	  goto GET_COMMAND;
+    		 }
+    		 shell.killNode();
+    		 goto GET_COMMAND;
 
-    	  }else if(arg== "ReviveNode"){
-    		  //TODO: get uniqueID
+    	  }
+
+    	  //------4--------
+    	  else if(arg== "ReviveNode"){
     		  cout<<"your choice is : ReviveNode "<<endl;
     		  cout<<"pleas enter the node id you wan'a revive : "<<endl;
+    		  getline(cin,uniqueID);
+    		  if(uniqueID==""){
+    		        goto GET_COMMAND;
+    		   }
+    		  shell.reviveNode();
     		  goto GET_COMMAND;
 
-    	  }else if(arg=="Killall"){
+    	  }
+
+    	  //------5--------
+    	  else if(arg=="Killall"){
     		  cout<<"your choice is : Killall "<<endl;
+    		  shell.killAll();
     		  goto GET_COMMAND;
 
-    	  }else if(arg=="PrintRT"){
-    		  //TODO: get uniqueID
+    	  }
+
+    	  //------6--------
+    	  else if(arg=="PrintRT"){
+
     		  cout<<"your choice is : PrintRT "<<endl;
     		  cout<<"pleas enter the node id you wan'a is RT view : "<<endl;
+    		  getline(cin,uniqueID);
+    		  if(uniqueID==""){
+    		  	  goto GET_COMMAND;
+    		   }
+    		  shell.printRt();
     		  goto GET_COMMAND;
 
-    	  }else if(arg=="SendPacket"){
-    		  //TODO: get sourceID targetID textMsg
+    	  }
+
+    	  //------7--------
+    	  else if(arg=="SendPacket"){
     		  cout<<"your choice is : SendPacket "<<endl;
 
 			  cout<<"pleas enter the sourceID : "<<endl;
-
+			  getline(cin,sourceID);
+			  if(sourceID==""){
+				  goto GET_COMMAND;
+			  }
     		  cout<<"pleas enter the targetID : "<<endl;
-
+    		  getline(cin,targetID);
+    		  if(targetID==""){
+    			  goto GET_COMMAND;
+    		  }
     		  cout<<"pleas enter the textMsg : "<<endl;
+    		  getline(cin,textMsg);
+    		  if(textMsg==""){
+    			  goto GET_COMMAND;
+    		  }
+    		  shell.sendPacket();
     		  goto GET_COMMAND;
 		  }
+
+    	  //------8--------
     	  else if(arg=="Run"){
     		  cout<<"your choice is : Run "<<endl;
+    		  shell.Run();
     		  goto GET_COMMAND;
     	  }
       }//end while
 }//end main
-
-void Shell::creatNet(char * file){
+void Shell::Exit(int i){
+	exit(i);
+}
+void Shell::createNet(const char * file){
 	string line;
 	ifstream netFile;
 	vector<string> args;
@@ -76,8 +131,38 @@ void Shell::creatNet(char * file){
 	}//end if
 	insertArgs(args);
 	netFile.close();
+
 }//end creatNet
 
+	void Shell::killNode() {
+		//TODO
+
+	}
+
+    void Shell::reviveNode()  {
+		//TODO
+
+	}
+
+    void Shell::killAll()  {
+		//TODO
+
+	}
+
+	void Shell::printRt()  {
+		//TODO
+
+	}
+
+	void Shell::sendPacket() {
+		//TODO
+
+	}
+
+	void Shell::Run()  {
+		//TODO
+
+	}
 
 void Shell::insertArgs(vector <string> argToNet){
 
