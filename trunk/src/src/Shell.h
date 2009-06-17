@@ -4,7 +4,7 @@
  *  Created on: Jun 10, 2009
  *      Author: dikla
  */
-
+//TEST
 #ifndef SHELL_H_
 #define SHELL_H_
 #include <stdio.h>
@@ -26,7 +26,9 @@ public:
 	void creatNet( char file [] );
 	void insertArgs(vector <string> argToNet);
 //	*vector<string> parse(char *str, char *delimiters);
-
+	int ** makeMatrix(unsigned int numberOfNodes_);
+	void  initMatrix(unsigned int numberOfNodes,int **matrix);
+	void printMatrix(unsigned int numberOfNodes,int **matrix);
 };
 
 
