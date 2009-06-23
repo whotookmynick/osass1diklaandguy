@@ -8,5 +8,9 @@
 #ifndef RT_H_
 #define RT_H_
 
-
+class  RT
+{
+public:
+	RT();
+};
 #endif /* RT_H_ */

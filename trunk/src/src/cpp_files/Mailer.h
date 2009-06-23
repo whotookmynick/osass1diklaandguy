@@ -7,6 +7,11 @@
 
 #ifndef MAILER_H_
 #define MAILER_H_
+public class Mailer{
+
+
+
+}
 
 
 #endif /* MAILER_H_ */
