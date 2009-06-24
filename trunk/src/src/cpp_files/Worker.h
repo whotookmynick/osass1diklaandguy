@@ -8,10 +8,14 @@
 #ifndef WORKER_H_
 #define WORKER_H_
 
-#include "Mailer.h"
+//#include "Mailer.h"
 #include "OSThread.h"
-#include "Massage.h"
+#include "Message.h"
 #include "RT.h"
+#include "Message.h"
+#include <pthread.h>
+#include <queue>
+using namespace std;
 
 class Worker : public OSThread
 {
@@ -19,12 +23,12 @@ private:
 
 
 	int _numOfWorkers;
-	vector <Massage> massagebourd;
+	vector <Message> massagebourd;
 	RT* myRT;
-    Mailer& _mailer;
-    std::set<int> _myNeighborsId;
+   // Mailer& _mailer;
+    //std::set<int> _myNeighborsId;
     int _workerId;
-    RoutingTable _rtTable;
+    RT _rtTable;
     std::vector<RT> _allRTs;
     bool _isOn;
     pthread_mutex_t _enabledBusy;
@@ -51,8 +55,8 @@ private:
 		void waitToDisabledSignal();
 		void sendMyRTtoAllNighbors();
 		void send(const Message& m);
-		void recv(std::queue<Message>& into);
-		void getMsg(queue<Message*>& messages);
+		//void recv(std::queue<Message>& into);
+		//void getMsg(queue<Message*>& messages);
 
 
 };
