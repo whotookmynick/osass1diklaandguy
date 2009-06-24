@@ -1,12 +1,14 @@
-#ifndef MAILER_H_
-#define MAILER_H_
-
 /*
  * Mailer.h
  *
- *  Created on: Jun 17, 2009
+ *  Created on: Jun 24, 2009
  *      Author: dikla
  */
+
+#ifndef MAILER_H_
+#define MAILER_H_
+
+
 
 
 #include "Message.h"
@@ -15,7 +17,6 @@
 #include "Worker.h"
 #include "MailBox.h"
 
-#include <string>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -30,15 +31,16 @@ using namespace std;
 
  class Mailer{
 	 private:
-		Scheduler* _scheduler;
+
+	    	Scheduler* _scheduler;
 			pthread_t _schedulerThread;
 			Shell& _shell;
-		/****************workers*******************/
+		// ****************workers*******************
 			int _numOfWorkers;
 			std::vector<Worker*> _workersVector;
 			std::vector<Mailbox> _mailboxesVector;
 
-			/****************messages & inbox*******************/
+			// ****************messages & inbox*******************
 			std::queue<Message*> _inboxQ;
 		    unsigned int _inboxSize;
 			bool _msgInProgress;
@@ -46,24 +48,24 @@ using namespace std;
 			pthread_mutex_t _msgInProgressMutex;
 			pthread_mutex_t _inboxMutex;
 
- public:
+	 public:
 
 		 Mailer(Shell& shell, int numOfWorkers, int bfrSize);
 		 virtual ~Mailer();
 
-		 /***********************************************/
+		 // ***********************************************
 		 void run();
 		 void start();
 		 void setScheduler(Scheduler* s);
 
-		 /****************handle messages***********************/
+		 // ****************handle messages***********************
 		 bool setMsgInInbox(Message* m);//if inbox full return false
 		// Reads the messages from the mailbox to msgQ
 		bool receive(int mailboxID, std::queue<Message*>& msgQ);
 		Message* readMsgFromInbox();
 		void setMsgInProgress(bool en);//_noMsgInProgress==true or false
 
-		/****************handle workers***********************/
+		// ****************handle workers***********************
 		Worker& getWorker(int wID);
 		void setWorkerOff(int wID);
 		void setWorkerOn(int wID);
@@ -71,7 +73,6 @@ using namespace std;
 		Mailbox& getMailbox(int mailboxID);
 		void reInitWorkers(int workerID);
 	};
-
 
 
 
