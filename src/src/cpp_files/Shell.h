@@ -1,3 +1,5 @@
+#ifndef SHELL_H_
+#define SHELL_H_
 /*
  * Shel.h
  *
@@ -5,9 +7,8 @@
  *      Author: dikla
  */
 //TEST
-#ifndef SHELL_H_
-#define SHELL_H_
-#include <stdio.h>
+
+
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -15,7 +16,8 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
-#include <string.h>
+
+
 using namespace std;
 
 class Shell {
