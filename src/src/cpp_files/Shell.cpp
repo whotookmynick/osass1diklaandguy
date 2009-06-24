@@ -188,6 +188,7 @@ void Shell::insertArgs(vector <string> argToNet){
 	char *result = NULL;
 
 	for ( unsigned int i=2 ; i<argToNet.size();i++ ){
+
 		strcpy(buf,argToNet[i].c_str());//line
 		cout<<"the char* buf : "<<buf<<endl;
 		int j=0;

@@ -1,7 +1,9 @@
 /*
  * MailBox.cpp
  *
- *  Created on: Jun 17, 2009
+ *  Created on: Jun 24, 2009
  *      Author: dikla
  */
+
+#include "MailBox.h"
 

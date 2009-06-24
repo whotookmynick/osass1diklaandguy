@@ -7,6 +7,6 @@
 
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
-class Scheduler{}
 
+class Scheduler{};
 #endif /* SCHEDULER_H_ */

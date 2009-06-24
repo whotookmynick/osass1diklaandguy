@@ -1,6 +1,10 @@
+/*
+ * Message.cpp
+ *
+ *  Created on: Jun 24, 2009
+ *      Author: dikla
+ */
 #include "Message.h"
-
-
 
 	Message::Message(string content,int rcvId, int sndId,string msgType){
 		_msgContent=content;
@@ -9,15 +13,15 @@
 		_sendTo=sndId;
 	};
 
-	virtual::~Message()
-	{
+	Message:: ~Message(){};
+	//{
 
-	}
+	//}
 
-	string Message::getMsgType(){
+	string Message:: getMsgType(){
 		return _msgType;
 	}
-	void Message::setContend(string content){
+
+	void Message:: setContend(string content){
 		_msgContent=content;
 	}
-

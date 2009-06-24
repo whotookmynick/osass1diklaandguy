@@ -14,11 +14,10 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <string>
+#include <string.h>
 #include <stdio.h>
-
-
 using namespace std;
+
 
 class Shell {
 public:

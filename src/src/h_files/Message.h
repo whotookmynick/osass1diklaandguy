@@ -1,18 +1,23 @@
-#ifndef MASSAGE_H_
-#define MASSAGE_H_
+/*
+ * Message.h
+ *
+ *  Created on: Jun 24, 2009
+ *      Author: dikla
+ */
 
+#ifndef MESSAGE_H_
+#define MESSAGE_H_
+
+//#include <iostream>
+//#include <vector>
+//
+//#include <string>
+//#include <fstream>
 #include <string>
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
 #include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <string>
 #include <stdio.h>
 #include <string.h>
 using namespace std;
-//#include "Worker.h"
 
 class Message {
 public:
@@ -32,8 +37,4 @@ private:
 };
 
 
-
-
-
-
-#endif /*MASSAGE_H_*/
+#endif /* MESSAGE_H_ */

@@ -5,15 +5,6 @@
 #include <pthread.h>
 #include <string>
 
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdio.h>
-#include <string.h>
 using namespace std;
 
 /* A wrapper class for the worker threads - wraps a pthread and executes the run method */

@@ -1,20 +1,25 @@
 /*
  * Worker.h
  *
- *  Created on: Jun 17, 2009
+ *  Created on: Jun 24, 2009
  *      Author: dikla
  */
 
 #ifndef WORKER_H_
 #define WORKER_H_
 
-//#include "Mailer.h"
+#include "Message.h"
 #include "OSThread.h"
-#include "Message.h"
+#include "Mailer.h"
 #include "RT.h"
-#include "Message.h"
-#include <pthread.h>
+#include <stdlib.h>
+#include <vector>
 #include <queue>
+#include <ostream>
+#include <set>
+#include <pthread.h>
+
+
 using namespace std;
 
 class Worker : public OSThread
@@ -25,8 +30,8 @@ private:
 	int _numOfWorkers;
 	vector <Message> massagebourd;
 	RT* myRT;
-   // Mailer& _mailer;
-    //std::set<int> _myNeighborsId;
+	//Mailer & _mailer;
+    std::set<int> _myNeighborsId;
     int _workerId;
     RT _rtTable;
     std::vector<RT> _allRTs;
@@ -55,10 +60,13 @@ private:
 		void waitToDisabledSignal();
 		void sendMyRTtoAllNighbors();
 		void send(const Message& m);
-		//void recv(std::queue<Message>& into);
-		//void getMsg(queue<Message*>& messages);
+		void recv(std::queue<Message>& into);
+		void getMsg(queue<Message*>& messages);
 
 
 };
+
+
+
 
 #endif /* WORKER_H_ */

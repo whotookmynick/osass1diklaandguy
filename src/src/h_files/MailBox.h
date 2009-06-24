@@ -1,7 +1,7 @@
 /*
  * MailBox.h
  *
- *  Created on: Jun 17, 2009
+ *  Created on: Jun 24, 2009
  *      Author: dikla
  */
 
@@ -19,6 +19,7 @@ class Mailbox {
 		std::queue<Message*> _sysQueue;
 		std::queue<Message*> _RegQueue;
 
+
 	public:
 			Mailbox();
 			virtual ~Mailbox();
@@ -30,6 +31,8 @@ class Mailbox {
 			void insertMstToregularQ(Message* m);
 
 };
+
+
 
 
 #endif /* MAILBOX_H_ */
