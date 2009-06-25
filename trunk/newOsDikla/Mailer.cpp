@@ -1,4 +1,5 @@
 #include "Mailer.h"
+
 #define DEBUG false
 Mailer* mailer;
 
@@ -34,7 +35,14 @@ bool Mailer::killNode(int nodeId){
 	_shell.printMsgFromMailer(msg);
 	return false;
 }
+bool Mailer::rcvPacket(string sourceID,string targetID,string textMsg){
+	int src;
+	int dst;
+	src = atoi(sourceID.c_str());
+	dst = atoi(targetID.c_str());
 
+	return false;
+}
 Mailer::~Mailer()
 {
 }
