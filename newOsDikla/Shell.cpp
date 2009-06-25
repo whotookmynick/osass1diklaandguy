@@ -59,7 +59,7 @@ void Shell::start(){
     		  if(uniqueID==""){
     		   	  goto GET_COMMAND;
     		 }
-    		  if (_mailer=NULL){
+    		  if (_mailer==NULL){
     			  cout<<"you dont have any mailer "<<endl;
     			  goto GET_COMMAND;
     		  }
