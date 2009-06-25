@@ -32,7 +32,7 @@ public:
     void reviveNode() ;
     void killAll() ;
 	void printRt() ;
-	void sendPacket() ;
+	void sendPacket(string sourceID,string targetID,string textMsg);
 	void Run() ;
 	void start();
 	void printMsgFromMailer(string msg);

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <iostream>
 using namespace std;
 
 class Mailer
@@ -24,6 +25,7 @@ class Mailer
 		bool addMsgToInbox(const string& msg);
 		void printInbox(const vector<void*>& v);
 		bool killNode(int nodeId);
+		bool rcvPacket(string sourceID,string targetID,string textMsg);
 };
 
 #endif /*MAILER_H_*/

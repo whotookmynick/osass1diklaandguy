@@ -19,8 +19,8 @@ Shell::~Shell(){}
 
 void Shell::start(){
 
-	 string arg = "";
-	 string fileConfig= "";
+	string arg = "";
+	string fileConfig= "";
     string uniqueID="";
     string sourceID ="";
     string targetID ="";
@@ -108,6 +108,7 @@ void Shell::start(){
     		  printRt();
     		  goto GET_COMMAND;
 
+
     	  }
 
     	  //------7--------
@@ -129,7 +130,7 @@ void Shell::start(){
     		  if(textMsg==""){
     			  goto GET_COMMAND;
     		  }
-    		  sendPacket();
+    		  sendPacket(sourceID,targetID,textMsg);
     		  goto GET_COMMAND;
 		  }
 
@@ -164,6 +165,12 @@ void Shell::createNet(const char * file){
 
 }//end creatNet
 
+
+void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
+	_mailer->rcvPacket(sourceID,targetID,textMsg);
+
+}
+
 	void Shell::killNode(int id) {
 		bool kill = _mailer->killNode(id);
 		cout<<kill<<endl;
@@ -182,11 +189,6 @@ void Shell::createNet(const char * file){
 	}
 
 	void Shell::printRt()  {
-		//TODO
-
-	}
-
-	void Shell::sendPacket() {
 		//TODO
 
 	}
