@@ -2,6 +2,8 @@
 #define MAILER_H_
 #include <stdio.h>
 #include "Shell.h"
+#include "Message.h"
+#include "MailBox.h"
 #include <vector>
 #include <string>
 #include <string.h>
@@ -17,15 +19,16 @@ class Mailer
 		Shell& _shell;
 		int _numOfWorkers;
 		int _inboxSize;
-		vector<string> _inbox;
+		vector<Message* > _inbox;
+		vector<Mailbox* > _mailBoxes;
 
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize);
 		virtual ~Mailer();
-		bool addMsgToInbox(const string& msg);
+		bool addMsgToInbox(Message* msg);
 		void printInbox(const vector<void*>& v);
 		bool killNode(int nodeId);
-		bool rcvPacket(string sourceID,string targetID,string textMsg);
+		bool rcvPacket(Message* msg);
 };
 
 #endif /*MAILER_H_*/

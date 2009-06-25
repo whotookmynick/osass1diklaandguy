@@ -1,5 +1,9 @@
 #include "Shell.h"
 #include "Mailer.h"
+#include "Message.h"
+#include "RegMsg.h"
+#include "InitMsg.h"
+#include "SysMsg.h"
 #define DEBUG false
 #include <stdio.h>
 using namespace std;
@@ -167,7 +171,12 @@ void Shell::createNet(const char * file){
 
 
 void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
-	_mailer->rcvPacket(sourceID,targetID,textMsg);
+	int src = atoi(sourceID.c_str());
+	int dst = atoi(targetID.c_str());
+	RegMsg regMsg(src,dst,textMsg);//TODO need new????
+	//= new RegMsg();
+	//RegMsg msg = new RegMsg();
+	_mailer->rcvPacket((Message*)&regMsg);
 
 }
 

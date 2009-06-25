@@ -9,7 +9,7 @@ _inboxSize(bufSize){
 
 }
 
-bool Mailer:: addMsgToInbox(const string& msg){
+bool Mailer:: addMsgToInbox(Message* msg){
 	_inbox.push_back(msg);
 	return true;
 }
@@ -35,13 +35,10 @@ bool Mailer::killNode(int nodeId){
 	_shell.printMsgFromMailer(msg);
 	return false;
 }
-bool Mailer::rcvPacket(string sourceID,string targetID,string textMsg){
-	int src;
-	int dst;
-	src = atoi(sourceID.c_str());
-	dst = atoi(targetID.c_str());
-
-	return false;
+bool Mailer::rcvPacket(Message* msg){//string sourceID,string targetID,string textMsg
+	_inbox.push_back(msg);
+	string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
+	return true;
 }
 Mailer::~Mailer()
 {
