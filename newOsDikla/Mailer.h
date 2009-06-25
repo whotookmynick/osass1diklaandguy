@@ -1,6 +1,6 @@
 #ifndef MAILER_H_
 #define MAILER_H_
-
+#include <stdio.h>
 #include "Shell.h"
 #include <vector>
 #include <string>

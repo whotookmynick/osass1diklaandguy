@@ -29,6 +29,8 @@ bool Mailer::killNode(int nodeId){
 	//if(DEBUG){
 		cout<<"kill node : " <<nodeId<<endl;
 	//}
+
+
 	_shell.printMsgFromMailer(msg);
 	return false;
 }
