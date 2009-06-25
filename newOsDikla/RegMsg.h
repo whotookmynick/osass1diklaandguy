@@ -4,10 +4,11 @@
 class RegMsg : public Message
 {
 public:
+	RegMsg(int src,int dst,string textMsgatoi);
 	RegMsg();
 	virtual ~RegMsg();
 public:
-
+	string toString(Message* msg);
 	int getSrc();
 	int getDes();
 	string getContent();
