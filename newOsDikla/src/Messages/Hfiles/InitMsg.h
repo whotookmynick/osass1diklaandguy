@@ -14,8 +14,7 @@ public:
 	string getType();
 	void printMsg();
 
-
-
+	string _msgContent;
 };
 
 #endif /*INITMSG_H_*/

@@ -1,7 +1,9 @@
 #include "Hfiles/SysMsg.h"
 
-SysMsg::SysMsg(int src,int dst,string textMsgatoi,int next):Message(src,dst,textMsgatoi,next)
+SysMsg::SysMsg(int src,int dst,string textMsgatoi,int next):
+	Message(src,dst,textMsgatoi,next)
 {
+
 }
 
 SysMsg::~SysMsg()
@@ -25,6 +27,13 @@ SysMsg::~SysMsg()
 		int nextId = getNext();
 		string content = getContent();
 		cout<<" msg from: "<<src<<" to: "<<des<<" throw: "<<nextId<<" --- "<<content<<endl;
+	}
+
+	void SysMsg::setRT(RT* rt){
+		_rt=rt;
+	}
+	RT* SysMsg::getRT(RT* rt){
+		return _rt;
 	}
 /* string  SysMsg::toString(Message* msg){
 		return "TODO";

@@ -16,8 +16,7 @@ public:
 	string getType();
 	void printMsg();
 
-
-
+	string _msgContent;
 };
 
 #endif /*REGMSG_H_*/

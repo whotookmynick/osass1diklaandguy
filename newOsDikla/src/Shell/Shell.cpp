@@ -16,9 +16,7 @@ int main(int argc,const char* argv[]){
     shell.start();
 }//end main
 
-void Shell::Exit(int i){
-	exit(i);
-}
+
 Shell::Shell(){}
 Shell::~Shell(){}
 
@@ -148,14 +146,14 @@ void Shell::start(){
       }//end while
 
 }
-
+//---------------------------------------------------------------------------------
+//					Shell messages
+//--------------------------------- ----------------------------------------------
 void Shell::createNet(const char * file){
-//	cout<<" vvv ";
 	string line;
 	ifstream netFile;
 	vector<string> args;
 	netFile.open(file);
-
 	if (netFile.is_open()) {
 		while (!netFile.eof() ) {
 	      getline (netFile,line);
@@ -164,18 +162,18 @@ void Shell::createNet(const char * file){
 	      args.push_back(line);
 		}//end while
 	}//end if
-
 	insertArgs(args);
-
 	netFile.close();
-
-	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize);//mailer->...
+	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize,*_neighbor);//mailer->...
 	_mailer->start();//mailer thread start
 
-
 }//end creatNet
-
-
+void Shell::Exit(int i){
+	exit(i);
+}
+//---------------------------------------------------------------------------------
+//					Reg messages
+//--------------------------------- -----------------------------------------------
 void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 	int src = atoi(sourceID.c_str());
 	int dst = atoi(targetID.c_str());
@@ -183,36 +181,39 @@ void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 	//= new RegMsg();
 	//RegMsg msg = new RegMsg();
 	_mailer->rcvPacket(regMsg);
+}
+
+//---------------------------------------------------------------------------------
+//					TODO
+//--------------------------------- -----------------------------------------------
+void Shell::killNode(int id) {
+	bool kill = _mailer->killNode(id);
+	cout<<kill<<endl;
+}
+
+void Shell::reviveNode()  {
+	//TODO
 
 }
 
-	void Shell::killNode(int id) {
-		bool kill = _mailer->killNode(id);
-		cout<<kill<<endl;
+void Shell::killAll()  {
+	//TODO
 
+}
 
-	}
+void Shell::printRt()  {
+	//TODO
 
-    void Shell::reviveNode()  {
-		//TODO
+}
 
-	}
+void Shell::Run()  {
+	//TODO
 
-    void Shell::killAll()  {
-		//TODO
+}
 
-	}
-
-	void Shell::printRt()  {
-		//TODO
-
-	}
-
-	void Shell::Run()  {
-		//TODO
-
-	}
-
+//---------------------------------------------------------------------------------
+//					set _bufferSize,_numberOfNodes,_neighbor and _neighbor
+//--------------------------------- -----------------------------------------------
 void Shell::insertArgs(vector <string> argToNet){
 
 	char buf[256];
@@ -221,82 +222,41 @@ void Shell::insertArgs(vector <string> argToNet){
 
 	_bufferSize= atoi(bufferSize.c_str());
 	_numberOfNodes=atoi(nodNumber.c_str());
-
 	_neighbor = makeMatrix(_numberOfNodes);
+
+	//-----------------------------insert to _neighbor matrix----------------------
 	initMatrix(_numberOfNodes,_neighbor);
-	if(DEBUG){
-		cout << "printing matrix before init:" << endl;
-		//printMatrix(numberOfNodes_,neighbor);
-
-		cout << "printing matrix after init:" << endl;
-		initMatrix(_numberOfNodes,_neighbor);//TODO: init metrix even without DEBUG???
-		//printMatrix(numberOfNodes_,neighbor);
-
-	}
-	//printf("the string is: ",argToNet[2]);
 	char delims[] = " ";
 	char *result = NULL;
 
 	for ( unsigned int i=2 ; i<argToNet.size();i++ ){
-
-		strcpy(buf,argToNet[i].c_str());//line
-
-		if(DEBUG){
-			cout<<"the char* buf : "<<buf<<endl;
-		}
-
 		int j=0;
+		int firstNode ;
+		strcpy(buf,argToNet[i].c_str());//line
 		result = strtok( buf, delims ); // create tokens ""object""
 
-		if(DEBUG){
-			cout<<"the firstNode buf: "<<buf<<endl;
-		}
-		int firstNode ;
 		//if(result!=0){
 			 firstNode = atoi(result);
 		//}
-		if(DEBUG){
-			//cout<<"the int first node is: "<<firstNode<<endl;
-		}
-
 		while( result != NULL ) {
-			if(DEBUG){
-				cout << "result is: "<<result << " "<<endl;
-			}
-			 result = strtok( NULL, delims ); // get next Token
+
+			result = strtok( NULL, delims ); // get next Token
 			 // if result isn't null insert atoi (result) otherwise insert 0
-
 			 _neighbor[firstNode][j]= (result!=NULL) ? atoi(result) : 0;//TODO : tell about change: in place of the first neigbors i will be is neigbors nodes
-
-			 if(DEBUG){
-			 cout<<"node :"<<firstNode<<" nigbore : "<<j<<" arry content for them : "<< _neighbor[firstNode][j]<<endl;
-			 }
-
 			 j++;
-		}
+		}//end while
 		cout << endl;
-
-	}
-
-	if(DEBUG){
-		cout<<"in insertArgs "<<endl;
-		cout << "printing matrix after insert:" << endl;
-		printMatrix(_numberOfNodes,_neighbor);
-	}
-
-
+	}//end for
 
 }//end insert
 
 
 
-int ** Shell::makeMatrix(unsigned int numberOfNodes_){
-	int ** neighbor = new int* [numberOfNodes_+1];//[numberOfNodes_];
-		for (unsigned int i=0; i<numberOfNodes_+1;i++){
-			neighbor[i]= new int [numberOfNodes_];
-	}
-    return neighbor;
-}
+
+
+//---------------------------------------------------------------------------------
+//									inits
+//--------------------------------- -----------------------------------------------
 void Shell:: initMatrix(unsigned int numberOfNodes,int **matrix){
 
 	for(unsigned int i = 0 ; i < numberOfNodes+1;i++){
@@ -305,7 +265,17 @@ void Shell:: initMatrix(unsigned int numberOfNodes,int **matrix){
 		}
 	}
 }
+int ** Shell::makeMatrix(unsigned int numberOfNodes_){
+	int ** neighbor = new int* [numberOfNodes_+1];//[numberOfNodes_];
+		for (unsigned int i=0; i<numberOfNodes_+1;i++){
+			neighbor[i]= new int [numberOfNodes_];
+	}
+    return neighbor;
+}
 
+//---------------------------------------------------------------------------------
+//									prints
+//--------------------------------- -----------------------------------------------
 void Shell:: printMatrix(unsigned int numberOfNodes,int **matrix){
 
 	for(unsigned int i = 0 ; i < numberOfNodes;i++){
@@ -323,6 +293,12 @@ void Shell:: printMsgFromMailer(string msg){
 }
 
 
+//---------------------------------------------------------------------------------
+//									getters and setters
+//--------------------------------- -----------------------------------------------
+int** Shell::getNigebors(){
+	return _neighbor;
+}
 
 
 
