@@ -11,16 +11,18 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <iostream>
+#include <list>
 using namespace std;
-
+class Worker;
 class Mailer
 {
 	private:
 		Shell& _shell;
 		int _numOfWorkers;
 		int _inboxSize;
-		vector<Message* > _inbox;
+		list<Message* > _inbox;
 		vector<Mailbox* > _mailBoxes;
+		vector<Worker*> _workers;
 		pthread_t _mailerThread;
 		pthread_mutex_t _inboxMutex;
 		pthread_mutexattr_t _mtxattr;
@@ -29,7 +31,7 @@ class Mailer
 		Mailer(Shell& shell,int numOfWorkers,int bufSize);
 		virtual ~Mailer();
 		bool addMsgToInbox(Message* msg);
-		void printInbox(vector<Message*> v);
+		void printInbox(list<Message*> v);
 		bool killNode(int nodeId);
 		bool rcvPacket(Message* msg);
 		bool deliverMsgToMailBox();//deliver ong msg to the next des

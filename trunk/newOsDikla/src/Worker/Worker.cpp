@@ -19,7 +19,17 @@ int Worker::getId(){
 			 yield();
 		 }
 		 else {
+			 cout<<" i am your worker my id "<<_id<<endl;
 			 msg->printMsg();}
 	 }
  }
 
+ /* studentSend - an abstract method that is used to send the message you wish to send */
+ 		bool Worker::studentSend(void *args) {
+ 			return false;
+ 		}
+
+ 		/* studentRecv - an abstract method that is used to receive a message */
+ 		bool Worker::studentRecv(void **args) {
+ 			return false;
+ 		}

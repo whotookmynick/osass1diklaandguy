@@ -2,13 +2,19 @@
 
 // Reads messages from the mailbox to destinyMsgQ.
 Mailbox::Mailbox(){
-
+	pthread_mutexattr_init(&_mtxattr);
+	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutex_init(&_QMutex, &_mtxattr);
 }
-Mailbox::~Mailbox(){}
+Mailbox::~Mailbox(){
+	pthread_mutex_destroy(&_QMutex);
+	pthread_mutexattr_destroy(&_mtxattr);
+}
 bool Mailbox::readMsg(std::queue<Message*>& destinyMsgQ){
 	return false ;
 }
 Message* Mailbox::readMsg(){
+	pthread_mutex_lock(&_QMutex);
 	Message * m =NULL;
 	if(!_IntQueue.empty()){
 		m =_IntQueue.front();
@@ -23,12 +29,15 @@ Message* Mailbox::readMsg(){
 		_RegQueue.pop_front();
 
 	}
+	pthread_mutex_unlock(&_QMutex);
 	return m;
 }
 
 bool Mailbox::insertMsg(Message* m){
+	pthread_mutex_lock(&_QMutex);
 	if(m==NULL){
 			cout<<" ERORR: msg is Empty "<<endl;
+			pthread_mutex_unlock(&_QMutex);
 			return false;
 	}
 	string type = m->getType();
@@ -40,21 +49,25 @@ bool Mailbox::insertMsg(Message* m){
 
 	if(type == "Reg" ){
 		_RegQueue.push_back(m);
+		pthread_mutex_unlock(&_QMutex);
 		return true;
 	}
 	if(type == "Init" ){
 		_IntQueue.push_back(m);
+		pthread_mutex_unlock(&_QMutex);
 		return true;
 	}
 	if(type == "Sys" ){
 		_sysQueue.push_back(m);
+		pthread_mutex_unlock(&_QMutex);
 		return true;
 	}
 	cout<<" no such type  "<< type << endl;
+	pthread_mutex_unlock(&_QMutex);
 	return false;
 }//insert message in the mailbox
 void Mailbox::printMailes(){
-
+	pthread_mutex_lock(&_QMutex);
 	if(!_sysQueue.empty()){
 		cout<<" print sys q from mailebox "<<endl;
 		printQ(_sysQueue);
@@ -79,9 +92,10 @@ void Mailbox::printMailes(){
 	if(_RegQueue.empty() && _RegQueue.empty() && _IntQueue.empty()){
 		cout<<" nothing in mail boxes "<<endl;
 	}
-
+	pthread_mutex_unlock(&_QMutex);
 }
 void Mailbox::printQ(list<Message*> l){
+	pthread_mutex_lock(&_QMutex);
 	for(unsigned  int i=0; i<l.size(); ++i){
 		string s ;
 		Message* m = l.front();
@@ -89,6 +103,7 @@ void Mailbox::printQ(list<Message*> l){
 		cout << endl;
 		cout << "----------------"<<endl;
 	}//end if*/
+	pthread_mutex_unlock(&_QMutex);
 }
 
 
