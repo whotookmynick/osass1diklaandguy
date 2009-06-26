@@ -10,7 +10,7 @@ using namespace std;
 class Message
 {
 public:
-	virtual string toString(Message* msg)=0;
+	//virtual string toString(Message* msg)=0;
 	virtual int getSrc()=0;
 	virtual int getDes()=0;
 	virtual string getContent()=0;

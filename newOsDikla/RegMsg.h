@@ -8,7 +8,7 @@ public:
 	RegMsg();
 	virtual ~RegMsg();
 public:
-	string toString(Message* msg);
+	//string toString(Message* msg);
 	int getSrc();
 	int getDes();
 	string getContent();

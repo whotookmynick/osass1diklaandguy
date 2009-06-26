@@ -9,7 +9,7 @@ public:
 	virtual ~InitMsg();
 
 public:
-
+	//string toString(Message* msg);
 	int getSrc();
 	int getDes();
 	string getContent();

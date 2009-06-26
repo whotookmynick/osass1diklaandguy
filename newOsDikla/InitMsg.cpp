@@ -23,3 +23,6 @@ int InitMsg::getDes(){
 string InitMsg::getContent(){
 	return _msgContent;
 };
+/*string  InitMsg::toString(Message* msg){
+	return "TODO";
+}*/

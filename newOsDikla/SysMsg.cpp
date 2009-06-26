@@ -24,3 +24,6 @@ SysMsg::~SysMsg()
 	string SysMsg::getContent(){
 		return _msgContent;
 	};
+/* string  SysMsg::toString(Message* msg){
+		return "TODO";
+	}*/

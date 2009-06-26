@@ -149,10 +149,12 @@ void Shell::start(){
 }
 
 void Shell::createNet(const char * file){
+//	cout<<" vvv ";
 	string line;
 	ifstream netFile;
 	vector<string> args;
 	netFile.open(file);
+
 	if (netFile.is_open()) {
 		while (!netFile.eof() ) {
 	      getline (netFile,line);
@@ -161,6 +163,7 @@ void Shell::createNet(const char * file){
 	      args.push_back(line);
 		}//end while
 	}//end if
+
 	insertArgs(args);
 
 	netFile.close();
@@ -245,11 +248,12 @@ void Shell::insertArgs(vector <string> argToNet){
 		if(DEBUG){
 			cout<<"the firstNode buf: "<<buf<<endl;
 		}
-
-		int firstNode = atoi(result);
-
+		int firstNode ;
+		//if(result!=0){
+			 firstNode = atoi(result);
+		//}
 		if(DEBUG){
-			cout<<"the int first node is: "<<firstNode<<endl;
+			//cout<<"the int first node is: "<<firstNode<<endl;
 		}
 
 		while( result != NULL ) {

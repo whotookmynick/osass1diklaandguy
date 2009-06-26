@@ -21,4 +21,3 @@ bool Mailbox::insertMsg(Message* m){
 	}
 	return false;
 }//insert message in the mailbox
-

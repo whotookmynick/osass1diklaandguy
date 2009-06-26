@@ -26,7 +26,7 @@ class Mailer
 		Mailer(Shell& shell,int numOfWorkers,int bufSize);
 		virtual ~Mailer();
 		bool addMsgToInbox(Message* msg);
-		void printInbox(const vector<void*>& v);
+		void printInbox(vector<Message*> v);
 		bool killNode(int nodeId);
 		bool rcvPacket(Message* msg);
 };
