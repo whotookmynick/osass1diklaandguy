@@ -16,13 +16,16 @@ _inboxSize(bufSize),_inbox(),_mailBoxes(){
 	for( int i=0;i<numOfWorkers;i++ ){
 		_mailBoxes[i]=new Mailbox();
 	}
-
+	pthread_mutexattr_init(&_mtxattr);
+	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutex_init(&_inboxMutex, &_mtxattr);
 }
 
 
 extern "C"{
 	void* mailerWrapper(void* f){
 		((Mailer*)f)->run();
+		return NULL;
 	}
 }
 
@@ -35,11 +38,14 @@ void Mailer::run(){
 	}
 }
 bool Mailer:: addMsgToInbox(Message* msg){
+	pthread_mutex_lock(&_inboxMutex);
 	_inbox.push_back(msg);
+	pthread_mutex_unlock(&_inboxMutex);
 	return true;
 }
 
 void Mailer::printInbox(vector<Message*> v){
+	pthread_mutex_lock(&_inboxMutex);
 	if(v.empty()){
 		cout<<" ERROR : trying to print null vector of messages"<<endl;
 		return;
@@ -57,10 +63,11 @@ void Mailer::printInbox(vector<Message*> v){
 			}
 		}//end for
 	}//end if
+	pthread_mutex_unlock(&_inboxMutex);
 }
 
 bool Mailer::killNode(int nodeId){
-
+	pthread_mutex_lock(&_inboxMutex);
 	string msg = "kill node "+ nodeId;
 	//if(DEBUG){
 		cout<<"kill node : " <<nodeId<<endl;
@@ -68,28 +75,35 @@ bool Mailer::killNode(int nodeId){
 
 
 	_shell.printMsgFromMailer(msg);
+	pthread_mutex_unlock(&_inboxMutex);
 	return false;
 }
+
 bool Mailer::rcvPacket(Message* msg){//string sourceID,string targetID,string textMsg
+	pthread_mutex_lock(&_inboxMutex);
 	_inbox.push_back(msg);
 	cout<<" printing inbox " <<endl;
 	printInbox(_inbox);
 	//string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
 	//deliverMsgToMailBox();//TODO remove
+	pthread_mutex_unlock(&_inboxMutex);
 	return true;
 }
 
 //deliver ong msg to the next des
 bool Mailer::deliverMsgToMailBox(){
-	cout<<" start to deliver "<<endl;
+	pthread_mutex_lock(&_inboxMutex);
+	//	cout<<" start to deliver "<<_inbox.size()<<endl;
 	if(_inbox.empty()){
-		cout<<" ERORR: inbox is Empty "<<endl;
+		//cout<<" ERORR: inbox is Empty "<<endl;
+		pthread_mutex_unlock(&_inboxMutex);
 		return false;
 	}
 	Message* m = _inbox.back();
 	_inbox.pop_back();
 	if(m==NULL){
-		cout<<" ERORR: msg is Empty "<<endl;
+		//cout<<" ERORR: msg is Empty "<<endl;
+		pthread_mutex_unlock(&_inboxMutex);
 		return false;
 	}
 	int sendTo = m->getNext();
@@ -100,9 +114,16 @@ bool Mailer::deliverMsgToMailBox(){
 	cout<<" to mailBox: "<<sendTo<<endl;
 	_mailBoxes[sendTo]->insertMsg(m);
 	_mailBoxes[sendTo]->printMailes();
+	pthread_mutex_unlock(&_inboxMutex);
 	return true;
 }
 
 Mailer::~Mailer()
 {
+	pthread_mutex_destroy(&_inboxMutex);
+	pthread_mutexattr_destroy(&_mtxattr);
+}
+Message* Mailer::readMails(int id){
+	return _mailBoxes[id]->readMsg();
+
 }

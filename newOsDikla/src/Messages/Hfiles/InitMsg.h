@@ -6,25 +6,15 @@ using namespace std;
 class InitMsg : public Message
 {
 public:
-	InitMsg();
+	InitMsg(int src,int dst,string textMsgatoi,int next);
 	virtual ~InitMsg();
 
 public:
-	//string toString(Message* msg);
-	int getSrc();
-	int getDes();
-	string getContent();
+
 	string getType();
-	void setNext(int nextId);
-	int getNext();
 	void printMsg();
 
-protected:
-	int _sendTo;
-	int _receiveFrom;
-	//string _msgType;//rt message system message
-	string _msgContent;
-	int _next;
+
 
 };
 

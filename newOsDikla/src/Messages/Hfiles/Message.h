@@ -11,12 +11,14 @@ class Message
 {
 public:
 	//virtual string toString(Message* msg)=0;
-	virtual int getSrc()=0;
-	virtual int getDes()=0;
-	virtual string getContent()=0;
+	Message(int src,int dst,string textMsgatoi,int next);
+	virtual ~Message();
+	virtual int getSrc();
+	virtual int getDes();
+	virtual string getContent();
 	virtual string getType()=0;
-	virtual void setNext(int nextId)=0;
-	virtual int getNext()=0;
+	virtual void setNext(int nextId);
+	virtual int getNext();
 	virtual void printMsg()=0;
 protected:
 	int _sendTo;

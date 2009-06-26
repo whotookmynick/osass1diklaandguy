@@ -29,4 +29,5 @@ class Mailbox {
 		bool insertMsg(Message* m);//insert message in the mailbox
 		void printMailes();
 		void printQ(list<Message*> l);
+		Message* readMsg();
 };

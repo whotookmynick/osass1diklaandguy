@@ -22,6 +22,8 @@ class Mailer
 		vector<Message* > _inbox;
 		vector<Mailbox* > _mailBoxes;
 		pthread_t _mailerThread;
+		pthread_mutex_t _inboxMutex;
+		pthread_mutexattr_t _mtxattr;
 		//void* mailerWrapper(void* f);
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize);
@@ -33,6 +35,7 @@ class Mailer
 		bool deliverMsgToMailBox();//deliver ong msg to the next des
 		void run();
 		void start();
+		Message* readMails(int id);
 };
 
 #endif /*MAILER_H_*/
