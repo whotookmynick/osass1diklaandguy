@@ -4,7 +4,7 @@
 class RegMsg : public Message
 {
 public:
-	RegMsg(int src,int dst,string textMsgatoi);
+	RegMsg(int src,int dst,string textMsgatoi,int next);
 	RegMsg();
 	virtual ~RegMsg();
 public:
@@ -13,11 +13,14 @@ public:
 	int getDes();
 	string getContent();
 	string getType();
+	void setNext(int nextId);
+	int getNext();
 protected:
 	int _sendTo;
 	int _receiveFrom;
 	//string _msgType;//rt message system message
 	string _msgContent;
+	int _next;
 
 };
 

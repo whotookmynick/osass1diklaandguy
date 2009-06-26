@@ -1,6 +1,7 @@
 #include "Hfiles/RegMsg.h"
 
-RegMsg::RegMsg(int src,int dst,string textMsgatoi):_receiveFrom(src),_sendTo(dst),_msgContent(textMsgatoi){}
+RegMsg::RegMsg(int src,int dst,string textMsgatoi,int next):
+	_receiveFrom(src),_sendTo(dst),_msgContent(textMsgatoi),_next(next){}
 
 RegMsg::RegMsg()
 {
@@ -25,6 +26,12 @@ int RegMsg::getDes(){
 string RegMsg::getContent(){
 	return _msgContent;
 };
+void RegMsg::setNext(int nextId){
+	_next = nextId;
+}
+int RegMsg::getNext(){
+	return _next;
+}
 /* string RegMsg::toString(Message* msg){
 	string startM =" msg from : ";
 	string to =" to " ;
