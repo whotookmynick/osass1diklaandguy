@@ -15,14 +15,17 @@ public:
 	virtual int getDes()=0;
 	virtual string getContent()=0;
 	virtual string getType()=0;
-	//void setNext(int nextId)virtual void setNext(int nextId);
+	virtual void setNext(int nextId)=0;
+	virtual int getNext()=0;
 protected:
 	int _sendTo;
 	int _receiveFrom;
 	//string _msgType;//rt message system message
 	string _msgContent;
+	int _next;
 
 
 };
 
 #endif /*MESSAGE_H_*/
+

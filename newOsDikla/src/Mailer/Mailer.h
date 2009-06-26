@@ -29,7 +29,8 @@ class Mailer
 		void printInbox(vector<Message*> v);
 		bool killNode(int nodeId);
 		bool rcvPacket(Message* msg);
-		bool deliverMsgToMailBox();//deliver ong msg to the des
+		bool deliverMsgToMailBox();//deliver ong msg to the next des
+
 };
 
 #endif /*MAILER_H_*/

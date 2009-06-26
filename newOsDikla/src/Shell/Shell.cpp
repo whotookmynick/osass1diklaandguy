@@ -176,7 +176,7 @@ void Shell::createNet(const char * file){
 void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 	int src = atoi(sourceID.c_str());
 	int dst = atoi(targetID.c_str());
-	RegMsg regMsg(src,dst,textMsg);//TODO need new????
+	RegMsg regMsg(src,dst,textMsg,src);//TODO need new????
 	//= new RegMsg();
 	//RegMsg msg = new RegMsg();
 	_mailer->rcvPacket((Message*)&regMsg);

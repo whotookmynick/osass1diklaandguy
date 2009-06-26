@@ -24,6 +24,12 @@ SysMsg::~SysMsg()
 	string SysMsg::getContent(){
 		return _msgContent;
 	};
+	void SysMsg::setNext(int nextId){
+		_next = nextId;
+	}
+	int SysMsg::getNext(){
+		return _next;
+	}
 /* string  SysMsg::toString(Message* msg){
 		return "TODO";
 	}*/

@@ -26,3 +26,9 @@ string InitMsg::getContent(){
 /*string  InitMsg::toString(Message* msg){
 	return "TODO";
 }*/
+void InitMsg::setNext(int nextId){
+	_next = nextId;
+}
+int InitMsg::getNext(){
+	return _next;
+}
