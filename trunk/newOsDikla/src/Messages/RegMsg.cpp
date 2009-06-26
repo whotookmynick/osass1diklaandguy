@@ -23,6 +23,7 @@ void RegMsg::printMsg(){
 	string content = getContent();
 	cout<<" msg from: "<<src<<" to: "<<des<<" throw: "<<nextId<<" --- "<<content<<endl;
 }
+
 /* string RegMsg::toString(Message* msg){
 	string startM =" msg from : ";
 	string to =" to " ;

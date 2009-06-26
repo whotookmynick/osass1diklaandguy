@@ -25,9 +25,7 @@ int Message::getDes(){
 	return _sendTo;
 };
 
-string Message::getContent(){
-	return _msgContent;
-};
+
 /*string  Message::toString(Message* msg){
 	return "TODO";
 }*/
@@ -36,4 +34,7 @@ void Message::setNext(int nextId){
 }
 int Message::getNext(){
 	return _next;
+}
+string Message::getContent(){
+	return _msgContent;
 }

@@ -3,9 +3,9 @@
 #define DEBUG false
 Mailer* mailer;
 
-Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize)
+Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize,int* negibors)
 :_shell(shell),_numOfWorkers(numOfWorkers),
-_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(){
+_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors){
 	//int mailBox
 	cout<<" number of workers: "<<_numOfWorkers<<endl;
 	cout<<" buffer size: "<<_inboxSize<<endl;
@@ -33,8 +33,10 @@ void Mailer::start(){
 	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
 
 	for(int i=1 ; i<=_numOfWorkers; i++){
+		int** nigborsMatrix = _shell.getNigebors();
+		int* n = nigborsMatrix[i];
 		Worker* workeri;
-		workeri= new Worker(i,*this);
+		workeri= new Worker(i,*this,n,_numOfWorkers);
 		_workers[i]=workeri;
 		workeri->start();
 	}

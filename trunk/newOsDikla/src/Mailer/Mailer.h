@@ -28,7 +28,7 @@ class Mailer
 		pthread_mutexattr_t _mtxattr;
 		//void* mailerWrapper(void* f);
 	public:
-		Mailer(Shell& shell,int numOfWorkers,int bufSize);
+		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors);
 		virtual ~Mailer();
 		bool addMsgToInbox(Message* msg);
 		void printInbox(list<Message*> v);
@@ -38,6 +38,7 @@ class Mailer
 		void run();
 		void start();
 		Message* readMails(int id);
+		int* _neigbors;
 };
 
 #endif /*MAILER_H_*/

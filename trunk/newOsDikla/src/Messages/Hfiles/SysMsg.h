@@ -2,11 +2,12 @@
 #define SYSMSG_H_
 #include "Message.h"
 #include <iostream>
+#include "Worker/RT.h"
 using namespace std;
 class SysMsg : public Message
 {
 public:
-	SysMsg(int src,int dst,string textMsgatoi,int next);
+	SysMsg(int src,int dst,string msgContent,int next);
 	virtual ~SysMsg();
 
 public:
@@ -15,7 +16,10 @@ public:
 	void printMsg();
 
 
-
+	string _msgContent;
+	RT* _rt;
+	void setRT(RT* rt);
+	RT* getRT(RT* rt);
 };
 
 #endif /*SYSMSG_H_*/

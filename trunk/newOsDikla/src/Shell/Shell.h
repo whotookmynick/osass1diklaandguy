@@ -14,30 +14,34 @@ using namespace std;
 class Mailer;
 
 class Shell {
-public:
-	Shell();
-	~Shell();
-	Mailer* _mailer;
-	int _bufferSize;
-	int _numberOfNodes;
-	vector<int> _nodesVector;
-	int** _neighbor;
-	//void creatNet( const char file [] );
-	void insertArgs(vector <string> argToNet);
-//	*vector<string> parse(char *str, char *delimiters);
-	int ** makeMatrix(unsigned int numberOfNodes_);
-	void  initMatrix(unsigned int numberOfNodes,int **matrix);
-	void printMatrix(unsigned int numberOfNodes,int **matrix);
-	void Exit(int i);
-	void createNet(const char file []) ;
-	void killNode(int id) ;
-    void reviveNode() ;
-    void killAll() ;
-	void printRt() ;
-	void sendPacket(string sourceID,string targetID,string textMsg);
-	void Run() ;
-	void start();
-	void printMsgFromMailer(string msg);
+	public:
+		Shell();
+		~Shell();
+
+		Mailer* _mailer;
+		int _bufferSize;
+		int _numberOfNodes;
+		vector<int> _nodesVector;
+		int** _neighbor;
+
+
+		//void creatNet( const char file [] );
+		void insertArgs(vector <string> argToNet);
+	//	*vector<string> parse(char *str, char *delimiters);
+		int ** makeMatrix(unsigned int numberOfNodes_);
+		void  initMatrix(unsigned int numberOfNodes,int **matrix);
+		void printMatrix(unsigned int numberOfNodes,int **matrix);
+		void Exit(int i);
+		void createNet(const char file []) ;
+		void killNode(int id) ;
+		void reviveNode() ;
+		void killAll() ;
+		void printRt() ;
+		void sendPacket(string sourceID,string targetID,string textMsg);
+		void Run() ;
+		void start();
+		void printMsgFromMailer(string msg);
+		int** getNigebors();
 
 };
 #endif /*SHELL_H_*/
