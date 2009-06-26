@@ -32,6 +32,17 @@ void RegMsg::setNext(int nextId){
 int RegMsg::getNext(){
 	return _next;
 }
+void RegMsg::printMsg(){
+	if (this==NULL){
+		cout<<"ERROR: i am NULL msg "<<endl;
+		return ;
+	}
+	int src = getSrc();
+	int des = getDes();
+	int nextId = getNext();
+	string content = getContent();
+	cout<<" msg from: "<<src<<" to: "<<des<<" throw: "<<nextId<<" --- "<<content<<endl;
+}
 /* string RegMsg::toString(Message* msg){
 	string startM =" msg from : ";
 	string to =" to " ;

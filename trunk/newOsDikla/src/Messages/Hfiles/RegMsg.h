@@ -1,6 +1,9 @@
 #ifndef REGMSG_H_
 #define REGMSG_H_
 #include "Message.h"
+#include <iostream>
+using namespace std;
+
 class RegMsg : public Message
 {
 public:
@@ -15,6 +18,8 @@ public:
 	string getType();
 	void setNext(int nextId);
 	int getNext();
+	void printMsg();
+
 protected:
 	int _sendTo;
 	int _receiveFrom;
