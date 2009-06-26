@@ -43,7 +43,7 @@ bool Worker::studentRecv(void **args) {
 //									Run and Broadcast
 //--------------------------------- -----------------------------------------------
  void Worker::run(){
-	 //broadcast();
+	 broadcast();
 	 while(true){
 		 Message* msg = _mailer.readMails(getId());
 		 if(msg==NULL){
@@ -51,6 +51,10 @@ bool Worker::studentRecv(void **args) {
 			 yield();
 		 }
 		 else {
+			 string type = msg->getType();
+			 if(type=="Sys"){
+				 rcvSysMsg((SysMsg*) msg);
+			 }
 			 cout<<" i am your worker my id "<<_id<<endl;
 			 msg->printMsg();}
 	 }
@@ -64,9 +68,16 @@ bool Worker::studentRecv(void **args) {
 		 else{
 			 SysMsg* m = new SysMsg(_id,i,"RT msg",i);
 			 m->setRT(_myRT);
+			 _mailer.rcvPacket(m);
 		 }//end else
 
 	 }//end for
  }//end broadcast
 
+ //---------------------------------------------------------------------------------
+ //									RT
+ //--------------------------------- -----------------------------------------------
 
+ void Worker::rcvSysMsg(SysMsg* msg){
+
+ }

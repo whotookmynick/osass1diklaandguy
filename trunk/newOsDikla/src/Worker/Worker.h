@@ -25,7 +25,7 @@ class Worker: public OSThread
 		bool studentSend(void *args);
 		/* studentRecv - an abstract method that is used to receive a message */
 		bool studentRecv(void **args);
-
+		void rcvSysMsg(SysMsg*msg);
 };
 
 #endif /*WORKER_H_*/
