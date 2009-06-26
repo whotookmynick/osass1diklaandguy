@@ -17,6 +17,7 @@ public:
 	virtual string getType()=0;
 	virtual void setNext(int nextId)=0;
 	virtual int getNext()=0;
+	virtual void printMsg()=0;
 protected:
 	int _sendTo;
 	int _receiveFrom;

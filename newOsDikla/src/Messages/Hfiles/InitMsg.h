@@ -1,7 +1,8 @@
 #ifndef INITMSG_H_
 #define INITMSG_H_
 #include "Message.h"
-
+#include <iostream>
+using namespace std;
 class InitMsg : public Message
 {
 public:
@@ -16,6 +17,8 @@ public:
 	string getType();
 	void setNext(int nextId);
 	int getNext();
+	void printMsg();
+
 protected:
 	int _sendTo;
 	int _receiveFrom;

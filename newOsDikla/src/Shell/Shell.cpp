@@ -167,6 +167,7 @@ void Shell::createNet(const char * file){
 	insertArgs(args);
 
 	netFile.close();
+
 	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize);//mailer->...
 
 

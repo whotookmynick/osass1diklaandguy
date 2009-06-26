@@ -1,7 +1,8 @@
 #ifndef SYSMSG_H_
 #define SYSMSG_H_
 #include "Message.h"
-
+#include <iostream>
+using namespace std;
 class SysMsg : public Message
 {
 public:
@@ -16,6 +17,8 @@ public:
 	string getType();
 	void setNext(int nextId);
 	int getNext();
+	void printMsg();
+
 protected:
 	int _sendTo;
 	int _receiveFrom;

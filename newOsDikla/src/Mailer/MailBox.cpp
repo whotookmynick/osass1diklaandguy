@@ -1,12 +1,25 @@
 #include "MailBox.h"
 
 // Reads messages from the mailbox to destinyMsgQ.
+Mailbox::Mailbox(){
 
+}
+Mailbox::~Mailbox(){}
 bool Mailbox::readMsg(std::queue<Message*>& destinyMsgQ){
 	return true;
 }
 bool Mailbox::insertMsg(Message* m){
+	if(m==NULL){
+			cout<<" ERORR: msg is Empty "<<endl;
+			return false;
+	}
 	string type = m->getType();
+	cout<<" (insertMsg): ";
+	cout<<" to Q type: "<<type;
+	m->printMsg();
+	cout<<endl;
+
+
 	if(type == "Reg" ){
 		_RegQueue.push_back(m);
 		return true;
@@ -19,6 +32,7 @@ bool Mailbox::insertMsg(Message* m){
 		_sysQueue.push_back(m);
 		return true;
 	}
+	cout<<" no such type  "<< type << endl;
 	return false;
 }//insert message in the mailbox
 void Mailbox::printMailes(){
