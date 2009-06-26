@@ -19,6 +19,21 @@ _inboxSize(bufSize),_inbox(),_mailBoxes(){
 
 }
 
+
+extern "C"{
+	void* mailerWrapper(void* f){
+		((Mailer*)f)->run();
+	}
+}
+
+void Mailer::start(){
+	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
+}
+void Mailer::run(){
+	while(true){
+		deliverMsgToMailBox();
+	}
+}
 bool Mailer:: addMsgToInbox(Message* msg){
 	_inbox.push_back(msg);
 	return true;
@@ -60,7 +75,7 @@ bool Mailer::rcvPacket(Message* msg){//string sourceID,string targetID,string te
 	cout<<" printing inbox " <<endl;
 	printInbox(_inbox);
 	//string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
-	deliverMsgToMailBox();//TODO remove
+	//deliverMsgToMailBox();//TODO remove
 	return true;
 }
 

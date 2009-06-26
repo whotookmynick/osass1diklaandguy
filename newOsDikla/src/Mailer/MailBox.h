@@ -14,12 +14,13 @@ using namespace std;
 class Mailbox {
 	private:
 
-		pthread_mutex_t _QMutex;
+		pthread_mutex_t _QMutex;//define rec mutex
 		list<Message*> _sysQueue;//TODO remove
 		list<Message*> _RegQueue;
 		list<Message*> _IntQueue;
 
-	public:
+
+	public://pthread_mutex_lock(_QMutex) and unlock
 		Mailbox();
 		virtual ~Mailbox();
 
