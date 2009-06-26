@@ -25,7 +25,7 @@ int RegMsg::getDes(){
 string RegMsg::getContent(){
 	return _msgContent;
 };
-string RegMsg::toString(Message* msg){
+/* string RegMsg::toString(Message* msg){
 	string startM =" msg from : ";
 	string to =" to " ;
 	int src = getSrc();
@@ -46,3 +46,4 @@ string RegMsg::toString(Message* msg){
 	//char* sms =strcat(,getSrc() ); //" msg from : " + getSrc() +" to: "+ getDes() + " - " + getContent();
 	return srcToContent;
 }
+*/

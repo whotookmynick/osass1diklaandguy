@@ -14,10 +14,12 @@ bool Mailer:: addMsgToInbox(Message* msg){
 	return true;
 }
 
-void Mailer::printInbox(const vector<void*>& v){
+void Mailer::printInbox(vector<Message*> v){
 	if (!v.empty()){
 		for(int i=0; i<v.size(); ++i){
-			cout << v[i] << " ";
+			string s ;
+			Message* m = v[i];
+			cout<<" from: "<< m->getSrc()<<" to "<<m->getDes()<<" - "<<m->getContent()<<endl ;
 			cout << endl;
 			cout << "----------------"<<endl;
 		}//end for
@@ -37,7 +39,10 @@ bool Mailer::killNode(int nodeId){
 }
 bool Mailer::rcvPacket(Message* msg){//string sourceID,string targetID,string textMsg
 	_inbox.push_back(msg);
-	string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
+	vector<Message*> v=_inbox;
+	printInbox(v);
+	//string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
+
 	return true;
 }
 Mailer::~Mailer()
