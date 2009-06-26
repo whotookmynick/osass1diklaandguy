@@ -21,7 +21,8 @@ class Mailer
 		int _inboxSize;
 		vector<Message* > _inbox;
 		vector<Mailbox* > _mailBoxes;
-
+		pthread_t _mailerThread;
+		//void* mailerWrapper(void* f);
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize);
 		virtual ~Mailer();
@@ -30,7 +31,8 @@ class Mailer
 		bool killNode(int nodeId);
 		bool rcvPacket(Message* msg);
 		bool deliverMsgToMailBox();//deliver ong msg to the next des
-
+		void run();
+		void start();
 };
 
 #endif /*MAILER_H_*/

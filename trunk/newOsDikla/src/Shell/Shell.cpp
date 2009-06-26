@@ -169,7 +169,7 @@ void Shell::createNet(const char * file){
 	netFile.close();
 
 	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize);//mailer->...
-
+	_mailer->start();//mailer thread start
 
 }//end creatNet
 
