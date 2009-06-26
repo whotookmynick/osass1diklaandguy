@@ -6,8 +6,26 @@ Mailbox::Mailbox(){
 }
 Mailbox::~Mailbox(){}
 bool Mailbox::readMsg(std::queue<Message*>& destinyMsgQ){
-	return true;
+	return false ;
 }
+Message* Mailbox::readMsg(){
+	Message * m =NULL;
+	if(!_IntQueue.empty()){
+		m =_IntQueue.front();
+		_IntQueue.pop_front();
+	}
+	else if(!_sysQueue.empty()){
+		m = _sysQueue.front();
+		_sysQueue.pop_front();
+	}
+	else if(!_RegQueue.empty()){
+		m = _RegQueue.front();
+		_RegQueue.pop_front();
+
+	}
+	return m;
+}
+
 bool Mailbox::insertMsg(Message* m){
 	if(m==NULL){
 			cout<<" ERORR: msg is Empty "<<endl;
