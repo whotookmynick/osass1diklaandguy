@@ -18,7 +18,7 @@ class Mailbox {
 		list<Message*> _sysQueue;//TODO remove
 		list<Message*> _RegQueue;
 		list<Message*> _IntQueue;
-
+		pthread_mutexattr_t _mtxattr;
 
 	public://pthread_mutex_lock(_QMutex) and unlock
 		Mailbox();

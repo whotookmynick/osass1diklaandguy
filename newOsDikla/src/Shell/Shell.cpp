@@ -4,6 +4,7 @@
 #include "Messages/Hfiles/RegMsg.h"
 #include "Messages/Hfiles/InitMsg.h"
 #include "Messages/Hfiles/SysMsg.h"
+#include "Worker/Worker.h"
 #define DEBUG false
 #include <stdio.h>
 using namespace std;
@@ -171,6 +172,7 @@ void Shell::createNet(const char * file){
 	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize);//mailer->...
 	_mailer->start();//mailer thread start
 
+
 }//end creatNet
 
 
@@ -220,14 +222,14 @@ void Shell::insertArgs(vector <string> argToNet){
 	_bufferSize= atoi(bufferSize.c_str());
 	_numberOfNodes=atoi(nodNumber.c_str());
 
-	int ** neighbor = makeMatrix(_numberOfNodes);
-	initMatrix(_numberOfNodes,neighbor);
+	_neighbor = makeMatrix(_numberOfNodes);
+	initMatrix(_numberOfNodes,_neighbor);
 	if(DEBUG){
 		cout << "printing matrix before init:" << endl;
 		//printMatrix(numberOfNodes_,neighbor);
 
 		cout << "printing matrix after init:" << endl;
-		initMatrix(_numberOfNodes,neighbor);//TODO: init metrix even without DEBUG???
+		initMatrix(_numberOfNodes,_neighbor);//TODO: init metrix even without DEBUG???
 		//printMatrix(numberOfNodes_,neighbor);
 
 	}
@@ -264,10 +266,10 @@ void Shell::insertArgs(vector <string> argToNet){
 			 result = strtok( NULL, delims ); // get next Token
 			 // if result isn't null insert atoi (result) otherwise insert 0
 
-			 neighbor[firstNode][j]= (result!=NULL) ? atoi(result) : 0;//TODO : tell about change: in place of the first neigbors i will be is neigbors nodes
+			 _neighbor[firstNode][j]= (result!=NULL) ? atoi(result) : 0;//TODO : tell about change: in place of the first neigbors i will be is neigbors nodes
 
 			 if(DEBUG){
-			 cout<<"node :"<<firstNode<<" nigbore : "<<j<<" arry content for them : "<< neighbor[firstNode][j]<<endl;
+			 cout<<"node :"<<firstNode<<" nigbore : "<<j<<" arry content for them : "<< _neighbor[firstNode][j]<<endl;
 			 }
 
 			 j++;
@@ -279,7 +281,7 @@ void Shell::insertArgs(vector <string> argToNet){
 	if(DEBUG){
 		cout<<"in insertArgs "<<endl;
 		cout << "printing matrix after insert:" << endl;
-		printMatrix(_numberOfNodes,neighbor);
+		printMatrix(_numberOfNodes,_neighbor);
 	}
 
 
@@ -289,15 +291,15 @@ void Shell::insertArgs(vector <string> argToNet){
 
 
 int ** Shell::makeMatrix(unsigned int numberOfNodes_){
-	int ** neighbor = new int* [numberOfNodes_];//[numberOfNodes_];
-		for (unsigned int i=0; i<numberOfNodes_;i++){
+	int ** neighbor = new int* [numberOfNodes_+1];//[numberOfNodes_];
+		for (unsigned int i=0; i<numberOfNodes_+1;i++){
 			neighbor[i]= new int [numberOfNodes_];
 	}
     return neighbor;
 }
 void Shell:: initMatrix(unsigned int numberOfNodes,int **matrix){
 
-	for(unsigned int i = 0 ; i < numberOfNodes;i++){
+	for(unsigned int i = 0 ; i < numberOfNodes+1;i++){
 		for(unsigned int j = 0 ; j < numberOfNodes;j++){
 			matrix[i][j] = 0;
 		}

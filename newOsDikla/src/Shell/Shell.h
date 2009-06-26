@@ -8,6 +8,7 @@
 #include <vector>
 #include <string.h>
 #include <stdio.h>
+
 using namespace std;
 
 class Mailer;
@@ -20,6 +21,7 @@ public:
 	int _bufferSize;
 	int _numberOfNodes;
 	vector<int> _nodesVector;
+	int** _neighbor;
 	//void creatNet( const char file [] );
 	void insertArgs(vector <string> argToNet);
 //	*vector<string> parse(char *str, char *delimiters);

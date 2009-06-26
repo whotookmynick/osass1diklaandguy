@@ -17,13 +17,12 @@ Message::Message(int src,int dst,string textMsgatoi,int next):
 Message::~Message()
 {
 }
-int Message::getSrc(
-){
-	return _sendTo;
+int Message::getSrc(){
+	return _receiveFrom;
 };
 
 int Message::getDes(){
-	return _receiveFrom;
+	return _sendTo;
 };
 
 string Message::getContent(){

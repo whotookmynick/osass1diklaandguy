@@ -12,7 +12,11 @@ class Worker: public OSThread
 		void run();
 		Mailer& _mailer;
 		int getId();
+		/* studentSend - an abstract method that is used to send the message you wish to send */
+		bool studentSend(void *args);
 
+		/* studentRecv - an abstract method that is used to receive a message */
+		bool studentRecv(void **args);
 
 };
 

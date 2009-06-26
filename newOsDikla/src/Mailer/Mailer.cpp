@@ -1,19 +1,19 @@
 #include "Mailer.h"
-
+#include "Worker/Worker.h"
 #define DEBUG false
 Mailer* mailer;
 
 Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize)
 :_shell(shell),_numOfWorkers(numOfWorkers),
-_inboxSize(bufSize),_inbox(),_mailBoxes(){
+_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(){
 	//int mailBox
 	cout<<" number of workers: "<<_numOfWorkers<<endl;
 	cout<<" buffer size: "<<_inboxSize<<endl;
 
 	_inbox.resize(_inboxSize);
-	_mailBoxes.resize(_numOfWorkers);
-
-	for( int i=0;i<numOfWorkers;i++ ){
+	_mailBoxes.resize(_numOfWorkers+1);
+	_workers.resize(_numOfWorkers+1);
+	for( int i=0;i<numOfWorkers+1;i++ ){
 		_mailBoxes[i]=new Mailbox();
 	}
 	pthread_mutexattr_init(&_mtxattr);
@@ -31,6 +31,14 @@ extern "C"{
 
 void Mailer::start(){
 	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
+
+	for(int i=1 ; i<=_numOfWorkers; i++){
+		Worker* workeri;
+		workeri= new Worker(i,*this);
+		_workers[i]=workeri;
+		workeri->start();
+	}
+
 }
 void Mailer::run(){
 	while(true){
@@ -44,18 +52,18 @@ bool Mailer:: addMsgToInbox(Message* msg){
 	return true;
 }
 
-void Mailer::printInbox(vector<Message*> v){
+void Mailer::printInbox(list<Message*> v){
 	pthread_mutex_lock(&_inboxMutex);
 	if(v.empty()){
 		cout<<" ERROR : trying to print null vector of messages"<<endl;
 		return;
 	}
 	else if (!v.empty()){
-		for(unsigned int i=0; i<v.size(); ++i){
+		for(list<Message*>::iterator itr=v.begin(); itr!=v.end(); ++itr){
 			string s ;
-			Message* m = v[i];
+			Message* m = *itr;
 			if(m==NULL){
-				cout<<" No Msg in "<<i<<" position "<<endl;
+				cout<<" No Msg in inbox "<<endl;
 			}
 			else{
 				m->printMsg();
@@ -100,7 +108,7 @@ bool Mailer::deliverMsgToMailBox(){
 		return false;
 	}
 	Message* m = _inbox.back();
-	_inbox.pop_back();
+	_inbox.pop_front();
 	if(m==NULL){
 		//cout<<" ERORR: msg is Empty "<<endl;
 		pthread_mutex_unlock(&_inboxMutex);
@@ -113,6 +121,8 @@ bool Mailer::deliverMsgToMailBox(){
 	m->printMsg();
 	cout<<" to mailBox: "<<sendTo<<endl;
 	_mailBoxes[sendTo]->insertMsg(m);
+	//wake worker
+	_workers[sendTo]->setQuanta(1);
 	_mailBoxes[sendTo]->printMailes();
 	pthread_mutex_unlock(&_inboxMutex);
 	return true;
