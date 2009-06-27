@@ -18,7 +18,10 @@ class Worker: public OSThread
 		Mailer& _mailer;
 		int _numOfWorkers;
 		bool _active;
+		pthread_cond_t _condWait;
+		pthread_mutex_t _waitMutex;
 
+		void wait();
 		void broadcast();
 		void setActive(bool a);
 		bool getActive();

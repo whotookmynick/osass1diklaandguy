@@ -9,7 +9,7 @@ Mailer* mailer;
 //--------------------------------- -----------------------------------------------
 Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize,int* negibors)
 :_shell(shell),_numOfWorkers(numOfWorkers),
-_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors){
+_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNeeded(false){
 	//int mailBox
 	cout<<" number of workers: "<<_numOfWorkers<<endl;
 	cout<<" buffer size: "<<_inboxSize<<endl;
@@ -59,7 +59,11 @@ void Mailer::start(){
 
 void Mailer::run(){
 	while(true){
-		deliverMsgToMailBox();
+		if(_waitNeeded){
+			//do nothing
+		}else{
+			deliverMsgToMailBox();
+		}
 	}
 }
 
@@ -185,19 +189,14 @@ vector<Worker*> Mailer::getWorker(){
 //									????? TODO - needed????
 //--------------------------------- -----------------------------------------------
 bool Mailer::killNode(int nodeId){
-	pthread_mutex_lock(&_inboxMutex);
-	bool active;
-	string msg = "kill node "+ nodeId;
-	cout<<"kill node : " <<nodeId<<endl;
-	for (int i=1; i<=_numOfWorkers; i++){
-		active =  _workers[i]->getActive();
-		if(i!=nodeId && active){
-			//create sysMsg with the dead worker rt
-			_workers[i]->getRT()->setRtDis(nodeId,-1,-1);
-		}//end if
-	}//end fo
-	//updateWorkerRT(nodeId);
-	pthread_mutex_unlock(&_inboxMutex);
+	InitMsg* killme = new InitMsg(nodeId,nodeId,"killMe",nodeId);
+	rcvPacket(killme);
+	_waitNeeded=true;
+	for(int i=1; i<=_numOfWorkers; i++){
+		InitMsg* initRT = new InitMsg(i,i,"initRT",i);
+		rcvPacket(initRT);
+	}//end for
+	_waitNeeded=false;
 	return false;
 }
 
