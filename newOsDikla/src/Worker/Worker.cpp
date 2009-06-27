@@ -4,11 +4,13 @@
 //---------------------------------------------------------------------------------
 //									Contractor and detractor
 //--------------------------------- -----------------------------------------------
+
 Worker::Worker(int id,Mailer& mailer,int* neigbors,int numOfWorkers):_id(id),
-_mailer(mailer),_numOfWorkers(numOfWorkers)
+_mailer(mailer),_numOfWorkers(numOfWorkers),_active(true)
 {
 	_myRT =new RT(numOfWorkers,_id);
 }
+
 Worker::~Worker()
 {
 }
@@ -24,6 +26,16 @@ int Worker::getId(){
 RT* Worker::getRT(){
 	return _myRT;
 }
+
+bool Worker::getActive(){
+	return _active;
+}
+
+
+void Worker::setActive(bool a){
+	_active=a;
+}
+
 
 //---------------------------------------------------------------------------------
 //									OSthreads
@@ -61,11 +73,10 @@ bool Worker::studentRecv(void **args) {
 	 }
  }
 
-
-
  //---------------------------------------------------------------------------------
  //									RT
  //--------------------------------- -----------------------------------------------
+
  void Worker::broadcast(){//send my rt
 	 //move on all neighbors  and send them messgage with my RT
 	 for(int i = 1 ;i<=_numOfWorkers;i++){

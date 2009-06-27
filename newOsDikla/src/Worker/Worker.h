@@ -14,11 +14,14 @@ class Worker: public OSThread
 
 		int* _nighbors;
 		RT* _myRT;
-		void broadcast();
 		int _id;
 		Mailer& _mailer;
 		int _numOfWorkers;
+		bool _active;
 
+		void broadcast();
+		void setActive(bool a);
+		bool getActive();
 		RT* getRT();
 		void run();
 		int getId();

@@ -10,12 +10,12 @@
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
+
 RT::RT(int targetNumber,int owner):
 	_numberOfTargets(targetNumber),_owner(owner),_rtTable() {
 	_rtTable.resize(_numberOfTargets+1);
 	initRT();
 }
-
 
 RT::~RT() {
 
@@ -59,9 +59,16 @@ bool RT::setRT(RT* nighborRT){
 	return setMinimal;
 }
 
+void RT::setRtDis(int target,int dis,int next){
+	_rtTable[target]->distance = dis;
+	_rtTable[target]->next = next;
+}
+
+
 //---------------------------------------------------------------------------------
 //									getters and setters
 //--------------------------------- -----------------------------------------------
+
 vector<rtStruct*> RT::getRtTable(){
 	return _rtTable;
 }
@@ -69,6 +76,7 @@ vector<rtStruct*> RT::getRtTable(){
 int RT::getID(){
 			return _owner;
 }
+
 
 //---------------------------------------------------------------------------------
 //									print

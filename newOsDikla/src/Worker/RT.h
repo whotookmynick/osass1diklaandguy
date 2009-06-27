@@ -35,6 +35,7 @@ class RT {
 		void initRT();
 		void printRT();
 		int getID();
+		void setRtDis(int target,int dis,int next);
 };
 
 #endif /* RT_H_ */
