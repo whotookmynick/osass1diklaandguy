@@ -25,20 +25,20 @@ Mailbox::~Mailbox(){
 
 Message* Mailbox::readMsg(){
 	pthread_mutex_lock(&_QMutex);
-	Message * m =NULL;
-	if(!_IntQueue.empty()){
-		m =_IntQueue.front();
-		_IntQueue.pop_front();
-	}
-	else if(!_sysQueue.empty()){
-		m = _sysQueue.front();
-		_sysQueue.pop_front();
-	}
-	else if(!_RegQueue.empty()){
-		m = _RegQueue.front();
-		_RegQueue.pop_front();
+		Message * m =NULL;
+		if(!_IntQueue.empty()){
+			m =_IntQueue.front();
+			_IntQueue.pop_front();
+		}
+		else if(!_sysQueue.empty()){
+			m = _sysQueue.front();
+			_sysQueue.pop_front();
+		}
+		else if(!_RegQueue.empty()){
+			m = _RegQueue.front();
+			_RegQueue.pop_front();
 
-	}
+		}
 	pthread_mutex_unlock(&_QMutex);
 	return m;
 }
@@ -51,23 +51,25 @@ bool Mailbox::insertMsg(Message* m){
 			return false;
 	}
 	string type = m->getType();
-	cout<<" (insertMsg): ";
-	cout<<" to Q type: "<<type;
-	m->printMsg();
-	cout<<endl;
 
+	cout<<" MESSAGE:  ";
+	m->printMsg();
 
 	if(type == "Reg" ){
+		cout<<" was inserted to REG Q "<<m->getContent()<<endl;
 		_RegQueue.push_back(m);
 		pthread_mutex_unlock(&_QMutex);
 		return true;
 	}
+
 	if(type == "Init" ){
+		cout<<" was inserted to INIT Q "<<m->getContent()<<endl;
 		_IntQueue.push_back(m);
 		pthread_mutex_unlock(&_QMutex);
 		return true;
 	}
 	if(type == "Sys" ){
+		cout<<" was inserted to SYS Q "<<m->getContent()<<endl;
 		_sysQueue.push_back(m);
 		pthread_mutex_unlock(&_QMutex);
 		return true;

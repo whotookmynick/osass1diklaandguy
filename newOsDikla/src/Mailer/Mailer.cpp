@@ -23,6 +23,8 @@ _inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNe
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&_inboxMutex, &_mtxattr);
+	pthread_mutex_init(&_waitMutex,NULL);
+	pthread_cond_init(&_condWait,NULL);
 }
 
 
@@ -30,6 +32,8 @@ Mailer::~Mailer()
 {
 	pthread_mutex_destroy(&_inboxMutex);
 	pthread_mutexattr_destroy(&_mtxattr);
+	pthread_mutex_destroy(&_waitMutex);
+	pthread_cond_destroy(&_condWait);
 }
 
 //---------------------------------------------------------------------------------
@@ -55,6 +59,7 @@ void Mailer::start(){
 		Worker* workeri;
 		workeri= new Worker(i,*this,n,_numOfWorkers,_numOfNighbors[i]);
 		_workers[i]=workeri;
+		cout<<" start worker " << i<<endl;
 		workeri->start();
 	}
 	_waitNeeded = false;
@@ -63,7 +68,7 @@ void Mailer::start(){
 void Mailer::run(){
 	while(true){
 		if(_waitNeeded){
-			//do nothing
+			cout<<" mailer is waitingggggggggggggggggg  "<<endl;
 		}else{
 			deliverMsgToMailBox();
 		}
@@ -191,14 +196,15 @@ vector<Worker*> Mailer::getWorker(){
 
 
 //---------------------------------------------------------------------------------
-//									????? TODO - needed????
+//									kill
 //--------------------------------- -----------------------------------------------
 bool Mailer::killNode(int nodeId){
-	InitMsg* killme = new InitMsg(nodeId,nodeId,"lll",nodeId);
+	InitMsg* killme = new InitMsg(nodeId,nodeId,"killMe",nodeId);
 	rcvPacket(killme);
 	_waitNeeded=true;
+	InitMsg* initRT;
 	for(int i=1; i<=_numOfWorkers; i++){
-		InitMsg* initRT = new InitMsg(i,i,"initRT",i);
+		initRT = new InitMsg(i,i,"initRT",i);
 		rcvPacket(initRT);
 	}//end for
 	_waitNeeded=false;
@@ -220,4 +226,25 @@ bool Mailer::reviveNode(int nodeId){
 	 */
 	pthread_mutex_unlock(&_inboxMutex);
 	return true;
+}
+void Mailer::killall(){
+	pthread_mutex_lock(&_waitMutex);
+	cout<<" we all gonna DIEEEEE :( "<<endl;
+	for(int i=1; i<=_numOfWorkers; i++){
+			_workers[i]->wait();
+		}
+
+	pthread_cond_wait(&_condWait,&_waitMutex);
+	pthread_mutex_unlock(&_waitMutex);
+
+}
+void Mailer::notify(){
+	pthread_mutex_lock(&_waitMutex);
+	cout<<" we all  gonna LIVEEE!!! "<<endl;
+	for(int i=1; i<=_numOfWorkers; i++){
+			_workers[i]->notify();
+		}
+
+	pthread_cond_signal(&_condWait);
+	pthread_mutex_unlock(&_waitMutex);
 }

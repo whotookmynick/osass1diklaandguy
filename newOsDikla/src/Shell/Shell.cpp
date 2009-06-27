@@ -192,19 +192,8 @@ void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 }
 
 void Shell::killAll()  {
+	_mailer->killall();
 
-	vector<Worker*> workers =_mailer->getWorker();
-	Worker* worker;
-	RT* workerRT ;
-	for(int i=1 ; i<_numberOfNodes+1;i++){
-		worker = workers[i];
-		if(worker->getActive()){
-			//print rt msg
-			workerRT = worker->getRT();
-			workerRT->initRT();
-			worker->setActive(false);
-		}
-	}
 }//end kill all
 
 void Shell::killNode(int id) {
@@ -219,15 +208,10 @@ void Shell::reviveNode(int id)  {
 
 }
 
-//---------------------------------------------------------------------------------
-//					TODO
-//--------------------------------- -----------------------------------------------
-
 void Shell::Run()  {
-	//TODO
+	_mailer->notify();
 
 }
-
 
 //---------------------------------------------------------------------------------
 //					set _bufferSize,_numberOfNodes,_neighbor and _neighbor
@@ -269,7 +253,7 @@ void Shell::insertArgs(vector <string> argToNet){
 		_numOfNighbors[firstNode]=_numOfNighbors[firstNode]-1;
 		cout<<" numbers of nighbors for node "<<firstNode<<" == "<<_numOfNighbors[firstNode]<<endl;
 		cout << endl;
-		printnighbors(firstNode,_numOfNighbors[firstNode]);
+		//printnighbors(firstNode,_numOfNighbors[firstNode]);
 	}//end for
 
 }//end insert
