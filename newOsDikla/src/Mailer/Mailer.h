@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "Shell/Shell.h"
 #include "Messages/Hfiles/Message.h"
+#include "Messages/Hfiles/InitMsg.h"deliverMsgToMailBox();
 #include "Mailer/MailBox.h"
 #include <vector>
 #include <string>
@@ -27,6 +28,7 @@ class Mailer
 		pthread_mutex_t _inboxMutex;
 		pthread_mutexattr_t _mtxattr;
 		//void* mailerWrapper(void* f);
+		bool _waitNeeded;
 
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors);

@@ -207,9 +207,9 @@ void Shell::killAll()  {
 }//end kill all
 
 void Shell::killNode(int id) {
-	Worker* worker = _mailer->getWorker()[id];
-	worker->getRT()->initRT();
-	worker->setActive(false);
+
+	//worker->getRT()->initRT();
+	//worker->setActive(false);
 	_mailer->killNode(id);
 }
 

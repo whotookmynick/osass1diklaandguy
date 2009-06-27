@@ -9,10 +9,14 @@ Worker::Worker(int id,Mailer& mailer,int* neigbors,int numOfWorkers):_id(id),
 _mailer(mailer),_numOfWorkers(numOfWorkers),_active(true)
 {
 	_myRT =new RT(numOfWorkers,_id);
+	pthread_mutex_init(&_waitMutex,NULL);
+	pthread_cond_init(&_condWait,NULL);
 }
 
 Worker::~Worker()
 {
+	pthread_mutex_destroy(&_waitMutex);
+	pthread_cond_destroy(&_condWait);
 }
 
 
@@ -65,13 +69,30 @@ bool Worker::studentRecv(void **args) {
 		 }
 		 else {
 			 string type = msg->getType();
+			 if(type=="Init"){
+				 string initM = msg->getContent();
+				 if(initM=="killMe"){
+					 wait();
+				 }else if(initM=="initRT"){
+					 _myRT->initRT();
+					 broadcast();
+				 }
+
+			 }
 			 if(type=="Sys"){
 				 rcvSysMsg((SysMsg*) msg);
 			 }
 			 cout<<" i am your worker my id "<<_id<<endl;
 			 msg->printMsg();}
+
 	 }
  }
+void Worker::wait(){
+	pthread_mutex_lock(&_waitMutex);
+	pthread_cond_wait(&_condWait,&_waitMutex);
+	pthread_mutex_unlock(&_waitMutex);
+
+}
 
  //---------------------------------------------------------------------------------
  //									RT

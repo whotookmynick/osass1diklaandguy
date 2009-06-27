@@ -28,10 +28,12 @@ class RT {
 
 		int _numberOfTargets;
 		int _owner;
-		vector<rtStruct*> _rtTable;
+		vector<rtStruct> _rtTable;
+
+
 
 		bool setRT(RT* nighborRT);
-		vector<rtStruct*> getRtTable();
+		vector<rtStruct> getRtTable();
 		void initRT();
 		void printRT();
 		int getID();
