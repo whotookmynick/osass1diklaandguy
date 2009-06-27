@@ -19,7 +19,7 @@ class Worker: public OSThread
 		Mailer& _mailer;
 		int _numOfWorkers;
 
-
+		RT* getRT();
 		void run();
 		int getId();
 		/* studentSend - an abstract method that is used to send the message you wish to send */

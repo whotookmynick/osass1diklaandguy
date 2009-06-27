@@ -37,48 +37,94 @@ void Shell::start(){
     	  getline(cin,arg);
     	  //cout << "your choice : " <<arg<<endl;
 
-    	  //------1--------
+
+  //##############################################################################
+  //						DONE
+  //##############################################################################
+  //------Exit--------
     	  if(arg=="Exit"){
     		  cout<<"your choice is : exit "<<endl;
     		 Exit(0);
     	  }
+  //------CreateNet--------
+		  else if(arg=="CreateNet"){
+			  cout<<"your choice is : CreateNet "<<endl;
+			  cout<<"pleas enter file configuration name : "<<endl;
+			  getline(cin,fileConfig);
+			  createNet(fileConfig.c_str());
+			//cout<<"in start creat "<<endl;
+			  goto GET_COMMAND;
 
-    	  //------2--------
-    	  else if(arg=="CreateNet"){
-    		  cout<<"your choice is : CreateNet "<<endl;
-    		  cout<<"pleas enter file configuration name : "<<endl;
-    		  getline(cin,fileConfig);
-    		  createNet(fileConfig.c_str());
-    		//cout<<"in start creat "<<endl;
-    		  goto GET_COMMAND;
+    	   }
+//------PrintRT--------
+		  else if(arg=="PrintRT"){
+			  cout<<"your choice is : PrintRT "<<endl;
+			  cout<<"pleas enter the node id you wan'a is RT view : "<<endl;
+			  getline(cin,uniqueID);
+			  if(uniqueID==""){
+				  goto GET_COMMAND;
+			   }
+			  printRt(atoi(uniqueID.c_str()));
+			  goto GET_COMMAND;
+		  }
+//------SendPacket--------
+		  else if(arg=="SendPacket"){
+			  cout<<"your choice is : SendPacket "<<endl;
 
-    	  }
+			  cout<<"pleas enter the sourceID : "<<endl;
+			  getline(cin,sourceID);
+			  if(sourceID==""){
+				  goto GET_COMMAND;
+			  }
+			  cout<<"pleas enter the targetID : "<<endl;
+			  getline(cin,targetID);
+			  if(targetID==""){
+				  goto GET_COMMAND;
+			  }
+			  cout<<"pleas enter the textMsg : "<<endl;
+			  getline(cin,textMsg);
+			  if(textMsg==""){
+				  goto GET_COMMAND;
+			  }
+			  sendPacket(sourceID,targetID,textMsg);
+			  goto GET_COMMAND;
+		  }
 
-    	  //------3--------
-    	  else if(arg=="KillNode"){
-    		  cout<<"your choice is : KillNode "<<endl;
-    		  cout<<"pleas enter the node id you wan'a kill : "<<endl;
-    		  getline(cin,uniqueID);
-    		  if(uniqueID==""){
-    		   	  goto GET_COMMAND;
-    		 }
-    		  if (_mailer==NULL){
-    			  cout<<"you dont have any mailer "<<endl;
-    			  goto GET_COMMAND;
-    		  }
-    		  //if(DEBUG){
-    		    cout<<"goto killNode "<<endl;
-    		    //}
-    		    killNode(atoi(uniqueID.c_str()));
+//------Killall--------
+		  else if(arg=="Killall"){
+			  cout<<"your choice is : Killall "<<endl;
+			  killAll();
+			  goto GET_COMMAND;
 
-    		  	//if(DEBUG){
-    		  	cout<<"return from killNode "<<endl;
-    		  	//}
-    			goto GET_COMMAND;
+		  }
+  //##############################################################################
+  //						TODO
+  //##############################################################################
+ //------KillNode--------
+		  else if(arg=="KillNode"){
+			  cout<<"your choice is : KillNode "<<endl;
+			  cout<<"pleas enter the node id you wan'a kill : "<<endl;
+			  getline(cin,uniqueID);
+			  if(uniqueID==""){
+				  goto GET_COMMAND;
+			 }
+			  if (_mailer==NULL){
+				  cout<<"you dont have any mailer "<<endl;
+				  goto GET_COMMAND;
+			  }
+			  //if(DEBUG){
+				cout<<"goto killNode "<<endl;
+				//}
+				killNode(atoi(uniqueID.c_str()));
+
+				//if(DEBUG){
+				cout<<"return from killNode "<<endl;
+				//}
+				goto GET_COMMAND;
 
     	  	   }
 
-    	  //------4--------
+//------ReviveNode--------
     	  else if(arg== "ReviveNode"){
     		  cout<<"your choice is : ReviveNode "<<endl;
     		  cout<<"pleas enter the node id you wan'a revive : "<<endl;
@@ -91,53 +137,9 @@ void Shell::start(){
 
     	  }
 
-    	  //------5--------
-    	  else if(arg=="Killall"){
-    		  cout<<"your choice is : Killall "<<endl;
-    		  killAll();
-    		  goto GET_COMMAND;
-
-    	  }
-
-    	  //------6--------
-    	  else if(arg=="PrintRT"){
-
-    		  cout<<"your choice is : PrintRT "<<endl;
-    		  cout<<"pleas enter the node id you wan'a is RT view : "<<endl;
-    		  getline(cin,uniqueID);
-    		  if(uniqueID==""){
-    		  	  goto GET_COMMAND;
-    		   }
-    		  printRt();
-    		  goto GET_COMMAND;
 
 
-    	  }
-
-    	  //------7--------
-    	  else if(arg=="SendPacket"){
-    		  cout<<"your choice is : SendPacket "<<endl;
-
-			  cout<<"pleas enter the sourceID : "<<endl;
-			  getline(cin,sourceID);
-			  if(sourceID==""){
-				  goto GET_COMMAND;
-			  }
-    		  cout<<"pleas enter the targetID : "<<endl;
-    		  getline(cin,targetID);
-    		  if(targetID==""){
-    			  goto GET_COMMAND;
-    		  }
-    		  cout<<"pleas enter the textMsg : "<<endl;
-    		  getline(cin,textMsg);
-    		  if(textMsg==""){
-    			  goto GET_COMMAND;
-    		  }
-    		  sendPacket(sourceID,targetID,textMsg);
-    		  goto GET_COMMAND;
-		  }
-
-    	  //------8--------
+//------Run--------
     	  else if(arg=="Run"){
     		  cout<<"your choice is : Run "<<endl;
     		  Run();
@@ -172,7 +174,7 @@ void Shell::Exit(int i){
 	exit(i);
 }
 //---------------------------------------------------------------------------------
-//					Reg messages
+//					SYS Reg messages
 //--------------------------------- -----------------------------------------------
 void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 	int src = atoi(sourceID.c_str());
@@ -183,25 +185,30 @@ void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 	_mailer->rcvPacket(regMsg);
 }
 
-//---------------------------------------------------------------------------------
-//					TODO
-//--------------------------------- -----------------------------------------------
+void Shell::killAll()  {
+	vector<Worker*> workers =_mailer->getWorker();
+	Worker* worker;
+	RT* workerRT ;
+	for(int i=1 ; i<_numberOfNodes+1;i++){
+		worker = workers[i];
+		//print rt msg
+		workerRT = worker->getRT();
+		workerRT->initRT();
+	}
+}//end kill all
+
+
 void Shell::killNode(int id) {
 	bool kill = _mailer->killNode(id);
 	cout<<kill<<endl;
 }
 
+
+//---------------------------------------------------------------------------------
+//					TODO
+//--------------------------------- -----------------------------------------------
+
 void Shell::reviveNode()  {
-	//TODO
-
-}
-
-void Shell::killAll()  {
-	//TODO
-
-}
-
-void Shell::printRt()  {
 	//TODO
 
 }
@@ -292,6 +299,13 @@ void Shell:: printMsgFromMailer(string msg){
 	cout<<"mailer answer was: "<<msg<<endl;
 }
 
+void Shell::printRt(int uniqueID)  {
+	vector<Worker*> workers =_mailer->getWorker();
+	Worker* worker = workers[uniqueID];
+	//print rt msg
+	RT* workerRT = worker->getRT();
+	workerRT->printRT();
+}
 
 //---------------------------------------------------------------------------------
 //									getters and setters

@@ -23,7 +23,8 @@ RT::~RT() {
 
 void RT::initRT(){
 	for(int i=1; i<=_numberOfTargets;i++){
-		if(i=_owner){
+		_rtTable[i]->target = i;
+		if( i==_owner){
 			_rtTable[i]->distance = 0;
 			_rtTable[i]->next = i;
 		}
@@ -43,7 +44,7 @@ bool RT::setRT(RT* nighborRT){
 	bool setMinimal = false;
 	vector<rtStruct*> yourRt = nighborRT->getRtTable();
 	for(int i=1; i<=_numberOfTargets;i++){
-		if(i=_owner){
+		if(i==_owner){
 			//do nothing
 		}else{
 			if(yourRt[i]->distance == -1){
@@ -54,8 +55,8 @@ bool RT::setRT(RT* nighborRT){
 				setMinimal = true;//my rtTable was change
 			}//end else if
 		}//end else
-
 	}//end for
+	return setMinimal;
 }
 
 //---------------------------------------------------------------------------------
@@ -70,12 +71,25 @@ int RT::getID(){
 }
 
 //---------------------------------------------------------------------------------
-//									TODO
+//									print
 //--------------------------------- -----------------------------------------------
-		void Reset(){}
 
-		void printRT(){}
+void RT::printRT(){
+	cout<<" prit RT of worker " << _owner<<endl;
+	cout<< " ********************************* " <<endl;
+	for(int i=1; i<=_numberOfTargets;i++){
 
-		bool update(RT* neighborRT){}
+		int dis =  _rtTable[i]->distance;
+		int tar =  _rtTable[i]->target;
+		int next = _rtTable[i]->next;
+
+		cout<<" target: "<<tar;
+		cout<<" distance: "<<dis;
+		cout<<" next: "<<next<<endl;
+		cout<<" ------------------------------------------- "<<endl;
+	}//end for
+}//end printRT
+
+
 
 

@@ -21,7 +21,9 @@ int Worker::getId(){
 	return _id;
 }
 
-
+RT* Worker::getRT(){
+	return _myRT;
+}
 
 //---------------------------------------------------------------------------------
 //									OSthreads

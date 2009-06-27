@@ -39,6 +39,7 @@ class Mailer
 		void start();
 		Message* readMails(int id);
 		int* _neigbors;
+		vector<Worker*> getWorker();
 };
 
 #endif /*MAILER_H_*/

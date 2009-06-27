@@ -33,7 +33,6 @@ class RT {
 		bool setRT(RT* nighborRT);
 		vector<rtStruct*> getRtTable();
 		void initRT();
-		void Reset();
 		void printRT();
 		int getID();
 };

@@ -36,7 +36,7 @@ class Shell {
 		void killNode(int id) ;
 		void reviveNode() ;
 		void killAll() ;
-		void printRt() ;
+		void printRt(int uniqueID) ;
 		void sendPacket(string sourceID,string targetID,string textMsg);
 		void Run() ;
 		void start();
