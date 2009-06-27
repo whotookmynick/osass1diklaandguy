@@ -13,25 +13,28 @@
 #include <iostream>
 using namespace std;
 
+typedef struct{
+				int target;
+				int distance;
+				int next;
+}rtStruct;
+
 class RT {
 	public:
-		RT();
+		RT(int numOfTargets,int owner);
 		virtual ~RT();
 
-		typedef struct{
-					int target;
-					int distance;
-					int next;
-		}rtStruct;
 
-		vector<rtStruct*> _rtTable;
+
+		int _numberOfTargets;
 		int _owner;
+		vector<rtStruct*> _rtTable;
 
-
-		RT(int ownerId);
+		bool setRT(RT* nighborRT);
+		vector<rtStruct*> getRtTable();
+		void initRT();
 		void Reset();
 		void printRT();
-		bool update(RT* neighborRT);
 		int getID();
 };
 

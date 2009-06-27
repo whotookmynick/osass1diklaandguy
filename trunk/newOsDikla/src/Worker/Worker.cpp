@@ -7,7 +7,7 @@
 Worker::Worker(int id,Mailer& mailer,int* neigbors,int numOfWorkers):_id(id),
 _mailer(mailer),_numOfWorkers(numOfWorkers)
 {
-	_myRT =new RT();
+	_myRT =new RT(numOfWorkers,_id);
 }
 Worker::~Worker()
 {
