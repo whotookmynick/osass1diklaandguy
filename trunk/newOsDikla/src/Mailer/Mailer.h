@@ -4,7 +4,7 @@
 #include "Shell/Shell.h"
 #include "OSScheduler.h"
 #include "Messages/Hfiles/Message.h"
-#include "Messages/Hfiles/InitMsg.h"deliverMsgToMailBox();
+#include "Messages/Hfiles/InitMsg.h"
 #include "Mailer/MailBox.h"
 #include <vector>
 #include <string>
