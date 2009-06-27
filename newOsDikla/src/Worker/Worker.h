@@ -15,9 +15,10 @@ class Worker: public OSThread
 		int* _nighbors;
 		RT* _myRT;
 		void broadcast();
-		int _numOfWorkers;
 		int _id;
 		Mailer& _mailer;
+		int _numOfWorkers;
+
 
 		void run();
 		int getId();

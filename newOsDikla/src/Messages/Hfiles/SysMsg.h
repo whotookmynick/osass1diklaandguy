@@ -19,7 +19,7 @@ public:
 	string _msgContent;
 	RT* _rt;
 	void setRT(RT* rt);
-	RT* getRT(RT* rt);
+	RT* getRT();
 };
 
 #endif /*SYSMSG_H_*/
