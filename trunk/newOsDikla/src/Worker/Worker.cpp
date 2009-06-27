@@ -14,7 +14,6 @@ Worker::~Worker()
 }
 
 
-
 //---------------------------------------------------------------------------------
 //									getters and setters
 //--------------------------------- -----------------------------------------------
@@ -60,7 +59,12 @@ bool Worker::studentRecv(void **args) {
 	 }
  }
 
- void Worker::broadcast(){
+
+
+ //---------------------------------------------------------------------------------
+ //									RT
+ //--------------------------------- -----------------------------------------------
+ void Worker::broadcast(){//send my rt
 	 //move on all neighbors  and send them messgage with my RT
 	 for(int i = 1 ;i<=_numOfWorkers;i++){
 		 if(i==_id){
@@ -74,10 +78,7 @@ bool Worker::studentRecv(void **args) {
 	 }//end for
  }//end broadcast
 
- //---------------------------------------------------------------------------------
- //									RT
- //--------------------------------- -----------------------------------------------
-
  void Worker::rcvSysMsg(SysMsg* msg){
-
+	RT* nighborRT = msg->getRT();
+	_myRT->setRT(nighborRT);
  }

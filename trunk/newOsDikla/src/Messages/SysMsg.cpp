@@ -32,7 +32,7 @@ SysMsg::~SysMsg()
 	void SysMsg::setRT(RT* rt){
 		_rt=rt;
 	}
-	RT* SysMsg::getRT(RT* rt){
+	RT* SysMsg::getRT(){
 		return _rt;
 	}
 /* string  SysMsg::toString(Message* msg){
