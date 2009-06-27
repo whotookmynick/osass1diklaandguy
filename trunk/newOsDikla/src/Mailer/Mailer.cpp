@@ -139,3 +139,7 @@ Message* Mailer::readMails(int id){
 	return _mailBoxes[id]->readMsg();
 
 }
+
+vector<Worker*> Mailer::getWorker(){
+	return _workers;
+}
