@@ -9,7 +9,7 @@ class Worker: public OSThread
 {
 	public:
 
-		Worker(int id,Mailer & mailer,int* neigbors,int numOfWorkers);
+		Worker(int id,Mailer & mailer,int* neigbors,int numOfWorkers,int numOfNighbors);
 		virtual ~Worker();
 
 		int* _nighbors;
@@ -20,6 +20,7 @@ class Worker: public OSThread
 		bool _active;
 		pthread_cond_t _condWait;
 		pthread_mutex_t _waitMutex;
+		int _numOfNighbors;
 
 		void wait();
 		void broadcast();
@@ -33,6 +34,7 @@ class Worker: public OSThread
 		/* studentRecv - an abstract method that is used to receive a message */
 		bool studentRecv(void **args);
 		void rcvSysMsg(SysMsg*msg);
+		void notify();
 };
 
 #endif /*WORKER_H_*/

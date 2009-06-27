@@ -23,7 +23,7 @@ class Shell {
 		int _numberOfNodes;
 		vector<int> _nodesVector;
 		int** _neighbor;
-
+		vector<int> _numOfNighbors;
 
 		//void creatNet( const char file [] );
 		void insertArgs(vector <string> argToNet);
@@ -42,6 +42,7 @@ class Shell {
 		void start();
 		void printMsgFromMailer(string msg);
 		int** getNigebors();
+		void printnighbors(int firstNode,int numOfnigb);
 
 };
 #endif /*SHELL_H_*/

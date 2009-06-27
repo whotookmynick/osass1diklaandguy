@@ -20,5 +20,5 @@ void InitMsg::printMsg(){
 	int des = getDes();
 	int nextId = getNext();
 	string content = getContent();
-	cout<<" msg from: "<<src<<" to: "<<des<<" throw: "<<nextId<<" --- "<<content<<endl;
+	//cout<<" msg from: "<<src<<" to: "<<des<<" throw: "<<nextId<<" --- "<<content<<endl;
 }
