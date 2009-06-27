@@ -27,6 +27,7 @@ class Mailer
 		pthread_mutex_t _inboxMutex;
 		pthread_mutexattr_t _mtxattr;
 		//void* mailerWrapper(void* f);
+
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors);
 		virtual ~Mailer();
@@ -40,6 +41,8 @@ class Mailer
 		Message* readMails(int id);
 		int* _neigbors;
 		vector<Worker*> getWorker();
+		void updateWorkerRT(int nodeId);
+		bool reviveNode(int nodeId);
 };
 
 #endif /*MAILER_H_*/

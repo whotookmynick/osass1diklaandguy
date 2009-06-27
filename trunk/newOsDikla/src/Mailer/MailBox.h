@@ -24,7 +24,7 @@ class Mailbox {
 		Mailbox();
 		virtual ~Mailbox();
 
-		bool readMsg(std::queue<Message*>& destinyMsgQ);// Reads messages from the mailbox to destinyMsgQ.
+		//bool readMsg(std::queue<Message*>& destinyMsgQ);// Reads messages from the mailbox to destinyMsgQ.
 														//System messages are read first.true on success
 		bool insertMsg(Message* m);//insert message in the mailbox
 		void printMailes();

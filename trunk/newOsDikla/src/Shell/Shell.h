@@ -34,7 +34,7 @@ class Shell {
 		void Exit(int i);
 		void createNet(const char file []) ;
 		void killNode(int id) ;
-		void reviveNode() ;
+		void reviveNode(int id) ;
 		void killAll() ;
 		void printRt(int uniqueID) ;
 		void sendPacket(string sourceID,string targetID,string textMsg);

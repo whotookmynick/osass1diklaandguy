@@ -16,7 +16,9 @@ int main(int argc,const char* argv[]){
     shell.start();
 }//end main
 
-
+//---------------------------------------------------------------------------------
+//							constarctors and distractor and start
+//--------------------------------- -----------------------------------------------
 Shell::Shell(){}
 Shell::~Shell(){}
 
@@ -132,7 +134,7 @@ void Shell::start(){
     		  if(uniqueID==""){
     		        goto GET_COMMAND;
     		   }
-    		  reviveNode();
+    		  reviveNode(atoi(uniqueID.c_str()));
     		  goto GET_COMMAND;
 
     	  }
@@ -148,6 +150,8 @@ void Shell::start(){
       }//end while
 
 }
+
+
 //---------------------------------------------------------------------------------
 //					Shell messages
 //--------------------------------- ----------------------------------------------
@@ -173,6 +177,7 @@ void Shell::createNet(const char * file){
 void Shell::Exit(int i){
 	exit(i);
 }
+
 //---------------------------------------------------------------------------------
 //					SYS Reg messages
 //--------------------------------- -----------------------------------------------
@@ -186,41 +191,47 @@ void Shell::sendPacket(string sourceID,string targetID,string textMsg) {
 }
 
 void Shell::killAll()  {
+
 	vector<Worker*> workers =_mailer->getWorker();
 	Worker* worker;
 	RT* workerRT ;
 	for(int i=1 ; i<_numberOfNodes+1;i++){
 		worker = workers[i];
-		//print rt msg
-		workerRT = worker->getRT();
-		workerRT->initRT();
+		if(worker->getActive()){
+			//print rt msg
+			workerRT = worker->getRT();
+			workerRT->initRT();
+			worker->setActive(false);
+		}
 	}
 }//end kill all
 
-
 void Shell::killNode(int id) {
-	bool kill = _mailer->killNode(id);
-	cout<<kill<<endl;
+	Worker* worker = _mailer->getWorker()[id];
+	worker->getRT()->initRT();
+	worker->setActive(false);
+	_mailer->killNode(id);
 }
 
+void Shell::reviveNode(int id)  {
+	//TODO
+
+}
 
 //---------------------------------------------------------------------------------
 //					TODO
 //--------------------------------- -----------------------------------------------
-
-void Shell::reviveNode()  {
-	//TODO
-
-}
 
 void Shell::Run()  {
 	//TODO
 
 }
 
+
 //---------------------------------------------------------------------------------
 //					set _bufferSize,_numberOfNodes,_neighbor and _neighbor
 //--------------------------------- -----------------------------------------------
+
 void Shell::insertArgs(vector <string> argToNet){
 
 	char buf[256];
@@ -257,13 +268,10 @@ void Shell::insertArgs(vector <string> argToNet){
 
 }//end insert
 
-
-
-
-
 //---------------------------------------------------------------------------------
 //									inits
 //--------------------------------- -----------------------------------------------
+
 void Shell:: initMatrix(unsigned int numberOfNodes,int **matrix){
 
 	for(unsigned int i = 0 ; i < numberOfNodes+1;i++){
@@ -272,6 +280,7 @@ void Shell:: initMatrix(unsigned int numberOfNodes,int **matrix){
 		}
 	}
 }
+
 int ** Shell::makeMatrix(unsigned int numberOfNodes_){
 	int ** neighbor = new int* [numberOfNodes_+1];//[numberOfNodes_];
 		for (unsigned int i=0; i<numberOfNodes_+1;i++){
@@ -283,6 +292,7 @@ int ** Shell::makeMatrix(unsigned int numberOfNodes_){
 //---------------------------------------------------------------------------------
 //									prints
 //--------------------------------- -----------------------------------------------
+
 void Shell:: printMatrix(unsigned int numberOfNodes,int **matrix){
 
 	for(unsigned int i = 0 ; i < numberOfNodes;i++){
@@ -310,6 +320,7 @@ void Shell::printRt(int uniqueID)  {
 //---------------------------------------------------------------------------------
 //									getters and setters
 //--------------------------------- -----------------------------------------------
+
 int** Shell::getNigebors(){
 	return _neighbor;
 }

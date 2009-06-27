@@ -1,18 +1,28 @@
 #include "MailBox.h"
 
+//---------------------------------------------------------------------------------
+//							constarctors and distractor and inits
+//--------------------------------- -----------------------------------------------
 // Reads messages from the mailbox to destinyMsgQ.
 Mailbox::Mailbox(){
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&_QMutex, &_mtxattr);
 }
+
 Mailbox::~Mailbox(){
 	pthread_mutex_destroy(&_QMutex);
 	pthread_mutexattr_destroy(&_mtxattr);
 }
-bool Mailbox::readMsg(std::queue<Message*>& destinyMsgQ){
+
+//---------------------------------------------------------------------------------
+//							deal with Mailes
+//--------------------------------- -----------------------------------------------
+
+/*bool Mailbox::readMsg(std::queue<Message*>& destinyMsgQ){
 	return false ;
-}
+}*/
+
 Message* Mailbox::readMsg(){
 	pthread_mutex_lock(&_QMutex);
 	Message * m =NULL;
@@ -66,6 +76,11 @@ bool Mailbox::insertMsg(Message* m){
 	pthread_mutex_unlock(&_QMutex);
 	return false;
 }//insert message in the mailbox
+
+
+//---------------------------------------------------------------------------------
+//							print
+//--------------------------------- -----------------------------------------------
 void Mailbox::printMailes(){
 	pthread_mutex_lock(&_QMutex);
 	if(!_sysQueue.empty()){
@@ -94,6 +109,8 @@ void Mailbox::printMailes(){
 	}
 	pthread_mutex_unlock(&_QMutex);
 }
+
+
 void Mailbox::printQ(list<Message*> l){
 	pthread_mutex_lock(&_QMutex);
 	for(unsigned  int i=0; i<l.size(); ++i){
@@ -106,5 +123,7 @@ void Mailbox::printQ(list<Message*> l){
 	pthread_mutex_unlock(&_QMutex);
 }
 
-
+//---------------------------------------------------------------------------------
+//									getters and setters
+//--------------------------------- -----------------------------------------------
 
