@@ -64,10 +64,11 @@ bool Worker::studentRecv(void **args) {
 		 Message* msg = _mailer.readMails(_id);
 		 if(msg==NULL){
 			 //give up time
-			 yield();
+			 //yield();
 		 }
 		 else {
 			 string type = msg->getType();
+			 cout<<" i have got a msg my id "<<_id<<" type  "<<type<<endl;
 			 if(type=="Init"){
 				 string initM = msg->getContent();
 				 if(initM=="killMe"){
