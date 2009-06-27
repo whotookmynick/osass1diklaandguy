@@ -7,9 +7,9 @@ Mailer* mailer;
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
-Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize,int* negibors)
+Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize,int* negibors,vector<int> numOfNighbors)
 :_shell(shell),_numOfWorkers(numOfWorkers),
-_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNeeded(false){
+_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNeeded(true),_numOfNighbors(numOfNighbors){
 	//int mailBox
 	cout<<" number of workers: "<<_numOfWorkers<<endl;
 	cout<<" buffer size: "<<_inboxSize<<endl;
@@ -17,7 +17,7 @@ _inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNe
 	_inbox.resize(_inboxSize);
 	_mailBoxes.resize(_numOfWorkers+1);
 	_workers.resize(_numOfWorkers+1);
-	for( int i=0;i<numOfWorkers+1;i++ ){
+	for( int i=1;i<numOfWorkers+1;i++ ){
 		_mailBoxes[i]=new Mailbox();
 	}
 	pthread_mutexattr_init(&_mtxattr);
@@ -44,17 +44,20 @@ extern "C"{
 }
 
 void Mailer::start(){
+
+	int** nigborsMatrix = _shell.getNigebors();
+	_waitNeeded=true;//no deliver till all done
 	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
 
 	for(int i=1 ; i<=_numOfWorkers; i++){
-		int** nigborsMatrix = _shell.getNigebors();
+
 		int* n = nigborsMatrix[i];
 		Worker* workeri;
-		workeri= new Worker(i,*this,n,_numOfWorkers);
+		workeri= new Worker(i,*this,n,_numOfWorkers,_numOfNighbors[i]);
 		_workers[i]=workeri;
 		workeri->start();
 	}
-
+	_waitNeeded = false;
 }
 
 void Mailer::run(){
@@ -81,6 +84,7 @@ void Mailer::printInbox(list<Message*> v){
 	pthread_mutex_lock(&_inboxMutex);
 	if(v.empty()){
 		cout<<" ERROR : trying to print null vector of messages"<<endl;
+		pthread_mutex_unlock(&_inboxMutex);
 		return;
 	}
 	else if (!v.empty()){
@@ -102,8 +106,8 @@ void Mailer::printInbox(list<Message*> v){
 bool Mailer::rcvPacket(Message* msg){//string sourceID,string targetID,string textMsg
 	pthread_mutex_lock(&_inboxMutex);
 	_inbox.push_back(msg);
-	cout<<" printing inbox " <<endl;
-	printInbox(_inbox);
+	//cout<<" printing inbox " <<endl;
+	//printInbox(_inbox);
 	//string type=msg->getType() ;//getType(); //TODO set the msg type in the shell
 	//deliverMsgToMailBox();//TODO remove
 	pthread_mutex_unlock(&_inboxMutex);
@@ -130,6 +134,7 @@ bool Mailer::deliverMsgToMailBox(){
 		pthread_mutex_unlock(&_inboxMutex);
 		return false;
 	}
+	cout<<" inbox not empty "<<endl;
 	Message* m = _inbox.back();
 	_inbox.pop_front();
 	if(m==NULL){
@@ -140,13 +145,13 @@ bool Mailer::deliverMsgToMailBox(){
 	int sendTo = m->getNext();
 	string mc = m->getContent();
 
-	cout<<" insert: ";
+	//cout<<" insert: ";
 	m->printMsg();
-	cout<<" to mailBox: "<<sendTo<<endl;
+	//cout<<" to mailBox: "<<sendTo<<endl;
 	_mailBoxes[sendTo]->insertMsg(m);
 	//wake worker
-	_workers[sendTo]->setQuanta(1);
-	_mailBoxes[sendTo]->printMailes();
+	_workers[sendTo]->setQuanta(1000);
+	//_mailBoxes[sendTo]->printMailes();
 	pthread_mutex_unlock(&_inboxMutex);
 	return true;
 }
@@ -189,7 +194,7 @@ vector<Worker*> Mailer::getWorker(){
 //									????? TODO - needed????
 //--------------------------------- -----------------------------------------------
 bool Mailer::killNode(int nodeId){
-	InitMsg* killme = new InitMsg(nodeId,nodeId,"killMe",nodeId);
+	InitMsg* killme = new InitMsg(nodeId,nodeId,"lll",nodeId);
 	rcvPacket(killme);
 	_waitNeeded=true;
 	for(int i=1; i<=_numOfWorkers; i++){
@@ -205,11 +210,14 @@ bool Mailer::reviveNode(int nodeId){
 
 	string msg = "revive node "+ nodeId;
 	cout<<"revive node : " <<nodeId<<endl;
-
+	_workers[nodeId]->notify();
+	InitMsg* initMsg = new InitMsg(nodeId,nodeId,"initRT",nodeId);
+	_mailBoxes[nodeId]->insertMsg(initMsg);
 	/*_workers[nodeId]->_myRT->initRT();
 	_workers[nodeId]->setActive(true);
 	updateWorkerRT(nodeId);
 	pthread_mutex_unlock(&_inboxMutex);
 	 */
+	pthread_mutex_unlock(&_inboxMutex);
 	return true;
 }

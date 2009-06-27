@@ -20,6 +20,7 @@ int main(int argc,const char* argv[]){
 //							constarctors and distractor and start
 //--------------------------------- -----------------------------------------------
 Shell::Shell(){}
+
 Shell::~Shell(){}
 
 void Shell::start(){
@@ -170,7 +171,7 @@ void Shell::createNet(const char * file){
 	}//end if
 	insertArgs(args);
 	netFile.close();
-	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize,*_neighbor);//mailer->...
+	_mailer=new Mailer(*this,_numberOfNodes,_bufferSize,*_neighbor,_numOfNighbors);//mailer->...
 	_mailer->start();//mailer thread start
 
 }//end creatNet
@@ -214,7 +215,7 @@ void Shell::killNode(int id) {
 }
 
 void Shell::reviveNode(int id)  {
-	//TODO
+	_mailer->reviveNode(id);
 
 }
 
@@ -241,7 +242,7 @@ void Shell::insertArgs(vector <string> argToNet){
 	_bufferSize= atoi(bufferSize.c_str());
 	_numberOfNodes=atoi(nodNumber.c_str());
 	_neighbor = makeMatrix(_numberOfNodes);
-
+	_numOfNighbors.resize(_numberOfNodes+1,0);
 	//-----------------------------insert to _neighbor matrix----------------------
 	initMatrix(_numberOfNodes,_neighbor);
 	char delims[] = " ";
@@ -256,17 +257,23 @@ void Shell::insertArgs(vector <string> argToNet){
 		//if(result!=0){
 			 firstNode = atoi(result);
 		//}
+		_numOfNighbors[firstNode]=0;
 		while( result != NULL ) {
+			_numOfNighbors[firstNode]=_numOfNighbors[firstNode]+1;
 
-			result = strtok( NULL, delims ); // get next Token
 			 // if result isn't null insert atoi (result) otherwise insert 0
 			 _neighbor[firstNode][j]= (result!=NULL) ? atoi(result) : 0;//TODO : tell about change: in place of the first neigbors i will be is neigbors nodes
 			 j++;
+			 result = strtok( NULL, delims ); // get next Token
 		}//end while
+		_numOfNighbors[firstNode]=_numOfNighbors[firstNode]-1;
+		cout<<" numbers of nighbors for node "<<firstNode<<" == "<<_numOfNighbors[firstNode]<<endl;
 		cout << endl;
+		printnighbors(firstNode,_numOfNighbors[firstNode]);
 	}//end for
 
 }//end insert
+
 
 //---------------------------------------------------------------------------------
 //									inits
@@ -317,6 +324,16 @@ void Shell::printRt(int uniqueID)  {
 	workerRT->printRT();
 }
 
+void Shell::printnighbors(int firstNode,int numOfnigb){
+	int n = 0  ;
+	cout<<" print the nigbors of : " <<firstNode<<endl;
+	int *ng = _neighbor[firstNode];
+	for(int i=1;i<=numOfnigb;i++){
+		n = ng[i];
+		cout<<" my nighbor "<<n<<endl;
+	}
+
+}
 //---------------------------------------------------------------------------------
 //									getters and setters
 //--------------------------------- -----------------------------------------------

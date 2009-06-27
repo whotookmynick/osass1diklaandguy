@@ -29,9 +29,10 @@ class Mailer
 		pthread_mutexattr_t _mtxattr;
 		//void* mailerWrapper(void* f);
 		bool _waitNeeded;
+		vector<int> _numOfNighbors;
 
 	public:
-		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors);
+		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors,vector<int> numOfNighbors);
 		virtual ~Mailer();
 		bool addMsgToInbox(Message* msg);
 		void printInbox(list<Message*> v);
