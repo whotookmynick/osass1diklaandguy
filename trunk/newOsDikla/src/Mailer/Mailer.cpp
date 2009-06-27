@@ -9,7 +9,8 @@ Mailer* mailer;
 //--------------------------------- -----------------------------------------------
 Mailer::Mailer(Shell& shell,int numOfWorkers,int bufSize,int* negibors,vector<int> numOfNighbors)
 :_shell(shell),_numOfWorkers(numOfWorkers),
-_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNeeded(true),_numOfNighbors(numOfNighbors){
+_inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors)
+,_waitNeeded(true),_numOfNighbors(numOfNighbors),_nextToRun(1){
 	//int mailBox
 	cout<<" number of workers: "<<_numOfWorkers<<endl;
 	cout<<" buffer size: "<<_inboxSize<<endl;
@@ -25,6 +26,7 @@ _inboxSize(bufSize),_inbox(),_mailBoxes(),_workers(),_neigbors(negibors),_waitNe
 	pthread_mutex_init(&_inboxMutex, &_mtxattr);
 	pthread_mutex_init(&_waitMutex,NULL);
 	pthread_cond_init(&_condWait,NULL);
+	//_rrScheduler = new OSScheduler();
 }
 
 
@@ -35,7 +37,9 @@ Mailer::~Mailer()
 	pthread_mutex_destroy(&_waitMutex);
 	pthread_cond_destroy(&_condWait);
 }
-
+void Mailer::setNextToRun(int value){
+	_nextToRun = value;
+}
 //---------------------------------------------------------------------------------
 //									threads
 //--------------------------------- -----------------------------------------------
@@ -51,7 +55,7 @@ void Mailer::start(){
 
 	int** nigborsMatrix = _shell.getNigebors();
 	_waitNeeded=true;//no deliver till all done
-	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
+
 
 	for(int i=1 ; i<=_numOfWorkers; i++){
 
@@ -59,21 +63,46 @@ void Mailer::start(){
 		Worker* workeri;
 		workeri= new Worker(i,*this,n,_numOfWorkers,_numOfNighbors[i]);
 		_workers[i]=workeri;
-		cout<<" start worker " << i<<endl;
 		workeri->start();
 	}
+	//cout<<" start worker " << _nextToRun<<endl;
+	notifyThreadChange(_workers[1]);
+	_workers[1]->setQuanta(3);
+	pthread_create(&_mailerThread,NULL,mailerWrapper,this);
 	_waitNeeded = false;
 }
 
 void Mailer::run(){
+	//sleep(2);
 	while(true){
-		if(_waitNeeded){
-			cout<<" mailer is waitingggggggggggggggggg  "<<endl;
-		}else{
-			deliverMsgToMailBox();
+
+		if(!_waitNeeded){
+					deliverMsgToMailBox();
 		}
+		else{
+			cout<<" mailer is waitingggggggggggggggggg  "<<endl;
+		}
+		if(checkThreadBlocked()){
+			runThread();
+		}
+
+
 	}
 }
+
+void Mailer::runThread(){
+	//cout<<" start worker " << _nextToRun<<endl;
+
+	notifyThreadChange(_workers[_nextToRun]);
+	_workers[_nextToRun]->setQuanta(3);
+	if(_nextToRun==_numOfWorkers){
+			_nextToRun = 1;
+	}else{
+			_nextToRun = _nextToRun+1;
+	}
+
+}
+
 
 //---------------------------------------------------------------------------------
 //									inbox handle
@@ -140,7 +169,7 @@ bool Mailer::deliverMsgToMailBox(){
 		return false;
 	}
 	cout<<" inbox not empty "<<endl;
-	Message* m = _inbox.back();
+	Message* m = _inbox.front();
 	_inbox.pop_front();
 	if(m==NULL){
 		//cout<<" ERORR: msg is Empty "<<endl;
@@ -155,7 +184,7 @@ bool Mailer::deliverMsgToMailBox(){
 	//cout<<" to mailBox: "<<sendTo<<endl;
 	_mailBoxes[sendTo]->insertMsg(m);
 	//wake worker
-	_workers[sendTo]->setQuanta(1000);
+	//_workers[sendTo]->setQuanta(1000);
 	//_mailBoxes[sendTo]->printMailes();
 	pthread_mutex_unlock(&_inboxMutex);
 	return true;

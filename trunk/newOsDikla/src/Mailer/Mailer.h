@@ -2,6 +2,7 @@
 #define MAILER_H_
 #include <stdio.h>
 #include "Shell/Shell.h"
+#include "OSScheduler.h"
 #include "Messages/Hfiles/Message.h"
 #include "Messages/Hfiles/InitMsg.h"deliverMsgToMailBox();
 #include "Mailer/MailBox.h"
@@ -15,7 +16,7 @@
 #include <list>
 using namespace std;
 class Worker;
-class Mailer
+class Mailer : public OSScheduler
 {
 	private:
 		Shell& _shell;
@@ -32,7 +33,8 @@ class Mailer
 		vector<int> _numOfNighbors;
 		pthread_cond_t _condWait;
 		pthread_mutex_t _waitMutex;
-
+		int _nextToRun;
+		//OSScheduler* _rrScheduler;
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors,vector<int> numOfNighbors);
 		virtual ~Mailer();
@@ -50,6 +52,8 @@ class Mailer
 		bool reviveNode(int nodeId);
 		void killall();
 		void notify();
+		void setNextToRun(int value);
+		void runThread();
 };
 
 #endif /*MAILER_H_*/
