@@ -30,6 +30,8 @@ class Mailer
 		//void* mailerWrapper(void* f);
 		bool _waitNeeded;
 		vector<int> _numOfNighbors;
+		pthread_cond_t _condWait;
+		pthread_mutex_t _waitMutex;
 
 	public:
 		Mailer(Shell& shell,int numOfWorkers,int bufSize,int* neigbors,vector<int> numOfNighbors);
@@ -46,6 +48,8 @@ class Mailer
 		vector<Worker*> getWorker();
 		void updateWorkerRT(int nodeId);
 		bool reviveNode(int nodeId);
+		void killall();
+		void notify();
 };
 
 #endif /*MAILER_H_*/

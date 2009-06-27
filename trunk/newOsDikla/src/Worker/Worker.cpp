@@ -61,10 +61,10 @@ bool Worker::studentRecv(void **args) {
  void Worker::run(){
 	 broadcast();
 	 while(true){
-		 Message* msg = _mailer.readMails(getId());
+		 Message* msg = _mailer.readMails(_id);
 		 if(msg==NULL){
 			 //give up time
-			 //yield();
+			 yield();
 		 }
 		 else {
 			 string type = msg->getType();
@@ -114,6 +114,8 @@ void Worker::notify(){
 		 }
 		 else{
 			 rsvId = _nighbors[i];
+			 cout<<" nighbor of worker : "<<_id<<" is: "<<rsvId<<endl;
+
 			 SysMsg* m = new SysMsg(_id,rsvId,"RT msg",rsvId);
 			 m->setRT(_myRT);
 			 _mailer.rcvPacket(m);
