@@ -7,41 +7,41 @@ class SystemCalls
 private:
 
 public:
-	virtual SystemCalls();
+	SystemCalls();
 	virtual ~SystemCalls();
 	/*
 	 * creates and opens a new file named ‘file_name’ returning a fd to the new file.
 	 * If type is soft-link mark it as such. Opens the file with the specified permissions.
 	 */
-	int MakeFile(char* file-name,type,int flag_access_permissions);
+	int MakeFile(char* file_name,int type,int flag_access_permissions);
 
 	/*
-	 * creates a hard link with name file-name, linked to target. Returns a new fd.
+	 * creates a hard link with name file_name, linked to target. Returns a new fd.
 	 */
-	int MakeHLink(char* target-file-name, char*file-name);
+	int MakeHLink(char* target_file_name, char*file_name);
 
 	/*
-	 * creates a new directory named ‘dir-name’
+	 * creates a new directory named ‘dir_name’
 	 */
-	int MakeDir(char* dir-name);
+	int MakeDir(char* dir_name);
 
 	/*
-	 * removes the directory ‘dir-name’
+	 * removes the directory ‘dir_name’
 	 */
-	int RmDir(char* dir-name);
+	int RmDir(char* dir_name);
 	/*
-	 * removes the file ‘file-name’
+	 * removes the file ‘file_name’
 	 */
-	int RmFile(char* file-name);
+	int RmFile(char* file_name);
 	/*
-	 * lists the content of the location-directory. Return list in buf.
+	 * lists the content of the location_directory. Return list in buf.
 	 */
-	int ls(char*dir-name, char * buf);
+	int ls(char*dir_name, char * buf);
 
 	/*
-	 * opens the file ‘file-name’. Needs to deal with soft-links. Opens the file with the specified permissions.
+	 * opens the file ‘file_name’. Needs to deal with soft_links. Opens the file with the specified permissions.
 	 */
-	int Open(char* filename, flag access-permissions);
+	int Open(char* filename, int flag_access_permissions);
 
 	/*
 	 * closes the entry of the file in the file table, and frees the entry in the fd table.
@@ -61,11 +61,11 @@ public:
 	 */
 	int Write (int fd, int nBytes,char * Buffer);
 	/*
-	 * Moves the child's i-node from its current directory to new destination.
+	 * Moves the child's i_node from its current directory to new destination.
 	 */
-	moveFile(char* parendDir, char * new_dest);
+	int moveFile(char* parendDir, char * new_dest);
 	/*
-	 * Ret urns whether this address is a directory or not. Needs to deal with soft-links.
+	 * Ret urns whether this address is a directory or not. Needs to deal with soft_links.
 	 */
 	bool isDir(char * address);
 	/*
@@ -89,7 +89,7 @@ public:
 	/*
 	 * releases the writing lock held by this process. Only the process that locked the file may release this lock.
 	 */
-	int releaseLockWrite(int fd)
+	int releaseLockWrite(int fd);
 };
 
 #endif /*SYSTEMCALLS_H_*/
