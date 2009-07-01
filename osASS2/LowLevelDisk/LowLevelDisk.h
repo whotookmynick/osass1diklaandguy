@@ -32,7 +32,7 @@ public:
 	/*
 	 *allocates a new i-node and returns its number
 	 */
-	void allocateInode();
+	int allocateInode();
 
 
 	/*
