@@ -7,3 +7,4 @@ LowLevelDisk::LowLevelDisk()
 LowLevelDisk::~LowLevelDisk()
 {
 }
+void  LowLevelDisk::allocateInode(){}
