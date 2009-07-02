@@ -25,10 +25,13 @@ public:
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
 
+
+	//int allocateInode();
+
 	/*The low Level Disk offers the following services
 	 *allocates a new i-node and returns its number
 	 */
-	void allocateInode();
+	int allocateInode();
 
 	/*
 	 * frees the specified i-node
@@ -52,12 +55,12 @@ public:
 	/*
 	 *return the type of the file (normal/directory/soft-link)
 	 */
-	string getInodeType(int i_node);
+	int getInodeType(int i_node);
 
 	/*
 	 * set the type of the file (normal/directory/soft-link).
 	 */
-	void setInodeType(int i_node, string filetype);
+	void setInodeType(int i_node, int filetype);
 
 	/*
 	 *return the number of the i-th data block containing the data of this file
@@ -95,7 +98,7 @@ public:
 	 */
 	void setFileSize(int i_node, int newSize);
 
-	/*The low Level Disk offers the following services:*/
+
 
 
 };
