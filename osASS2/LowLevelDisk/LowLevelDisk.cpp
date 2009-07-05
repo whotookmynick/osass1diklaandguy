@@ -1,5 +1,5 @@
 #include "LowLevelDisk.h"
-
+#include  "Logger.h"
 
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
@@ -18,37 +18,90 @@ LowLevelDisk::~LowLevelDisk()
 //---------------------------------------------------------------------------/
 //								Help function
 //---------------------------------------------------------------------------/
+int  LowLevelDisk::findFreeNode(){
+	LOG_DEBUG("find free node");
+	return 1;
+}
 
+void LowLevelDisk::rmvNodeFromFreeNode(){
+	 LOG_DEBUG("remove node from freeNode table");
+}
+
+void LowLevelDisk::initNode(int node_id){
+	LOG_DEBUG("init node " << node_id);
+
+}
+
+void LowLevelDisk::addFreeNodeToFreeNodeList(int i_node){
+	LOG_DEBUG("add  Node "<<i_node<<" To Free Node List ");
+}
+
+void LowLevelDisk::freeInodeBlocks(int i_node){
+	LOG_DEBUG("free i Node "<<i_node<<" blocks ");
+}
+
+int  LowLevelDisk::getFreeBlock(){
+	LOG_DEBUG("get next free Node ");
+	return 1;
+}
+
+void LowLevelDisk::initBlock(int block_id){
+	LOG_DEBUG("init block "<<block_id);
+}
+
+void LowLevelDisk::rmvBlockFromFreeBlock(){
+	LOG_DEBUG("remove Block from free Block table");
+}
+
+void LowLevelDisk::addFreeBlockToFreeBlockList(int dblock){
+	LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
+}
 
 //---------------------------------------------------------------------------/
 //								Low Level functions
 //---------------------------------------------------------------------------/
 
 
-
+//TODO: inform the super block
+//TODO: Log msg and exception
 int  LowLevelDisk::allocateInode(){
-	return 1;
+	int node_id = LowLevelDisk::findFreeNode();
+	LowLevelDisk::rmvNodeFromFreeNode();//remove the node frome free node list
+	LowLevelDisk::initNode(node_id);//init node details to defult
+	return node_id;
 }
-
 
 
 void LowLevelDisk::freeInode(int i_node){
+	LowLevelDisk::initNode(i_node);//init node details to defult
+	LowLevelDisk::addFreeNodeToFreeNodeList(i_node);
+	LowLevelDisk::freeInodeBlocks(i_node);//directly and indirectly
 
 }
 
 
-void LowLevelDisk::allocateDataBlock(){}
+int LowLevelDisk::allocateDataBlock(){
+	int block_id=LowLevelDisk::getFreeBlock();
+	LowLevelDisk::initBlock(block_id);
+	LowLevelDisk::rmvBlockFromFreeBlock();//remove the Block frome free Block list
+	return block_id;
+}
 
 
-void LowLevelDisk::freeDataBlock(int dblock){}
+void LowLevelDisk::freeDataBlock(int dblock){
+	LowLevelDisk::initBlock(dblock);
+	LowLevelDisk::addFreeBlockToFreeBlockList(dblock);
+}
 
 
 int LowLevelDisk::getInodeType(int i_node){
-	return NULL;
+	return _iNodeTable[i_node]->fileType;
 }
 
 
-void LowLevelDisk::setInodeType(int i_node, int filetype){}
+void LowLevelDisk::setInodeType(int i_node, int filetype){
+
+}
 
 
 int LowLevelDisk::getDataBlock (int i_node, int i){
