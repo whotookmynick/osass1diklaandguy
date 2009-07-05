@@ -17,6 +17,13 @@ Note – all services mentioned above should return appropriate error codes to s
  requesting to allocate an i-node when there are none free,
 *asking for the file name of a free i-node, asking the 34th data block of a file that contains only 30 data blocks, etc.)
 */
+typedef struct{
+	int fileType;//0==normal 1==directory 2==soft link
+	int hardLinkNum;;
+	int fileSize;
+	int block[10];
+	int indirectBlock;
+}nodeStruct;
 
 class LowLevelDisk
 {
@@ -24,6 +31,24 @@ class LowLevelDisk
 public:
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
+	nodeStruct* _iNodeTable[];//TODO:change
+
+	//---------------------------------------------------------------------------/
+	//								Help function
+	//---------------------------------------------------------------------------/
+	int  findFreeNode();
+	void rmvNodeFromFreeNode();
+	void initNode(int node_id);
+	void addFreeNodeToFreeNodeList(int i_node);
+	void freeInodeBlocks(int i_node);
+	int  getFreeBlock();
+	void initBlock(int block_id);
+	void rmvBlockFromFreeBlock();
+	void addFreeBlockToFreeBlockList(int dblock);
+
+	//---------------------------------------------------------------------------/
+	//								Low Level functions
+	//---------------------------------------------------------------------------/
 
 
 	//int allocateInode();
@@ -43,7 +68,7 @@ public:
 	/*
 	 * allocates a data block and returns its number
 	 */
-	void allocateDataBlock();
+	int allocateDataBlock();
 
 	/*
 	* frees the specified block.
