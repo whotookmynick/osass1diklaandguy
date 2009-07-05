@@ -1,6 +1,6 @@
 #include "LowLevelDisk.h"
 #include  "Logger.h"
-
+//#include <stdexpt>
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
@@ -100,11 +100,25 @@ int LowLevelDisk::getInodeType(int i_node){
 
 
 void LowLevelDisk::setInodeType(int i_node, int filetype){
+	if (filetype<0 | filetype>2 ){
+		cerr<<"no such file type"<<endl;
+	//	throw invalid_argument("no such file type");//TODO: add exception
+
+	}
+	if (i_node<0){//TODO::other illegal inodes numbers
+		cerr<<"no such i_node"<<endl;
+	//	throw invalid_argument("no such i_node");
+
+	}
+
+	_iNodeTable[i_node]->fileType=filetype;
 
 }
 
 
 int LowLevelDisk::getDataBlock (int i_node, int i){
+
+
 	return 1;
 }
 
