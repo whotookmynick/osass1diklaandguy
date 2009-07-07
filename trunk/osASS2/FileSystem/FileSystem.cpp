@@ -55,6 +55,32 @@ int FileSystem::getFileType(int i_node)
 	return _lldisk->getInodeType(i_node);
 }
 
+void FileSystem::f_read(int i_node,char* buffer,int offset,int nBytes)
+{
+	int bytesRead = 0;
+	int blockNum = offset/BLOCK_SIZE;
+	char* currBuffer = (char*)malloc(sizeof(BLOCK_SIZE));
+	_lldisk->readBlock(blockNum,currBuffer);
+	int blockStartOffset = offset - (blockNum * BLOCK_SIZE);
+	while (strlen(currBuffer)==0 & bytesRead < nBytes)
+	{
+		for (int bufferIndex = blockStartOffset; bufferIndex < BLOCK_SIZE & bytesRead < nBytes; bufferIndex++)
+		{
+			buffer[bytesRead] = currBuffer[bufferIndex];
+		}
+		blockNum++;
+		_lldisk->readBlock(blockNum,currBuffer);
+		blockStartOffset = 0;
+	}
+
+}
+
+void FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
+{
+
+}
+
+
 FileSystem::~FileSystem()
 {
 
