@@ -11,6 +11,8 @@
 #define SOFT_LINK 1;
 #define DIR 2;
 #define REGULAR_FILE 3;
+int BLOCK_SIZE = 64;
+
 
 using namespace std;
 class FileSystem
@@ -42,7 +44,7 @@ public:
 	/**
 	 **reads nBytes (at most) from the given file (represented by this i_node) at the given offset inside the file into the buffer.
 	 **/
-	void f_read(int i_node,char** buffer,int offset,int nBytes);
+	void f_read(int i_node,char* buffer,int offset,int nBytes);
 
 	/**
 	 ** writes nBytes (at most) to the given file (represented by this i_node)
@@ -50,7 +52,7 @@ public:
 	 **  If the amount to be written exceeds the current allocated block,
 	 **  a new block should be allocated to accommodate the rest of the data.
 	 **/
-	void f_write(int i_node,char** buffer,int offset,int nBytes );
+	void f_write(int i_node,char* buffer,int offset,int nBytes );
 
 	/**
 	 ** Notice that both f_read and f_write only work on normal files (not directories).
