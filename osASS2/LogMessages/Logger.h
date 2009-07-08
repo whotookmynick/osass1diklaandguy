@@ -8,11 +8,6 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#include <pthread.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <sstream>
 
 #define LOG_DEBUG(m) \
 { \
