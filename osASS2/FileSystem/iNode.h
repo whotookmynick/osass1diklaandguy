@@ -19,14 +19,25 @@ File size in bytes. (4 bytes)
  */
 class iNode {
 private:
-	int _fileType;
+	int _fileType;//0==normal 1==directory 2==soft link
 	int _numOfHardLinks;
 	int _fileSize;
 	int _directBlocks[10];
 	void* _indirectBlocks;
 public:
+
+
+
 	iNode();
 	virtual ~iNode();
+	void setFileType(int _fileType);
+	int getNumOfHardLinks();
+	void setNumOfHardLinks(int _numOfHardLinks);
+	int getFileSize();
+
+	void setFileSize(int _fileSize);
+	int getFileType();
 };
 
 #endif /* INODE_H_ */
+//0==normal 1==directory 2==soft link
