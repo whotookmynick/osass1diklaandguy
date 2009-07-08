@@ -13,6 +13,13 @@ LowLevelDisk::LowLevelDisk()
 LowLevelDisk::~LowLevelDisk()
 {
 }
+//---------------------------------------------------------------------------/
+//								Getters and setters
+//---------------------------------------------------------------------------/
+int LowLevelDisk::getNumOfBlocks(){}
+int LowLevelDisk::getNumOfInodes(){}
+void LowLevelDisk::setNumOfBlocks(){}
+void LowLevelDisk::setNumOfInodes(){}
 
 
 //---------------------------------------------------------------------------/
@@ -118,7 +125,12 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 
 int LowLevelDisk::getDataBlock (int i_node, int i){
 
+	if (i>=0 | i<=9){
+		//return the i enter in the i_node
+	}
+	else{
 
+	}
 	return 1;
 }
 

@@ -25,6 +25,8 @@ typedef struct{
 	int indirectBlock;
 }nodeStruct;
 
+
+
 class LowLevelDisk
 {
 
@@ -122,6 +124,17 @@ public:
 	 * set the file size.
 	 */
 	void setFileSize(int i_node, int newSize);
+
+	//------------------------------------------------------------//
+	int getNumOfBlocks();
+    int getNumOfInodes();
+    void setNumOfBlocks();
+    void setNumOfInodes();
+
+private:
+    int _numOfBlocks;
+    int _numOfInodes;
+
 
 
 
