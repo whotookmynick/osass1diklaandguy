@@ -3,7 +3,9 @@
 
 #include <string>
 #include <string.h>
-#include "LowLevelList.h"
+#include <stdlib.h>
+#include "BlockList.h"
+#include "iNode.h"
 using namespace std;
 
 
@@ -18,13 +20,6 @@ Note – all services mentioned above should return appropriate error codes to s
  requesting to allocate an i-node when there are none free,
 *asking for the file name of a free i-node, asking the 34th data block of a file that contains only 30 data blocks, etc.)
 */
-typedef struct{
-	int fileType;//0==normal 1==directory 2==soft link
-	int hardLinkNum;;
-	int fileSize;
-	int block[10];
-	int indirectBlock;
-}nodeStruct;
 
 
 
@@ -34,7 +29,7 @@ class LowLevelDisk
 public:
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
-	nodeStruct* _iNodeTable[];//TODO:change
+	iNode* _iNodeTable[];//TODO:change
 
 	//---------------------------------------------------------------------------/
 	//								Help function
@@ -135,8 +130,8 @@ public:
 private:
     int _numOfBlocks;
     int _numOfInodes;
-    LowLevelList* _freeInodesList;
-    LowLevelList* _freeBlockesList;
+    BlockList* _freeInodesList;
+    BlockList* _freeBlockesList;
 
 
 
