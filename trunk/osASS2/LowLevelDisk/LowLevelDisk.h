@@ -3,8 +3,9 @@
 
 #include <string>
 #include <string.h>
-#include <string>
+#include "LowLevelList.h"
 using namespace std;
+
 
 /*
 * Regular files simply store the data written to them by user programs.
@@ -134,7 +135,8 @@ public:
 private:
     int _numOfBlocks;
     int _numOfInodes;
-
+    LowLevelList* _freeInodesList;
+    LowLevelList* _freeBlockesList;
 
 
 
