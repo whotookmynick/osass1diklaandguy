@@ -1,22 +1,22 @@
 /*
- * LowLevelList.cpp
+ * BlockList.cpp
  *
  *  Created on: Jul 8, 2009
  *      Author: dikla
  */
 
-#include "LowLevelList.h"
+#include "BlockList.h"
 
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-LowLevelList::LowLevelList() {
+BlockList::BlockList(int numOfBlocks,int firstBlockAdress,int blockSize) {
 	// TODO Auto-generated constructor stub
 
 }
 
-LowLevelList::~LowLevelList() {
+BlockList::~BlockList() {
 	// TODO Auto-generated destructor stub
 }
 
@@ -24,15 +24,15 @@ LowLevelList::~LowLevelList() {
 //
 //--------------------------------- -----------------------------------------------
 
-int LowLevelList::size(){}
-bool LowLevelList::empty(){}
+int BlockList::size(){}
+bool BlockList::empty(){}
 
-bool LowLevelList::contains(int& ib){}
+bool BlockList::contains(int& ib){}
 
 //---------------------------------------------------------------------------------
 //
 //--------------------------------- -----------------------------------------------
 
-int& LowLevelList::Head(){}
-void LowLevelList::pop_front(){}
-void LowLevelList::push_back(int& ib){}
+int& BlockList::Head(){}
+void BlockList::pop_front(){}
+void BlockList::push_back(int& ib){}

@@ -1,6 +1,15 @@
 #include "LowLevelDisk.h"
 #include  "Logger.h"
+#include <string>
+#include <string.h>
+#include <stdlib.h>
+#include <iostream>
+#include "BlockList.h"
+using namespace std;
+
+//#include "FileSystem/iNode.h"
 //#include <stdexpt>
+
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
@@ -16,7 +25,9 @@ LowLevelDisk::~LowLevelDisk()
 //---------------------------------------------------------------------------/
 //								Getters and setters
 //---------------------------------------------------------------------------/
-int LowLevelDisk::getNumOfBlocks(){}
+int LowLevelDisk::getNumOfBlocks(){
+
+}
 int LowLevelDisk::getNumOfInodes(){}
 void LowLevelDisk::setNumOfBlocks(){}
 void LowLevelDisk::setNumOfInodes(){}
@@ -27,41 +38,42 @@ void LowLevelDisk::setNumOfInodes(){}
 //---------------------------------------------------------------------------/
 int  LowLevelDisk::findFreeNode(){
 	LOG_DEBUG("find free node");
+
 	return 1;
 }
 
 void LowLevelDisk::rmvNodeFromFreeNode(){
-	 LOG_DEBUG("remove node from freeNode table");
+	// LOG_DEBUG("remove node from freeNode table");
 }
 
 void LowLevelDisk::initNode(int node_id){
-	LOG_DEBUG("init node " << node_id);
+	//LOG_DEBUG("init node " << node_id);
 
 }
 
 void LowLevelDisk::addFreeNodeToFreeNodeList(int i_node){
-	LOG_DEBUG("add  Node "<<i_node<<" To Free Node List ");
+	//LOG_DEBUG("add  Node "<<i_node<<" To Free Node List ");
 }
 
 void LowLevelDisk::freeInodeBlocks(int i_node){
-	LOG_DEBUG("free i Node "<<i_node<<" blocks ");
+	//LOG_DEBUG("free i Node "<<i_node<<" blocks ");
 }
 
 int  LowLevelDisk::getFreeBlock(){
-	LOG_DEBUG("get next free Node ");
+	//LOG_DEBUG("get next free Node ");
 	return 1;
 }
 
 void LowLevelDisk::initBlock(int block_id){
-	LOG_DEBUG("init block "<<block_id);
+	//LOG_DEBUG("init block "<<block_id);
 }
 
 void LowLevelDisk::rmvBlockFromFreeBlock(){
-	LOG_DEBUG("remove Block from free Block table");
+	//LOG_DEBUG("remove Block from free Block table");
 }
 
 void LowLevelDisk::addFreeBlockToFreeBlockList(int dblock){
-	LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
+	//LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
 }
 
 //---------------------------------------------------------------------------/
@@ -102,23 +114,23 @@ void LowLevelDisk::freeDataBlock(int dblock){
 
 
 int LowLevelDisk::getInodeType(int i_node){
-	return _iNodeTable[i_node]->fileType;
+	return _iNodeTable[i_node]->getFileType();
 }
 
 
 void LowLevelDisk::setInodeType(int i_node, int filetype){
 	if (filetype<0 | filetype>2 ){
-		cerr<<"no such file type"<<endl;
+	//	cerr<<"no such file type"<<endl;
 	//	throw invalid_argument("no such file type");//TODO: add exception
 
 	}
 	if (i_node<0){//TODO::other illegal inodes numbers
-		cerr<<"no such i_node"<<endl;
+	//	cerr<<"no such i_node"<<endl;
 	//	throw invalid_argument("no such i_node");
 
 	}
 
-	_iNodeTable[i_node]->fileType=filetype;
+	_iNodeTable[i_node]->setFileType(filetype);
 
 }
 
