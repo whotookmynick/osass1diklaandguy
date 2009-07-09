@@ -25,74 +25,74 @@ SystemCalls::~SystemCalls(){}
 //---------------------------------------------------------------------------/
 //								Low Level functions
 //---------------------------------------------------------------------------/
-int SystemCallsMakeFile(char* file_name,int type,int flag_access_permissions){
+int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	return 1;
 }
 
 
-int SystemCallsMakeHLink(char* target_file_name, char*file_name){
+int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
 	return 1;
 }
 
 
-int MakeDir(char* dir_name){
+int SystemCalls::MakeDir(char* dir_name){
 	return 1;
 }
 
-int RmDir(char* dir_name){
+int SystemCalls::RmDir(char* dir_name){
 	return 1;
 }
 
-int RmFile(char* file_name){
+int SystemCalls::RmFile(char* file_name){
 	return 1;
 }
 
-int ls(char*dir_name, char * buf){
-	return 1;
-}
-
-
-int Open(char* filename, int flag_access_permissions){
-	return 1;
-}
-
-int Close(int fd){
-	return 1;
-}
-
-int Seek(int fd, int location){
-	return 1;
-}
-
-int Read (int fd, int nBytes, char *Buffer){
+int SystemCalls::ls(char*dir_name, char * buf){
 	return 1;
 }
 
 
-int Write (int fd, int nBytes,char * Buffer){
+int SystemCalls::Open(char* filename, int flag_access_permissions){
 	return 1;
 }
 
-int moveFile(char* parendDir, char * new_dest){
+int SystemCalls::Close(int fd){
 	return 1;
 }
 
-bool isDir(char * address){
+int SystemCalls::Seek(int fd, int location){
+	return 1;
+}
+
+int SystemCalls::Read (int fd, int nBytes, char *Buffer){
+	return 1;
+}
+
+
+int SystemCalls::Write (int fd, int nBytes,char * Buffer){
+	return 1;
+}
+
+int SystemCalls::moveFile(char* parendDir, char * new_dest){
+	return 1;
+}
+
+bool SystemCalls::isDir(char * address){
 	return false;
 }
 
-int lockRead(int fd){
+int SystemCalls::lockRead(int fd){
 	return 1;
 }
 
-int lockWrite(int fd){
+int SystemCalls::lockWrite(int fd){
 	return 1;
 }
 
-int releaseLockRead(int fd){
+int SystemCalls::releaseLockRead(int fd){
 	return 1;
 }
 
-int releaseLockWrite(int fd){
+int SystemCalls::releaseLockWrite(int fd){
 	return 1;
 }
