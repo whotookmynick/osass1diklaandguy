@@ -1,5 +1,5 @@
 #include "LowLevelDisk.h"
-#include  "Logger.h"
+//#include  "Logger.h"
 #include <string>
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@ void LowLevelDisk::setNumOfInodes(){}
 //								Help function
 //---------------------------------------------------------------------------/
 int  LowLevelDisk::findFreeNode(){
-	LOG_DEBUG("find free node");
+//	LOG_DEBUG("find free node");
 
 	return 1;
 }

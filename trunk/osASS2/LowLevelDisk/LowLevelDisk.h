@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "BlockList.h"
-#include "iNode.h"
+#include "../FileSystem/iNode.h"
 using namespace std;
 
 
