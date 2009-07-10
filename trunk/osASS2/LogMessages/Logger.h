@@ -11,6 +11,7 @@
 #include <string>
 #include <string.h>
 #include <sstream>
+#include <iostream>
 using namespace std;
 
 #define LOG_DEBUG(m) \
