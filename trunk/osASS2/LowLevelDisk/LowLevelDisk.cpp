@@ -1,5 +1,9 @@
 #include "LowLevelDisk.h"
 #include <sys/stat.h>
+#include <sstream>
+#include <math.h>
+#include <fcntl.h>
+
 
 //#include <stdexpt>
 
@@ -26,8 +30,29 @@ bool LowLevelDisk::existsFileSystem(const string& filename) {
 
   return(blnReturn);
 }
+void* LowLevelDisk::createFileSystem(const string& file){
+
+	return NULL;
+}
+void LowLevelDisk::initVars(){
+		// DiskDescriptor();
+	    //initializeFreeBlocksList();
+	    //initializeFreeInodesList();
+	    //initializeInodesList();
+}
 
 
+void LowLevelDisk::openFileSystem(const string& file){
+
+	_fd = open(file.c_str(),O_RDWR);
+	  if (_fd!=-1){
+		  throw OpenFileExcemption(file);
+	  }
+
+	  initVars();
+
+
+}
 
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
@@ -52,13 +77,13 @@ bool LowLevelDisk::existsFileSystem(const string& filename) {
 
 
 
-LowLevelDisk::LowLevelDisk(const std::string& file)//TODO cahnge offset
+LowLevelDisk::LowLevelDisk(const std::string& file):_iNodeTable(),_freeInodesList(),_freeBlockesList()
 {
 	if (existsFileSystem(file)){
-
+		openFileSystem(file);
 	}
 	else{
-		//createFyleSystem(file);
+		createFileSystem(file);
 	}
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
@@ -69,6 +94,9 @@ LowLevelDisk::LowLevelDisk(const std::string& file)//TODO cahnge offset
 
 LowLevelDisk::LowLevelDisk()
 {
+	delete _freeInodesList;
+	delete _freeBlockesList;
+	//TODO close open files
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&_RecMutex, &_mtxattr);
