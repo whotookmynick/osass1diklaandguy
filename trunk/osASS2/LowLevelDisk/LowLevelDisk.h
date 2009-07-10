@@ -152,12 +152,11 @@ public:
 
 private:
 
+	//define recursive mutex
 	pthread_t _mainThread;
-	pthread_mutex_t _FileMutex;
+	pthread_mutex_t _RecMutex;
 	pthread_mutexattr_t _mtxattr;
-	bool _waitNeeded;
-	pthread_cond_t _condWait;
-	pthread_mutex_t _waitMutex;
+
 
 
 
