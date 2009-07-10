@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <pthread.h>
+#include <stdlib.h>
+
 #include  "InodeList.h";
 
 using namespace std;
@@ -56,6 +58,8 @@ public:
 	void addFreeBlockToFreeBlockList(int dblock);
 	bool existsFileSystem(const string& filename);
 	void createFyleSystem(const string& filename);
+	void  initVars();
+
 	//---------------------------------------------------------------------------/
 	//								Low Level functions
 	//---------------------------------------------------------------------------/
@@ -145,9 +149,8 @@ public:
 	void setNumOfFreeBlocks(int i);
 	void setNumOfFreeInodes(int i);
 
-
-
-
+	void* createFileSystem(const string& file);
+	void openFileSystem(const string& file);
 
 	int getDataBlockSize();
 
