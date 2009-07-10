@@ -3,3 +3,4 @@ i had Logger.h - we can add also other macros in this header
 
 i had in iNode.h and cpp getters and setters
 
+the Logger is in LogMessage directory
