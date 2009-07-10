@@ -58,7 +58,7 @@ LowLevelDisk::LowLevelDisk(const std::string& file)//TODO cahnge offset
 
 	}
 	else{
-		createFyleSystem(file);
+		//createFyleSystem(file);
 	}
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
