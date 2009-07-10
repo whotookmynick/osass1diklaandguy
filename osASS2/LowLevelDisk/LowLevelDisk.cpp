@@ -1,13 +1,65 @@
 #include "LowLevelDisk.h"
+#include <sys/stat.h>
 
 //#include <stdexpt>
+
+bool LowLevelDisk::existsFileSystem(const string& filename) {
+  struct stat stFileInfo;
+  bool blnReturn;
+  int intStat;
+
+  // Attempt to get the file attributes
+  intStat = stat(filename.c_str(),&stFileInfo);
+  if(intStat == 0) {
+    // We were able to get the file attributes
+    // so the file obviously exists.
+    blnReturn = true;
+  } else {
+    // We were not able to get the file attributes.
+    // This may mean that we don't have permission to
+    // access the folder which contains this file. If you
+    // need to do that level of checking, lookup the
+    // return values of stat which will give you
+    // more details on why stat failed.
+    blnReturn = false;
+  }
+
+  return(blnReturn);
+}
+
+
 
 //---------------------------------------------------------------------------------
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
-
-LowLevelDisk::LowLevelDisk(const std::string& file)
+/*LowLevelServices::LowLevelServices(const string& filename, Configuration& conf)
+: _lock(), _freeBlocks(), _freeInodes(), _inodes()
 {
+	if (!fileSystemExists(filename)) {
+			LOG_INFO("file system at ["<<filename<<"] does not exist. creating\n");
+			createNewFileSystem(filename,conf);
+	} else {
+			LOG_INFO("file system at ["<<filename<<"] exists. opening\n");
+			openExistingFileSystem(filename);
+	}
+
+	LOG_INFO("disk initialized.\n");
+}
+*/
+
+
+
+
+
+
+LowLevelDisk::LowLevelDisk(const std::string& file)//TODO cahnge offset
+{
+	if (existsFileSystem(file)){
+
+	}
+	else{
+		createFyleSystem(file);
+	}
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&_RecMutex, &_mtxattr);
@@ -60,10 +112,14 @@ int LowLevelDisk::getDataBlockSize(){
 int  LowLevelDisk::findFreeNode(){
 
 	LOG_DEBUG("find free node");
-	 if (_freeInodesList->empty()) {
-
+	if (_freeInodesList->empty()) {
 		throw EmptyListException("FreeInode");
-		}
+	}
+	_freeInodesList->head();
+	_freeInodesList->pop_front();
+	//TODO create new inode
+	//_iNodeTable->get(inodeNum).setActive(false);
+
 	return 1;
 }
 
@@ -120,22 +176,8 @@ int  LowLevelDisk::allocateInode(){
 
 
     int inodeNum;
-
-      /*  synchronized(&_lock) {
-                if (_freeInodes->empty()) {
-                        LOG_WARNING("no more free inodes\n");
-                        _lock.unlock();
-                        throw OutOfInodesException();
-                }
-
-                inodeNum = _freeInodes->front();
-                _freeInodes->pop_front();
-        }*/
-
-        //return inodeNum;
     pthread_mutex_unlock(&_RecMutex);
     return node_id;
-
 }
 
 
@@ -176,7 +218,9 @@ int LowLevelDisk::getInodeType(int i_node){
 	pthread_mutex_lock(&_RecMutex);
 
 	pthread_mutex_unlock(&_RecMutex);
-	return _iNodeTable[i_node]->getFileType();
+	iNode inodeN = _iNodeTable->get(i_node);
+
+	return inodeN.getFileType();
 }
 
 
@@ -195,7 +239,7 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 
 	}
 
-	_iNodeTable[i_node]->setFileType(filetype);
+	_iNodeTable->get(i_node).setFileType(filetype);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
