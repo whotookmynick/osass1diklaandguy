@@ -4,6 +4,7 @@
 #include "BlockList.h"
 #include "BlockList.h"
 #include "iNode.h"
+
 #include  "Logger.h"
 #include "Exception.cpp"
 
@@ -13,6 +14,7 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <pthread.h>
+#include  "InodeList.h";
 
 using namespace std;
 
@@ -38,7 +40,7 @@ public:
 	LowLevelDisk(const std::string& file);
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
-	iNode* _iNodeTable[];//TODO:change
+
 
 	//---------------------------------------------------------------------------/
 	//								Help function
@@ -52,7 +54,8 @@ public:
 	void initBlock(int block_id);
 	void rmvBlockFromFreeBlock();
 	void addFreeBlockToFreeBlockList(int dblock);
-
+	bool existsFileSystem(const string& filename);
+	void createFyleSystem(const string& filename);
 	//---------------------------------------------------------------------------/
 	//								Low Level functions
 	//---------------------------------------------------------------------------/
@@ -159,8 +162,8 @@ private:
 
 
 
-
-	 int _fd;
+	InodeList* _iNodeTable;
+	int _fd;
 
 	int _blockSize;
     int _numOfBlocks;

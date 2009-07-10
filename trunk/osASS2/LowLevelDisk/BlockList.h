@@ -32,7 +32,7 @@ public:
 	bool contains(int& value);
 
 
-	int& Head();//reference to the  front
+	int& head();//reference to the  front
 	void pop_front();
 	void push_back(int& val);
 

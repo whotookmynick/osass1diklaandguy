@@ -33,6 +33,6 @@ bool BlockList::contains(int& ib){}
 //
 //--------------------------------- -----------------------------------------------
 
-int& BlockList::Head(){}
+int& BlockList::head(){}
 void BlockList::pop_front(){}
 void BlockList::push_back(int& ib){}
