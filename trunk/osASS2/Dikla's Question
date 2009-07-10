@@ -3,3 +3,5 @@
 
 i had Exception.cpp - we can add also other excemption class to use in this header
 the Logger is in LogMessage directory
+
+i had struct to inode so we can malloc it
