@@ -1,11 +1,19 @@
 #ifndef LOWLEVELDISK_H_
 #define LOWLEVELDISK_H_
 
+#include "BlockList.h"
+#include "BlockList.h"
+#include "iNode.h"
+#include  "Logger.h"
+#include "Exception.cpp"
+
+#include <iostream>
 #include <string>
 #include <string.h>
 #include <stdlib.h>
-#include "BlockList.h"
-#include "../FileSystem/iNode.h"
+#include <stdexcept>
+#include <pthread.h>
+
 using namespace std;
 
 
@@ -27,6 +35,7 @@ class LowLevelDisk
 {
 
 public:
+	LowLevelDisk(const std::string& file);
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
 	iNode* _iNodeTable[];//TODO:change
@@ -124,12 +133,42 @@ public:
 	//------------------------------------------------------------//
 	int getNumOfBlocks();
     int getNumOfInodes();
-    void setNumOfBlocks();
-    void setNumOfInodes();
+//    void setNumOfBlocks();
+//    void setNumOfInodes();
+
+    /////////////////////////////////////////////
+    int getNumOfFreeBlocks();
+	int getNumOfFreeInodes();
+	void setNumOfFreeBlocks(int i);
+	void setNumOfFreeInodes(int i);
+
+
+
+
+
+	int getDataBlockSize();
+
+	/////////////////////////////////////////////
 
 private:
+
+	pthread_t _mainThread;
+	pthread_mutex_t _FileMutex;
+	pthread_mutexattr_t _mtxattr;
+	bool _waitNeeded;
+	pthread_cond_t _condWait;
+	pthread_mutex_t _waitMutex;
+
+
+
+	 int _fd;
+
+	int _blockSize;
     int _numOfBlocks;
     int _numOfInodes;
+    int _numOfFreeBlocks;
+    int _numOfFreeInodes;
+
     BlockList* _freeInodesList;
     BlockList* _freeBlockesList;
 
