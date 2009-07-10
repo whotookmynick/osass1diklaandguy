@@ -7,7 +7,9 @@
 
 #ifndef INODE_H_
 #define INODE_H_
+#define Num_DirectBlocks 10
 
+class LowLevelDisk;
 /*
  * Each i-node has the following structure:
 File type: file, directory, soft-link. (1 byte)
@@ -17,17 +19,24 @@ File size in bytes. (4 bytes)
 1 single-indirect block. (4 bytes)
  *
  */
+
+typedef struct {
+	int  type;
+	int  numOfHardLinks;
+	int  size;
+	int  directBlock[Num_DirectBlocks];
+	int  indirectBlockAdress;
+} InodeStruct;
+
+
 class iNode {
 private:
-	int _fileType;//0==normal 1==directory 2==soft link
-	int _numOfHardLinks;
-	int _fileSize;
-	int _directBlocks[10];
-	void* _indirectBlocks;
+	InodeStruct* _inodeStruct;
+	bool _active;
 public:
 
 
-
+	iNode(int offset,LowLevelDisk& disk);
 	iNode();
 	virtual ~iNode();
 	void setFileType(int _fileType);
@@ -37,6 +46,9 @@ public:
 
 	void setFileSize(int _fileSize);
 	int getFileType();
+
+	void setActive(bool a);
+	bool getActive();
 };
 
 #endif /* INODE_H_ */
