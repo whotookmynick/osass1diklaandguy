@@ -11,6 +11,7 @@ iNode::iNode() {
 	// TODO Auto-generated constructor stub
 
 }
+iNode::iNode(int offset,LowLevelDisk& disk){}//TODO
 
 iNode::~iNode() {
 	// TODO Auto-generated destructor stub
@@ -18,32 +19,38 @@ iNode::~iNode() {
 
 void iNode::setFileType(int _fileType)
 {
-    this->_fileType = _fileType;
+    _inodeStruct->type = _fileType;
 }
 
 int iNode::getNumOfHardLinks()
 {
-   return _numOfHardLinks;
+   return _inodeStruct->numOfHardLinks;
 }
 
-void iNode::setNumOfHardLinks(int _numOfHardLinks)
+void iNode::setNumOfHardLinks(int numOfHardLinks)
 {
-   this->_numOfHardLinks = _numOfHardLinks;
+ _inodeStruct->numOfHardLinks= numOfHardLinks;
 }
 
 int iNode::getFileSize()
 {
-   return _fileSize;
+   return _inodeStruct->size;
 }
 
 int iNode::getFileType()
 {
-   return _fileType;
+	return _inodeStruct->type;
 }
 
 void iNode::setFileSize(int _fileSize)
 {
-   this->_fileSize = _fileSize;
+   _inodeStruct->size = _fileSize;
 }
 
+void iNode::setActive(bool a){
+	_active=a;
+}
 
+bool iNode::getActive(){
+	return _active;
+	}
