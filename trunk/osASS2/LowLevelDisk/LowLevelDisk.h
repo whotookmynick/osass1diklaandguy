@@ -20,6 +20,12 @@
 
 using namespace std;
 
+const int OFFSET = 0;
+//const int SIZE_OF_ENTRY = sizeof(int);
+const int ROOT_INODE = 0;
+const int SIZE_OF_SUPER_BLOCK = 5;
+const int SIZE_OF_INODE = sizeof(InodeStruct);
+const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
 
 /*
 * Regular files simply store the data written to them by user programs.
@@ -59,7 +65,9 @@ public:
 	bool existsFileSystem(const string& filename);
 	void createFyleSystem(const string& filename);
 	void  initVars();
-
+	void initFreeBlocksList();
+    void initFreeInodesList();
+    void initInodesList();
 	//---------------------------------------------------------------------------/
 	//								Low Level functions
 	//---------------------------------------------------------------------------/
