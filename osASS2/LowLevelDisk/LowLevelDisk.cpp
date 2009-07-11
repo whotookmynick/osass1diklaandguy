@@ -158,9 +158,13 @@ int LowLevelDisk::getDataBlockSize(){
 //---------------------------------------------------------------------------/
 //								Help function
 //---------------------------------------------------------------------------/
+int getInodeFromString(const string& elementName){
+	cout<<" unimplemented function getInodeFromString "<<endl;
+	return 1;
+}
 
 int  LowLevelDisk::findFreeNode(){
-
+	cout<<" unimplemented function findFreeNode "<<endl;
 	LOG_DEBUG("find free node");
 	if (_freeInodesList->empty()) {
 		throw EmptyListException("FreeInode");
@@ -174,36 +178,45 @@ int  LowLevelDisk::findFreeNode(){
 }
 
 void LowLevelDisk::rmvNodeFromFreeNode(){
+	cout<<" unimplemented function  "<<endl;
+
 	// LOG_DEBUG("remove node from freeNode table");
 }
 
 void LowLevelDisk::initNode(int node_id){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("init node " << node_id);
 
 }
 
 void LowLevelDisk::addFreeNodeToFreeNodeList(int i_node){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("add  Node "<<i_node<<" To Free Node List ");
 }
 
 void LowLevelDisk::freeInodeBlocks(int i_node){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("free i Node "<<i_node<<" blocks ");
 }
 
 int  LowLevelDisk::getFreeBlock(){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("get next free Node ");
 	return 1;
 }
 
 void LowLevelDisk::initBlock(int block_id){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("init block "<<block_id);
 }
 
 void LowLevelDisk::rmvBlockFromFreeBlock(){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("remove Block from free Block table");
 }
 
 void LowLevelDisk::addFreeBlockToFreeBlockList(int dblock){
+	cout<<" unimplemented function  "<<endl;
 	//LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
 }
 
@@ -215,6 +228,7 @@ void LowLevelDisk::addFreeBlockToFreeBlockList(int dblock){
 //TODO: inform the super block
 //TODO: Log msg and exception
 int  LowLevelDisk::allocateInode(){
+	cout<<" unimplemented function allocateInode "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 	int node_id = LowLevelDisk::findFreeNode();
@@ -232,6 +246,7 @@ int  LowLevelDisk::allocateInode(){
 
 
 void LowLevelDisk::freeInode(int i_node){
+	cout<<" unimplemented function freeInode "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 
@@ -243,6 +258,7 @@ void LowLevelDisk::freeInode(int i_node){
 
 
 int LowLevelDisk::allocateDataBlock(){
+	cout<<" unimplemented function  allocateDataBlock "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 
@@ -255,6 +271,7 @@ int LowLevelDisk::allocateDataBlock(){
 
 
 void LowLevelDisk::freeDataBlock(int dblock){
+	cout<<" unimplemented function freeDataBlock "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 
@@ -265,6 +282,7 @@ void LowLevelDisk::freeDataBlock(int dblock){
 
 
 int LowLevelDisk::getInodeType(int i_node){
+	cout<<" unimplemented function  getInodeType "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 	pthread_mutex_unlock(&_RecMutex);
@@ -275,6 +293,7 @@ int LowLevelDisk::getInodeType(int i_node){
 
 
 void LowLevelDisk::setInodeType(int i_node, int filetype){
+	cout<<" unimplemented function setInodeType "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if (filetype<0 | filetype>2 ){
 	//	cerr<<"no such file type"<<endl
@@ -295,6 +314,7 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 
 
 int LowLevelDisk::getDataBlock (int i_node, int i){
+	cout<<" unimplemented function getDataBlock  "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if (i>=0 | i<=9){
 		pthread_mutex_unlock(&_RecMutex);
@@ -311,6 +331,7 @@ int LowLevelDisk::getDataBlock (int i_node, int i){
 
 
 void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
+	cout<<" unimplemented function setDataBlock "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 
@@ -319,6 +340,7 @@ void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 
 
 void LowLevelDisk::readBlock(int dblockNum, char* buf){
+	cout<<" unimplemented function  readBlock"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	//init empty buffer if block does not exist
 
@@ -328,6 +350,7 @@ void LowLevelDisk::readBlock(int dblockNum, char* buf){
 
 
 void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
+	cout<<" unimplemented function  writeBlock"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 	pthread_mutex_unlock(&_RecMutex);
@@ -335,6 +358,7 @@ void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 
 
 int LowLevelDisk::getFileSize(int i_node){
+	cout<<" unimplemented function getFileSize "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 
@@ -344,6 +368,7 @@ int LowLevelDisk::getFileSize(int i_node){
 
 
 void LowLevelDisk::setFileSize(int i_node, int newSize){
+	cout<<" unimplemented function setFileSize "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 
 

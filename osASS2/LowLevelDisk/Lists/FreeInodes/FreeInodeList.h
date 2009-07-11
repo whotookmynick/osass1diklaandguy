@@ -7,8 +7,8 @@
 
 #ifndef FREEINODELIST_H_
 #define FREEINODELIST_H_
-#include "BlockList.h"
-#include  "../LowLevelDisk.h"
+#include "../BlockList.h"
+#include  "../../LowLevelDisk.h"
 
 class FreeInodeList : virtual BlockList {
 public:
