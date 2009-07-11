@@ -8,13 +8,13 @@
 
 //#include <stdexpt>
 
-bool LowLevelDisk::existsFileSystem(const string& filename) {
+bool LowLevelDisk::existsFileSystem() {
   struct stat stFileInfo;
   bool blnReturn;
   int intStat;
 
   // Attempt to get the file attributes
-  intStat = stat(filename.c_str(),&stFileInfo);
+  intStat = stat(SYS_FILE_NAME.c_str(),&stFileInfo);
   if(intStat == 0) {
     // We were able to get the file attributes
     // so the file obviously exists.
@@ -31,7 +31,7 @@ bool LowLevelDisk::existsFileSystem(const string& filename) {
 
   return(blnReturn);
 }
-void* LowLevelDisk::createFileSystem(const string& file){
+void* LowLevelDisk::createFileSystem(){
 
 	return NULL;
 }
@@ -72,11 +72,11 @@ void LowLevelDisk::initVars(){
 }
 
 
-void LowLevelDisk::openFileSystem(const string& file){
+void LowLevelDisk::openFileSystem(){
 
-	_fd = open(file.c_str(),O_RDWR);
+	_fd = open(SYS_FILE_NAME.c_str(),O_RDWR);
 	  if (_fd!=-1){
-		  throw OpenFileExcemption(file);
+		  throw OpenFileExcemption(SYS_FILE_NAME);
 	  }
 
 	  initVars();
@@ -107,13 +107,13 @@ void LowLevelDisk::openFileSystem(const string& file){
 
 
 
-LowLevelDisk::LowLevelDisk(const std::string& file):_iNodeTable(),_freeInodesList(),_freeBlockesList()
+LowLevelDisk::LowLevelDisk():_iNodeTable(),_freeInodesList(),_freeBlockesList()
 {
-	if (existsFileSystem(file)){
-		openFileSystem(file);
+	if (existsFileSystem()){
+			openFileSystem();
 	}
 	else{
-		createFileSystem(file);
+			createFileSystem();
 	}
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
@@ -122,15 +122,6 @@ LowLevelDisk::LowLevelDisk(const std::string& file):_iNodeTable(),_freeInodesLis
 
 }
 
-LowLevelDisk::LowLevelDisk()
-{
-
-	//TODO close open files
-	pthread_mutexattr_init(&_mtxattr);
-	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
-	pthread_mutex_init(&_RecMutex, &_mtxattr);
-
-}
 
 LowLevelDisk::~LowLevelDisk()
 {
