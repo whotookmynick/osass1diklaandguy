@@ -1,12 +1,10 @@
 #ifndef LOWLEVELDISK_H_
 #define LOWLEVELDISK_H_
 
-#include "BlockList.h"
-#include "BlockList.h"
-#include "iNode.h"
-
-#include  "Logger.h"
-#include "Exception.cpp"
+#include "Lists/BlockList.h"
+#include "../FileSystem/iNode.h"
+#include  "../LogMessages/Logger.h"
+#include "../Exception/Exception.cpp"
 
 #include <iostream>
 #include <string>
@@ -16,7 +14,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-#include  "InodeList.h"
+#include  "Lists/InodeList.h"
 
 using namespace std;
 
