@@ -143,6 +143,7 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 {
 	char currEntryBuffer[20];
 	int currOffset = 0;
+	list<FileEntry> oldDir = this->d_read(i_node);
 	list<FileEntry>::iterator it;
 	it = dlist.begin();
 	while( it != dlist.end() ) {
@@ -153,6 +154,26 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 		currOffset += 16;
 	    ++it;
     }
+	if (currOffset < _lldisk->getFileSize(i_node))
+	{
+		int currBlockInFile = currOffset / BLOCK_SIZE;
+		int currBlock = _lldisk->getDataBlock(i_node, currBlockInFile);
+		char currBlockBuffer[BLOCK_SIZE];
+		_lldisk->readBlock(currBlock,currBlockBuffer);
+		for(int i = currOffset - (currBlockInFile * BLOCK_SIZE); i < BLOCK_SIZE; i++)
+		{
+			currBlockBuffer[i] = 0;
+		}
+		_lldisk->writeBlock(currBlock,currBlockBuffer);
+		currBlockInFile++;
+		currBlock = _lldisk->getDataBlock(i_node,currBlockInFile);
+		while (currBlock != -1)
+		{
+			_lldisk->freeDataBlock(currBlock);
+			currBlockInFile++;
+			currBlock = _lldisk->getDataBlock(i_node,currBlockInFile);
+		}
+	}
 // Now to check if no old data is left.
 
 }

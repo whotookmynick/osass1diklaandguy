@@ -27,6 +27,8 @@
 <option id="gnu.cpp.compiler.option.other.other.1431016038" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
 <option id="gnu.cpp.compiler.option.include.paths.1755355364" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/Exception}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LowLevelDisk/Lists}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/FileSystem}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LogMessages}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LibraryFunctionsUI}&quot;"/>
@@ -42,7 +44,7 @@
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1778918183" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1391318966" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <option id="gnu.cpp.link.option.flags.1160928870" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-lpthread" valueType="string"/>
-<option id="gnu.cpp.link.option.libs.265259953" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs"/>
+<option id="gnu.cpp.link.option.libs.265259953" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.22162676" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>

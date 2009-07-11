@@ -13,6 +13,7 @@
 #include <vector>
 #include <pthread.h>
 #include <sstream>
+#include <unistd.h>
 #include "../SystemCalls/SystemCalls.h"
 
 
@@ -28,11 +29,21 @@ private:
 
 	pthread_t ui_thread;
 	SystemCalls *_systemCallsCaller;
+	string _pwd;
+	vector<int> _fdTable;
 
+	/*------------------------ HELP FUNCTIONS ---------------------*/
+	string getRealPWD();
+	void goDownDir();
+
+	/* END HELP FUNCTIONS */
 public:
 
-        OSUI(int dataBlockSize,int numberOfInodes,int diskSize);
+        OSUI(SystemCalls* systemCallsCaller);
         virtual ~OSUI();
+
+        void run();
+
         /*
          * makes a directory with the given name.
          */
@@ -123,11 +134,15 @@ public:
          */
         int crprc(int id, int parent);
         /*
-         * This function is needed to test the file system intensively. It allows executing many commands quickly from a file given as input. Do not wait for a command to return before dispatching the next command. For example, if requested to read a large amount of data, the shell should be able to receive another command even though the read command hasn't finished yet. Each command has the following syntax: [commandName][space][first arg][space][second arg] etc. Each space will be exactly one space. Each command is terminated by a '\n'.
+         * This function is needed to test the file system intensively.
+         * It allows executing many commands quickly from a file given as input.
+         * Do not wait for a command to return before dispatching the next command.
+         * For example, if requested to read a large amount of data,
+         * the shell should be able to receive another command even though the read command hasn't finished yet.
+         * Each command has the following syntax: [commandName][space][first arg][space][second arg] etc.
+         * Each space will be exactly one space. Each command is terminated by a '\n'.
          */
         int batch(string file_name);
-
-        void run();
 
 };
 

@@ -11,7 +11,10 @@
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize){}
+SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize)
+{
+	_fileSys = new FileSystem(dataBlockSize,numberOfInodes,diskSize);
+}
 
 SystemCalls::~SystemCalls(){}
 
@@ -36,7 +39,35 @@ int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
 
 
 int SystemCalls::MakeDir(char* dir_name){
-	return 1;
+	string dir_nameString(dir_name);
+	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
+	int newDir_iNode = _fileSys->createDir();
+	int pwdInode = ROOT_PWD_INODE;
+	list<FileEntry> currPWD;
+	bool done = false;
+	while (!done)
+	{
+		string currDir = pwd.substr(0, pwd.find("/"));
+		currPWD = _fileSys->d_read(pwdInode);
+		pwdInode = -1;
+		list<FileEntry>::iterator it = currPWD.begin();
+		while (it != currPWD.end() & pwdInode == -1)
+		{
+			FileEntry curr = *it;
+			string currEntryName(curr.getFileName());
+			if (currDir.compare(currEntryName) == 0)
+			{
+				pwdInode = curr.getInodeNum();
+			}
+			++it;
+		}
+		done = pwd.empty();
+	}
+	currPWD = _fileSys->d_read(pwdInode);
+	FileEntry newDirEntry(newDir_iNode,(char*)new_dir_name.c_str(),-1);
+	currPWD.push_back(newDirEntry);
+	_fileSys->d_write(pwdInode,currPWD);
 }
 
 int SystemCalls::RmDir(char* dir_name){
