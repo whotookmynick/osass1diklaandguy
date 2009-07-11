@@ -16,7 +16,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-#include  "InodeList.h";
+#include  "InodeList.h"
 
 using namespace std;
 
@@ -50,24 +50,7 @@ public:
 	virtual ~LowLevelDisk();
 
 
-	//---------------------------------------------------------------------------/
-	//								Help function
-	//---------------------------------------------------------------------------/
-	int  findFreeNode();
-	void rmvNodeFromFreeNode();
-	void initNode(int node_id);
-	void addFreeNodeToFreeNodeList(int i_node);
-	void freeInodeBlocks(int i_node);
-	int  getFreeBlock();
-	void initBlock(int block_id);
-	void rmvBlockFromFreeBlock();
-	void addFreeBlockToFreeBlockList(int dblock);
-	bool existsFileSystem(const string& filename);
-	void createFyleSystem(const string& filename);
-	void  initVars();
-	void initFreeBlocksList();
-    void initFreeInodesList();
-    void initInodesList();
+
 	//---------------------------------------------------------------------------/
 	//								Low Level functions
 	//---------------------------------------------------------------------------/
@@ -165,6 +148,26 @@ public:
 	/////////////////////////////////////////////
 
 private:
+	//---------------------------------------------------------------------------/
+	//								Help function
+	//---------------------------------------------------------------------------/
+	int  findFreeNode();
+	void rmvNodeFromFreeNode();
+	void initNode(int node_id);
+	void addFreeNodeToFreeNodeList(int i_node);
+	void freeInodeBlocks(int i_node);
+	int  getFreeBlock();
+	void initBlock(int block_id);
+	void rmvBlockFromFreeBlock();
+	void addFreeBlockToFreeBlockList(int dblock);
+	bool existsFileSystem(const string& filename);
+	void createFyleSystem(const string& filename);
+	void  initVars();
+	void initFreeBlocksList();
+    void initFreeInodesList();
+    void initInodesList();
+
+
 
 	//define recursive mutex
 	pthread_t _mainThread;
