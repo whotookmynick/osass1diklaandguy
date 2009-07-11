@@ -124,8 +124,7 @@ LowLevelDisk::LowLevelDisk(const std::string& file):_iNodeTable(),_freeInodesLis
 
 LowLevelDisk::LowLevelDisk()
 {
-	delete _freeInodesList;
-	delete _freeBlockesList;
+
 	//TODO close open files
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
@@ -135,6 +134,8 @@ LowLevelDisk::LowLevelDisk()
 
 LowLevelDisk::~LowLevelDisk()
 {
+	delete _freeInodesList;
+	delete _freeBlockesList;
 	pthread_mutex_destroy(&_RecMutex);
 	pthread_mutexattr_destroy(&_mtxattr);
 
@@ -307,6 +308,8 @@ int LowLevelDisk::getDataBlock (int i_node, int i){
 	if (i>=0 | i<=9){
 		pthread_mutex_unlock(&_RecMutex);
 		//return the i enter in the i_node
+		//return -1 if block does not exist
+
 	}
 	else{
 
@@ -326,7 +329,7 @@ void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 
 void LowLevelDisk::readBlock(int dblockNum, char* buf){
 	pthread_mutex_lock(&_RecMutex);
-
+	//init empty buffer if block does not exist
 
 	pthread_mutex_unlock(&_RecMutex);
 }

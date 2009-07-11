@@ -8,9 +8,9 @@
 #ifndef INODELIST_H_
 #define INODELIST_H_
 
-#include "Logger.h"
+#include "../../LogMessages/Logger.h"
 //#include "LowLevelDisk.h"
-#include "iNode.h"
+#include "../../FileSystem/iNode.h"
 #include <sstream>
 #include <math.h>
 #include <sys/mman.h>
