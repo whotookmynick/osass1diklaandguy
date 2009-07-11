@@ -37,12 +37,21 @@ int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
 	return 1;
 }
 
-
 int SystemCalls::MakeDir(char* dir_name){
 	string dir_nameString(dir_name);
 	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	int pwdInode = -1;
+	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
 	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
 	int newDir_iNode = _fileSys->createDir();
+	FileEntry newDirEntry(newDir_iNode,(char*)new_dir_name.c_str(),-1);
+	currPWD.push_back(newDirEntry);
+	_fileSys->d_write(pwdInode,currPWD);
+	return 1;
+}
+
+list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
+{
 	int pwdInode = ROOT_PWD_INODE;
 	list<FileEntry> currPWD;
 	bool done = false;
@@ -65,9 +74,8 @@ int SystemCalls::MakeDir(char* dir_name){
 		done = pwd.empty();
 	}
 	currPWD = _fileSys->d_read(pwdInode);
-	FileEntry newDirEntry(newDir_iNode,(char*)new_dir_name.c_str(),-1);
-	currPWD.push_back(newDirEntry);
-	_fileSys->d_write(pwdInode,currPWD);
+	*lastInode = pwdInode;
+	return currPWD;
 }
 
 int SystemCalls::RmDir(char* dir_name){
