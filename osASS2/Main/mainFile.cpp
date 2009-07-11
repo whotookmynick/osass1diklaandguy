@@ -6,13 +6,50 @@
  */
 
 #include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <fstream>
 #include "../LibraryFunctionsUI/UI.h"
 
 using namespace std;
 
+void parseConfigFile(ifstream *myfile,int configargs[3])
+{
+	string line,value;
+	getline (*myfile,line);
+	value = line.substr(line.find("=") + 1);
+	configargs[0] = atoi(value.c_str());
+	getline (*myfile,line);
+	value = line.substr(line.find("=") + 1);
+	configargs[1] = atoi(value.c_str());
+	getline (*myfile,line);
+	value = line.substr(line.find("=") + 1);
+	configargs[2] = atoi(value.c_str());
+
+
+}
+
 int main(int argc,char** argv)
 {
-	cout<<"not implemented yet"<<endl;
+	if (argc < 2)
+	{
+		cout<<"Usage: sim <config_filename>"<<endl;
+		return 0;
+	}
+	int configargs[3];
+	ifstream *myfile = new ifstream(argv[1]);
+	if (myfile->is_open())
+	{
+		parseConfigFile(myfile,configargs);
+		cout <<"finished parsing" <<endl;
+	}
+	else
+	{
+		cout << "Unable to open file"<<endl;
+		return 0;
+	}
+	new OSUI(configargs[0],configargs[1],configargs[2]);
+	pthread_exit(0);
 }
 
 

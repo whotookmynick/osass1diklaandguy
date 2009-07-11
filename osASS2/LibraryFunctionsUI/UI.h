@@ -31,7 +31,7 @@ private:
 
 public:
 
-        OSUI();
+        OSUI(int dataBlockSize,int numberOfInodes,int diskSize);
         virtual ~OSUI();
         /*
          * makes a directory with the given name.

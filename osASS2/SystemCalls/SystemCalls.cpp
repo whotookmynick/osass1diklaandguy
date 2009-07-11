@@ -11,7 +11,7 @@
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-SystemCalls::SystemCalls(){}
+SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize){}
 
 SystemCalls::~SystemCalls(){}
 
