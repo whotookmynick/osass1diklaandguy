@@ -64,11 +64,64 @@ void LowLevelDisk::initFreeBlocksList() {
 }
 
 
-void LowLevelDisk::initVars(){
-		// DiskDescriptor();
+void LowLevelDisk::initVarsFromFile(){
+/*	_numOfBlocks;//offset 0 in file
+	_blockSize;//offset 1 in file
+	_rootInode;//offset 2 in file
+	_numOfFreeBlocks;//offset 3 in file
+	_firstEmptyBlock;//in offset 4 in file
+	_lastEmptyBlock;//in offset 5
+	_numOfInodes;//in offset 6
+	_numOfFreeInodes;//in offset 7
+
+
+	_firstFreeInode;//offset 8
+	_lastFreeInode;//offset 9
+
+	    BlockList* _freeInodesList;//block 3 in super block
+	    BlockList* _freeBlockesList;//block 4 in super block
+	    InodeList* _iNodeTable;//block 5
+
+
+
+
+	    // DiskDescriptor();
 	    //initFreeBlocksList();
+
 	    //initFreeInodesList();
 	    //initInodesList();
+*/
+}
+
+
+
+
+void LowLevelDisk::initVars(){
+	/*_numOfBlocks;//offset 0 in file
+	_blockSize;//offset 1 in file
+	_rootInode;//offset 2 in file
+	_numOfFreeBlocks;//offset 3 in file
+	_firstEmptyBlock;//in offset 4 in file
+	_lastEmptyBlock;//in offset 5
+	_numOfInodes;//in offset 6
+	_numOfFreeInodes;//in offset 7
+
+
+	_firstFreeInode;//offset 8
+	_lastFreeInode;//offset 9
+
+	    BlockList* _freeInodesList;//block 3 in super block
+	    BlockList* _freeBlockesList;//block 4 in super block
+	    InodeList* _iNodeTable;//block 5
+
+
+
+
+	    // DiskDescriptor();
+	    //initFreeBlocksList();
+
+	    //initFreeInodesList();
+	    //initInodesList();	     */
 }
 
 
@@ -111,10 +164,15 @@ LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_i
 {
 	if (existsFileSystem()){
 			openFileSystem();
+			initVarsFromFile();
 	}
 	else{
 			createFileSystem();
+			initVars();
 	}
+
+
+
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&_RecMutex, &_mtxattr);
@@ -158,7 +216,25 @@ int LowLevelDisk::getDataBlockSize(){
 //---------------------------------------------------------------------------/
 //								Help function
 //---------------------------------------------------------------------------/
+void* LowLevelDisk::readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes){
+	off_t offset = fromOffset;
+	size_t size = numOfBytes;
+	pread(_fd,buf,size,offset);
+	return buf;
+}
+
+int LowLevelDisk::writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes){
+	off_t offset = fromOffset;
+	size_t size = numOfBytes;
+	size_t sizeWriten = pwrite(_fd,buf,size,offset);
+	int sizeW = sizeWriten;
+	return sizeW;
+}
+
+
+
 int getInodeFromString(const string& elementName){
+
 	cout<<" unimplemented function getInodeFromString "<<endl;
 	return 1;
 }
