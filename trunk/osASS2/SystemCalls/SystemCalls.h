@@ -7,7 +7,7 @@ class SystemCalls
 private:
 
 public:
-	SystemCalls();
+	SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~SystemCalls();
 	/*
 	 * creates and opens a new file named ‘file_name’ returning a fd to the new file.
