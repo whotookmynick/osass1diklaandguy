@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <pthread.h>
 #include <stdlib.h>
-
+#include <unistd.h>
 #include  "Lists/InodeList.h"
 
 using namespace std;
@@ -171,8 +171,9 @@ private:
 	void initFreeBlocksList();
     void initFreeInodesList();
     void initInodesList();
-
-
+    void* readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);//read data from hard disk
+    int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
+    void initVarsFromFile();
 
 	//define recursive mutex
 	pthread_t _mainThread;
@@ -184,22 +185,22 @@ private:
 
 	int _fd;
 
+	int _numOfBlocks;//offset 0 in file
 	int _blockSize;//offset 1 in file
-    int _numOfBlocks;//offset 0 in file
+	int _rootInode;//offset 2 in file
+	int _numOfFreeBlocks;//offset 3 in file
+	int _firstEmptyBlock;//in offset 4 in file
+	int _lastEmptyBlock;//in offset 5
     int _numOfInodes;//in offset 6
-    int _numOfFreeBlocks;//offset 3 in file
     int _numOfFreeInodes;//in offset 7
-    int _rootInode;//offset 2 in file
-    int _firstEmptyBlock;//in offset 4 in file
-    int _lastEmptyBlock;//in offset 5
     int _firstFreeInode;//offset 8
     int _lastFreeInode;//offset 9
 
 
     BlockList* _freeInodesList;//block 3 in super block
     BlockList* _freeBlockesList;//block 4 in super block
-
     InodeList* _iNodeTable;//block 5
+
     //rest of the block in block 5 + _numOfInodes/blocksize round up
 
 
