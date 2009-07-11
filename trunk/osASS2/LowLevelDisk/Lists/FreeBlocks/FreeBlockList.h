@@ -7,8 +7,8 @@
 
 #ifndef FREEBLOCKLIST_H_
 #define FREEBLOCKLIST_H_
-#include "BlockList.h"
-#include  "../LowLevelDisk.h"
+#include "../BlockList.h"
+#include  "../../LowLevelDisk.h"
 
 class FreeBlockList : virtual BlockList {
 public:

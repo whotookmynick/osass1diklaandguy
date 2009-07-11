@@ -127,27 +127,28 @@ public:
 	 */
 	void setFileSize(int i_node, int newSize);
 
+	//------------------------------------------------------------//
+		int getNumOfBlocks();
+		int getNumOfInodes();
+	//    void setNumOfBlocks();
+	//    void setNumOfInodes();
+
+		/////////////////////////////////////////////
+		int getNumOfFreeBlocks();
+		int getNumOfFreeInodes();
+		void setNumOfFreeBlocks(int i);
+		void setNumOfFreeInodes(int i);
+
+		int getDataBlockSize();
+		int getInodeFromString(const string& elementName);//find the inode concted to the file name or directory name
+
 
 private:
 
 
 
-	//------------------------------------------------------------//
-		int getNumOfBlocks();
-	    int getNumOfInodes();
-	//    void setNumOfBlocks();
-	//    void setNumOfInodes();
-
-	    /////////////////////////////////////////////
-	    int getNumOfFreeBlocks();
-		int getNumOfFreeInodes();
-		void setNumOfFreeBlocks(int i);
-		void setNumOfFreeInodes(int i);
-
 		void* createFileSystem();
 		void openFileSystem();
-
-		int getDataBlockSize();
 
 		/////////////////////////////////////////////
 
@@ -180,21 +181,26 @@ private:
 
 
 
-	InodeList* _iNodeTable;
+
 	int _fd;
 
-	int _blockSize;
-    int _numOfBlocks;
-    int _numOfInodes;
-    int _numOfFreeBlocks;
-    int _numOfFreeInodes;
+	int _blockSize;//offset 1 in file
+    int _numOfBlocks;//offset 0 in file
+    int _numOfInodes;//in offset 6
+    int _numOfFreeBlocks;//offset 3 in file
+    int _numOfFreeInodes;//in offset 7
+    int _rootInode;//offset 2 in file
+    int _firstEmptyBlock;//in offset 4 in file
+    int _lastEmptyBlock;//in offset 5
+    int _firstFreeInode;//offset 8
+    int _lastFreeInode;//offset 9
 
 
+    BlockList* _freeInodesList;//block 3 in super block
+    BlockList* _freeBlockesList;//block 4 in super block
 
-    BlockList* _freeInodesList;
-    BlockList* _freeBlockesList;
-
-
+    InodeList* _iNodeTable;//block 5
+    //rest of the block in block 5 + _numOfInodes/blocksize round up
 
 
 };
