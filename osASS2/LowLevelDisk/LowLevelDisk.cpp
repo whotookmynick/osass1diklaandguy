@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 
+
 //#include <stdexpt>
 
 bool LowLevelDisk::existsFileSystem(const string& filename) {
@@ -34,11 +35,40 @@ void* LowLevelDisk::createFileSystem(const string& file){
 
 	return NULL;
 }
+
+
+
+
+void LowLevelDisk::initFreeInodesList() {
+    LOG_DEBUG("init freeInodeList\n");
+    //set firstBlockOffset = NumOfFreeBlocks * blockSize;
+    //set offset = OFFSET + ((_NumOfFreeInodes)- the first discreptors of disk  );
+    //set freeInodesHead = OFFSET + ( firstBlockInFreeInodes ??? - the first discreptors of disk );
+    //set freeInodesTail = OFFSET + ( lastBlockInFreeInodes???? -_diskDesc );
+    //_freeInodesList = new FreeInodesList(_fd, sizeOffset, headOffset, tailOffset,firstBlockOffset,*this);
+}
+
+void LowLevelDisk::initInodesList() {
+    LOG_DEBUG("init inodesList\n");
+    //offset = NUM_OF_BLOCKS_IN_INODE_LIST * blockSize;
+    //_inodes = new InodesList(_fd, offset, *this);
+}
+
+void LowLevelDisk::initFreeBlocksList() {
+    LOG_DEBUG("init freeBlocksList\n");
+    //set firstBlockOffset = freeBlocksBlockNum *blockSize;
+    //set sizeOffset = OFFSET + freeBlocksCount - the first discreptors of disk );
+	 //set headOffset = OFFSET + (freeBlocksHead - the first discreptors of disk);
+	//set tailOffset = OFFSET + ( freeBlocksTail - the first discreptors of disk );
+    //_freeBlocks = new FreeBlocksList(_fd, sizeOffset, headOffset, tailOffset,firstBlockOffset,*this);
+}
+
+
 void LowLevelDisk::initVars(){
 		// DiskDescriptor();
-	    //initializeFreeBlocksList();
-	    //initializeFreeInodesList();
-	    //initializeInodesList();
+	    //initFreeBlocksList();
+	    //initFreeInodesList();
+	    //initInodesList();
 }
 
 
