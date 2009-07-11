@@ -5,12 +5,14 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "../LowLevelDisk/LowLevelDisk.h"
+#include "FileEntry.h"
+#include "LowLevelDisk.h"
 #include "OpenFileDescriptor.h"
 
 #define SOFT_LINK 1;
 #define DIR 2;
 #define REGULAR_FILE 3;
+
 int BLOCK_SIZE = 64;
 
 
@@ -21,8 +23,14 @@ private:
 	LowLevelDisk* _lldisk;
 	vector<OpenFileDescriptor*> _openFilesTable;
 
+	/* ------------------------- HELP FUNCTIONS ---------------------------------*/
 	int createSoftLink();
+
 	int createRegularFile();
+
+	int turnBytesToInt(char* bytes);
+	/* END HELP FUNCTIONS */
+
 public:
 
 	FileSystem();
@@ -64,14 +72,14 @@ public:
 	 ** that lists the files in this directory.
 	 ** Each element in this list therefore contains a filename and i_node number.
 	 **/
-	list<char**> d_read(int i_node);
+	list<FileEntry> d_read(int i_node);
 
 	/**
 	 ** replaces the content of the given directory file (specified by i_node)
 	 ** with the information stored in the list.
 	 ** The list has the same format as that returned by d_read().
 	 **/
-	void d_write(int i_node,list<char**> dlist);
+	void d_write(int i_node,list<FileEntry> dlist);
 
 	/**
 	 ** delete the file.

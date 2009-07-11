@@ -8,13 +8,13 @@
 #include "iNode.h"
 
 iNode::iNode() {
-	// TODO Auto-generated constructor stub
+
 
 }
-iNode::iNode(int offset,LowLevelDisk& disk){}//TODO
+iNode::iNode(int offset,LowLevelDisk& disk){}
 
 iNode::~iNode() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void iNode::setFileType(int _fileType)
