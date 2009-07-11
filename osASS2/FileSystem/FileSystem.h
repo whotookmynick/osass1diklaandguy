@@ -29,30 +29,32 @@ private:
 	int createRegularFile();
 
 	int turnBytesToInt(char* bytes);
+
+	void intToByte(int val, char *bytes );
 	/* END HELP FUNCTIONS */
 
 public:
 
-	FileSystem();
+	FileSystem(int dataBlockSize,int numberOfInodes,int diskSize);
 
 	virtual ~FileSystem();
 	/**
 	 ** creates a file returning its i_node number. Flag indicates whether the file to create is a regular file or a soft link.
 	 **/
-	int createFile(int flag);
+	virtual int createFile(int flag);
 	/**
 	 ** creates a directory, returning its i_node number.
 	 **/
-	int createDir();
+	virtual int createDir();
 
 	/**
 	 ** Returns the type of the file this i_node represents.
 	 **/
-	int getFileType(int i_node);
+	virtual int getFileType(int i_node);
 	/**
 	 **reads nBytes (at most) from the given file (represented by this i_node) at the given offset inside the file into the buffer.
 	 **/
-	void f_read(int i_node,char* buffer,int offset,int nBytes);
+	virtual void f_read(int i_node,char* buffer,int offset,int nBytes);
 
 	/**
 	 ** writes nBytes (at most) to the given file (represented by this i_node)
@@ -60,7 +62,7 @@ public:
 	 **  If the amount to be written exceeds the current allocated block,
 	 **  a new block should be allocated to accommodate the rest of the data.
 	 **/
-	void f_write(int i_node,char* buffer,int offset,int nBytes );
+	virtual void f_write(int i_node,char* buffer,int offset,int nBytes );
 
 	/**
 	 ** Notice that both f_read and f_write only work on normal files (not directories).
@@ -72,23 +74,23 @@ public:
 	 ** that lists the files in this directory.
 	 ** Each element in this list therefore contains a filename and i_node number.
 	 **/
-	list<FileEntry> d_read(int i_node);
+	virtual list<FileEntry> d_read(int i_node);
 
 	/**
 	 ** replaces the content of the given directory file (specified by i_node)
 	 ** with the information stored in the list.
 	 ** The list has the same format as that returned by d_read().
 	 **/
-	void d_write(int i_node,list<FileEntry> dlist);
+	virtual void d_write(int i_node,list<FileEntry> dlist);
 
 	/**
 	 ** delete the file.
 	 **/
-	void f_delete(int i_node);
+	virtual void f_delete(int i_node);
 	/**
 	 ** delete the directory if it is empty.
 	 **/
-	void d_delete(int i_node);
+	virtual void d_delete(int i_node);
 
 };
 

@@ -8,9 +8,9 @@
 #include "FileSystem.h"
 
 
-FileSystem::FileSystem()
+FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize)
 {
-	_lldisk = new LowLevelDisk();
+	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
 }
 
 /*
@@ -115,6 +115,7 @@ list<FileEntry> FileSystem::d_read(int i_node)
 		int entrySize = _lldisk->getFileSize(entryInode);
 		FileEntry entry(entryInode,entryName,entrySize);
 		ans.push_back(entry);
+		currOffset += 16;
 	}
 	return ans;
 }
@@ -129,9 +130,45 @@ int FileSystem::turnBytesToInt(char* bytes)
 	return Int32;
 }
 
-FileSystem::d_write(int i_node,list<FileEntry> dlist)
-{
 
+void FileSystem::intToByte(int val, char *bytes )
+{
+bytes[0] = (char)val;
+bytes[1] = (char)(val >> 8);
+bytes[2] = (char)(val >> 16);
+bytes[3] = (char)(val >> 24);
+}
+
+void FileSystem::d_write(int i_node,list<FileEntry> dlist)
+{
+	char currEntryBuffer[20];
+	int currOffset = 0;
+	list<FileEntry>::iterator it;
+	it = dlist.begin();
+	while( it != dlist.end() ) {
+		FileEntry currEntry = *it;
+		intToByte(currEntry.getInodeNum(),currEntryBuffer);
+		strcpy(currEntryBuffer+4,currEntry.getFileName());
+		this->f_write(i_node,currEntryBuffer,currOffset,16);
+		currOffset += 16;
+	    ++it;
+    }
+// Now to check if no old data is left.
+
+}
+
+void FileSystem::f_delete(int i_node)
+{
+	_lldisk->freeInode(i_node);
+}
+
+void FileSystem::d_delete(int i_node)
+{
+	list<FileEntry> dListing = this->d_read(i_node);
+	if (dListing.empty())
+	{
+		f_delete(i_node);
+	}
 }
 
 FileSystem::~FileSystem()
