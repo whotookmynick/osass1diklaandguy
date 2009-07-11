@@ -29,10 +29,10 @@ static vector<string> splitAroundWhiteSpaces(string line)
 
 }
 
-OSUI::OSUI(int dataBlockSize,int numberOfInodes,int diskSize)
+OSUI::OSUI(SystemCalls* systemCallsCaller)
 {
-	cout<<"Creating system calls layer"<<endl;
-	_systemCallsCaller = new SystemCalls(dataBlockSize,numberOfInodes,diskSize);
+	_systemCallsCaller = systemCallsCaller;
+	_pwd = getRealPWD();
 	if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
 	{
 		perror("UI thread creation failed");
@@ -41,33 +41,41 @@ OSUI::OSUI(int dataBlockSize,int numberOfInodes,int diskSize)
 }
 
 void OSUI::run(){
-		string input;
-		bool stopWhile = false;
-		while (!stopWhile)
+	string input;
+	bool stopWhile = false;
+	while (!stopWhile)
+	{
+		cout<<_pwd<<"> ";
+		getline(cin,input);
+		vector<string> args = splitAroundWhiteSpaces(input);
+		if (args[0].compare("mkdir") == 0)
 		{
-			cout<<"> ";
-			getline(cin,input);
-			vector<string> args = splitAroundWhiteSpaces(input);
-			if (args[0].compare("mkdir") == 0)
-			{
-				this->mkdir(args[1]);
-			}
-			else if (args[0].compare("create"))
-			{
-				this->create(args[1]);
-			}
-			stopWhile = input.compare("Exit") == 0;
+			this->mkdir(args[1]);
 		}
-
-		cout<<"Simulation Ended"<<endl;
-		pthread_exit(0);
-
+		else if (args[0].compare("create") == 0)
+		{
+			this->create(args[1]);
+		}
+		else if (args[0].compare("cd") == 0)
+		{
+			cout<<"run found cd and args[1] = "<<args[1]<<endl;
+			this->cd(args[1]);
+		}
+		stopWhile = input.compare("Exit") == 0;
 	}
+
+	cout<<"Simulation Ended"<<endl;
+	pthread_exit(0);
+
+}
 
 int OSUI::mkdir (string dir_name)
 {
-	char* dir_name_c = (char*)dir_name.c_str();
-	int i_nodeNum = _systemCallsCaller->MakeDir(dir_name_c);
+	string temp;
+	temp = _pwd;
+	temp.append("/" + dir_name);
+//	char* dir_name_c = (char*)dir_name.c_str();
+	int i_nodeNum = _systemCallsCaller->MakeDir((char*)temp.c_str());
 	return i_nodeNum;
 }
 
@@ -77,6 +85,52 @@ int OSUI::create(string file_name)
 	int i_nodeNum = _systemCallsCaller->MakeFile(file_name_c,0,0);
 	return i_nodeNum;
 }
+
+int OSUI::cd(string new_dir)
+{
+	string dir_change = new_dir.substr(0,new_dir.find('/'));
+	if (_systemCallsCaller->isDir((char*)dir_change.c_str()))
+	{
+		string next_dir;
+		if (new_dir.empty() | new_dir.compare("/") == 0)
+			return 1;
+		if (new_dir.at(0) == '.')
+		{
+			//		cout<<"cd goDownDir()"<<endl;
+			goDownDir();
+		}
+		else
+		{
+			//		cout<<"cd goUpDir"<<endl;
+			string firstDirChange;
+			new_dir = new_dir.substr(1);
+			firstDirChange = new_dir.substr(0,new_dir.find('/'));
+			_pwd.append("/" + firstDirChange);
+		}
+		int nextDirPlace = new_dir.find('/');
+		if (nextDirPlace == -1)
+			return 1;
+		next_dir = new_dir.substr(nextDirPlace);
+		return this->cd(next_dir);
+	}
+	cerr<<"Could not find dir"<<endl;
+	return 1;
+}
+
+void OSUI::goDownDir()
+{
+	int lastDirPlace = _pwd.find_last_of("/");
+	_pwd = _pwd.substr(0,lastDirPlace);
+	//	cout<<"goDownDir _pwd = "<<_pwd<<endl;
+}
+
+string OSUI::getRealPWD()
+{
+	char *path = NULL;
+	path = getcwd(NULL, 0); // or _getcwd
+	return string(path);
+}
+
 OSUI::~OSUI()
 {
 

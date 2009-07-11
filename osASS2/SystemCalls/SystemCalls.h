@@ -1,11 +1,14 @@
 #ifndef SYSTEMCALLS_H_
 #define SYSTEMCALLS_H_
 
+#include "FileSystem.h"
+
+const int ROOT_PWD_INODE = 2;
 
 class SystemCalls
 {
 private:
-
+	FileSystem *_fileSys;
 public:
 	SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~SystemCalls();
@@ -33,10 +36,11 @@ public:
 	 * removes the file ‘file_name’
 	 */
 	int RmFile(char* file_name);
+
 	/*
 	 * lists the content of the location_directory. Return list in buf.
 	 */
-	int ls(char*dir_name, char * buf);
+	int ls(char *dir_name, char * buf);
 
 	/*
 	 * opens the file ‘file_name’. Needs to deal with soft_links. Opens the file with the specified permissions.
@@ -64,8 +68,9 @@ public:
 	 * Moves the child's i_node from its current directory to new destination.
 	 */
 	int moveFile(char* parendDir, char * new_dest);
+
 	/*
-	 * Ret urns whether this address is a directory or not. Needs to deal with soft_links.
+	 * Returns whether this address is a directory or not. Needs to deal with soft_links.
 	 */
 	bool isDir(char * address);
 	/*

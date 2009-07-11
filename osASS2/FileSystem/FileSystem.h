@@ -13,7 +13,7 @@
 #define DIR 2;
 #define REGULAR_FILE 3;
 
-int BLOCK_SIZE = 64;
+const int BLOCK_SIZE = 64;
 
 
 using namespace std;

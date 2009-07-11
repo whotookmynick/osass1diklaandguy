@@ -9,7 +9,8 @@
 #include <string>
 #include <stdlib.h>
 #include <fstream>
-#include "../LibraryFunctionsUI/UI.h"
+#include "UI.h"
+#include "SystemCalls/SystemCalls.h"
 
 using namespace std;
 
@@ -48,7 +49,9 @@ int main(int argc,char** argv)
 		cout << "Unable to open file"<<endl;
 		return 0;
 	}
-	new OSUI(configargs[0],configargs[1],configargs[2]);
+	cout<<"Creating system calls layer"<<endl;
+	SystemCalls* systemCallsCaller = new SystemCalls(configargs[0],configargs[1],configargs[2]);
+	new OSUI(systemCallsCaller);
 	pthread_exit(0);
 }
 
