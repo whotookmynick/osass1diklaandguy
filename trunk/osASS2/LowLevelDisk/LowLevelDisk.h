@@ -24,6 +24,7 @@ const int ROOT_INODE = 0;
 const int SIZE_OF_SUPER_BLOCK = 5;
 const int SIZE_OF_INODE = sizeof(InodeStruct);
 const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
+const string SYS_FILE_NAME = "SYS_FILE";
 
 /*
 * Regular files simply store the data written to them by user programs.
@@ -43,7 +44,6 @@ class LowLevelDisk
 {
 
 public:
-	LowLevelDisk(const std::string& file);
 	LowLevelDisk();
 	virtual ~LowLevelDisk();
 
@@ -126,26 +126,31 @@ public:
 	 */
 	void setFileSize(int i_node, int newSize);
 
-	//------------------------------------------------------------//
-	int getNumOfBlocks();
-    int getNumOfInodes();
-//    void setNumOfBlocks();
-//    void setNumOfInodes();
-
-    /////////////////////////////////////////////
-    int getNumOfFreeBlocks();
-	int getNumOfFreeInodes();
-	void setNumOfFreeBlocks(int i);
-	void setNumOfFreeInodes(int i);
-
-	void* createFileSystem(const string& file);
-	void openFileSystem(const string& file);
-
-	int getDataBlockSize();
-
-	/////////////////////////////////////////////
 
 private:
+
+
+
+	//------------------------------------------------------------//
+		int getNumOfBlocks();
+	    int getNumOfInodes();
+	//    void setNumOfBlocks();
+	//    void setNumOfInodes();
+
+	    /////////////////////////////////////////////
+	    int getNumOfFreeBlocks();
+		int getNumOfFreeInodes();
+		void setNumOfFreeBlocks(int i);
+		void setNumOfFreeInodes(int i);
+
+		void* createFileSystem();
+		void openFileSystem();
+
+		int getDataBlockSize();
+
+		/////////////////////////////////////////////
+
+
 	//---------------------------------------------------------------------------/
 	//								Help function
 	//---------------------------------------------------------------------------/
@@ -158,7 +163,7 @@ private:
 	void initBlock(int block_id);
 	void rmvBlockFromFreeBlock();
 	void addFreeBlockToFreeBlockList(int dblock);
-	bool existsFileSystem(const string& filename);
+	bool existsFileSystem();
 	void createFyleSystem(const string& filename);
 	void  initVars();
 	void initFreeBlocksList();

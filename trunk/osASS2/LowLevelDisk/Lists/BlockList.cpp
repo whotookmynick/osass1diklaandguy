@@ -31,7 +31,7 @@ int BlockList::size(){
 }
 
 bool BlockList::empty(){
-	return true;
+	return size()==0;
 }
 
 bool BlockList::contains(int v)  {
@@ -42,6 +42,9 @@ int BlockList::head(){
 	return 1;
 }//reference to the  front
 
-void BlockList::pop_front(){}
+void BlockList::pop_front(){
+
+
+}
 
 void BlockList::push_back(int& val){}
