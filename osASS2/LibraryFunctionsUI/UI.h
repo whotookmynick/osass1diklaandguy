@@ -130,7 +130,13 @@ public:
          */
         int swprc(int new_process_num);
         /*
-         *Creates a process with the given id. If a process with this id already exists, return an error. If parent == _1, this process is created with no open files. If parent ) _1, this process is defined as the child of the process with id parent. This means that it is created with an exact copy of the int fd table of the parent. If process with id parent doesn’t exist return an error. This function doesn’t switch to the context of the newly created process, rather it stays in the context of the current process.
+         * Creates a process with the given id. If a process with this id already exists, return an error.
+         * If parent == -1, this process is created with no open files.
+         * If parent ) _1, this process is defined as the child of the process with id parent.
+         * This means that it is created with an exact copy of the int fd table of the parent.
+         * If process with id parent doesn’t exist return an error.
+         * This function doesn’t switch to the context of the newly created process,
+         * rather it stays in the context of the current process.
          */
         int crprc(int id, int parent);
         /*

@@ -8,7 +8,11 @@ const int ROOT_PWD_INODE = 2;
 class SystemCalls
 {
 private:
+
 	FileSystem *_fileSys;
+
+	list<FileEntry> readPWDDir(string pwd,int *lastInode);
+
 public:
 	SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~SystemCalls();
