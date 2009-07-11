@@ -24,6 +24,7 @@ const int ROOT_INODE = 0;
 const int SIZE_OF_SUPER_BLOCK = 5;
 const int SIZE_OF_INODE = sizeof(InodeStruct);
 const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
+
 const string SYS_FILE_NAME = "SYS_FILE";
 
 /*
@@ -44,7 +45,7 @@ class LowLevelDisk
 {
 
 public:
-	LowLevelDisk();
+	LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~LowLevelDisk();
 
 
@@ -187,6 +188,8 @@ private:
     int _numOfInodes;
     int _numOfFreeBlocks;
     int _numOfFreeInodes;
+
+
 
     BlockList* _freeInodesList;
     BlockList* _freeBlockesList;
