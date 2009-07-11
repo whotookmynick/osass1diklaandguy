@@ -107,7 +107,7 @@ void LowLevelDisk::openFileSystem(){
 
 
 
-LowLevelDisk::LowLevelDisk():_iNodeTable(),_freeInodesList(),_freeBlockesList()
+LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_iNodeTable(),_freeInodesList(),_freeBlockesList()
 {
 	if (existsFileSystem()){
 			openFileSystem();
