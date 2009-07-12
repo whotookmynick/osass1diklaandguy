@@ -55,20 +55,20 @@ Note – all services mentioned above should return appropriate error codes to s
 */
 
 typedef struct{
-	int _numOfBlocks;//offset 0 in file
-	int _blockSize;//offset 1 in file
-	int _rootInode;//offset 2 in file
-	int _numOfFreeBlocks;//offset 3 in file
-	int _firstEmptyBlock;//in offset 4 in file
-	int _lastEmptyBlock;//in offset 5
-	int _numOfInodes;//in offset 6
-	int _numOfFreeInodes;//in offset 7
-	int _firstFreeInode;//offset 8
-	int _lastFreeInode;//offset 9
+	int numOfBlocks;//offset 0 in file
+	int blockSize;//offset 1 in file
+	int rootInode;//offset 2 in file
+	int numOfFreeBlocks;//offset 3 in file
+	int firstEmptyBlock;//in offset 4 in file
+	int lastEmptyBlock;//in offset 5
+	int numOfInodes;//in offset 6
+	int numOfFreeInodes;//in offset 7
+	int firstFreeInode;//offset 8
+	int lastFreeInode;//offset 9
 
-	int _firstBlockOfFreeInodesOffset;
-	int _firstBlockOfFreeBlocksOffset;
-	int _inodeTableOffset;
+	int firstBlockOfFreeInodesOffset;
+	int firstBlockOfFreeBlocksOffset;
+	int inodeTableOffset;
 
 }superBlock;
 
@@ -205,9 +205,11 @@ private:
     void* readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);//read data from hard disk
     int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
 
-    void  initVarsFromConfig();
-    void initVarsFromHardDisk();
+   // void informSuperBlock(int offset,int value);
+   // void  initVarsFromConfig();
+    //void initVarsFromHardDisk();
 
+    void initSuperBlockFromHardDisk();
 	//define recursive mutex
 	pthread_t _mainThread;
 	pthread_mutex_t _RecMutex;

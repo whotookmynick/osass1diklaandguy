@@ -30,6 +30,7 @@ public:
 	map<int,iNode*> _inodesMap;
 
 	iNode* createInode(int inode);
+	void emptyBlock(int i_node);
 
 private:
     int _offset;

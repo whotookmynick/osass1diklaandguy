@@ -39,4 +39,4 @@ iNode* InodeList::createInode(int inode){
 }
 
 
-
+void InodeList::emptyBlock(int i_node){}
