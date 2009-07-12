@@ -29,11 +29,23 @@ static vector<string> splitAroundWhiteSpaces(string line)
 
 }
 
-OSUI::OSUI(SystemCalls* systemCallsCaller)
+OSUI::OSUI(SystemCalls* systemCallsCaller):_systemCallsCaller(systemCallsCaller)
 {
 	_fdTable = new vector<int>();
-	_systemCallsCaller = systemCallsCaller;
+//	_systemCallsCaller = systemCallsCaller;
 	_pwd = getRealPWD();
+	init();
+}
+
+OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,int pid,string pwd,vector<OSUI*>* processTable):
+_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_pwd(pwd),_processTable(processTable)
+{
+	init();
+}
+
+void OSUI::init()
+{
+	_processTable->push_back(this);
 	if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
 	{
 		perror("UI thread creation failed");
@@ -73,8 +85,10 @@ void OSUI::run(){
 int OSUI::mkdir (string dir_name)
 {
 	string temp;
+	temp = _pwd;
+	temp.append("/" + dir_name);
 //	char* dir_name_c = (char*)dir_name.c_str();
-	int i_nodeNum = _systemCallsCaller->MakeDir((char*)dir_name.c_str(),_pwd);
+	int i_nodeNum = _systemCallsCaller->MakeDir((char*)temp.c_str());
 	return i_nodeNum;
 }
 
@@ -127,6 +141,30 @@ void OSUI::goDownDir()
 	int lastDirPlace = _pwd.find_last_of("/");
 	_pwd = _pwd.substr(0,lastDirPlace);
 	//	cout<<"goDownDir _pwd = "<<_pwd<<endl;
+}
+
+int OSUI::crprc(int id, int parent)
+{
+	if (processExists(id))
+	{
+		cout<<"process id already exists"<<endl;
+		return -1;
+	}
+	new OSUI(_systemCallsCaller,_fdTable,id,_pwd,_processTable);
+}
+
+bool OSUI::processExists(int pid)
+{
+
+	for(int i = 0; i < _processTable->size();i++)
+	{
+		OSUI* curr = _processTable->at(i);
+		if (curr->getPid() == pid)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 string OSUI::getRealPWD()
