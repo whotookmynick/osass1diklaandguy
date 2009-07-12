@@ -11,7 +11,10 @@ iNode::iNode() {
 
 
 }
-iNode::iNode(int offset,LowLevelDisk& disk){}
+iNode::iNode(int offset,LowLevelDisk& disk){
+
+
+}
 
 iNode::~iNode() {
 
