@@ -8,8 +8,9 @@
 #include "FreeBlockList.h"
 
 
-FreeBlockList::FreeBlockList(int fd,int numOfBlocks,int firstBlockAdress,int lastBlockAdress,int blockSize,LowLevelDisk& disk)
-    : BlockList(fd,numOfBlocks,firstBlockAdress,lastBlockAdress,blockSize,disk) {};
+FreeBlockList::FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
+: BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {};
+
 
 
 

@@ -5,7 +5,8 @@
 #include "../FileSystem/iNode.h"
 #include  "../LogMessages/Logger.h"
 #include "../Exception/Exception.cpp"
-
+#include "Lists/FreeBlocks/FreeBlockList.h"
+#include "Lists/FreeInodes/FreeInodeList.h"
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -26,6 +27,7 @@ const int SIZE_OF_INODE = sizeof(InodeStruct);
 const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
 
 //SUPER BLOCK CONTROL
+const int NUM_OF_BLOCK_OFFSET=0;
 const int BLOCK_SIZE_OFFSET=1;
 const int ROOT_INODE_OFFSET=2;
 const int NUM_OF_FREE_BLOCK_OFFSET=3;
@@ -35,8 +37,10 @@ const int INODE_TABLE_SIZE_OFFSET=6;
 const int NUM_OF_FREE_INODES_OFFSET=7;
 const int FIRST_EMPTY_INODE_POINTER_OFFSET=8;
 const int LAST_EMPTY_INODE_POINTER_OFFSET=9;
-
+const int FIRST_FREE_BLOCK_BLOCK =  3;//block 3
+const int FIRST_FREE_INODE_BLOCK =  4;//block 4
 const string SYS_FILE_NAME = "SYS_FILE";
+const int INODE_TABLE_BLOCK_NUM = 5;
 
 /*
 * Regular files simply store the data written to them by user programs.
@@ -62,9 +66,9 @@ typedef struct{
 	int _firstFreeInode;//offset 8
 	int _lastFreeInode;//offset 9
 
-	BlockList* _freeInodesList;//block 3 in super block
-	BlockList* _freeBlockesList;//block 4 in super block
-
+	int _firstBlockOfFreeInodesOffset;
+	int _firstBlockOfFreeBlocksOffset;
+	int _inodeTableOffset;
 
 }superBlock;
 
@@ -215,6 +219,14 @@ private:
 	int _fd;
 	superBlock* _superBlock;
 	InodeList* _iNodeTable;//block 5
+
+
+
+	FreeBlockList* _freeBlockesList;//block 4 in super block
+	FreeInodeList* _freeInodesList; //_freeInodesList;
+
+	//block 3 in super block
+	int _numOfBlocksInInodeTable;
     //rest of the block in block 5 + _numOfInodes/blocksize round up
 
 

@@ -8,11 +8,11 @@
 #ifndef FREEBLOCKLIST_H_
 #define FREEBLOCKLIST_H_
 #include "../BlockList.h"
-#include  "../../LowLevelDisk.h"
+class LowLevelDisk;
 
 class FreeBlockList : virtual BlockList {
 public:
-	FreeBlockList(int fd,int numOfBlocks,int firstBlockAdress,int lastBlockAdress,int blockSize,LowLevelDisk& disk);
+	FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk);
 
 
 //To freeLists to implement

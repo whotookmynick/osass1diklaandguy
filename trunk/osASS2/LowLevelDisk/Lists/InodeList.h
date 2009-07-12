@@ -21,7 +21,7 @@ using namespace std;
 class InodeList{
 public:
 
-	InodeList(int offset, LowLevelDisk& disk);
+	InodeList(int fd,int offset, LowLevelDisk& disk);
 
 	virtual ~InodeList();
 
@@ -34,6 +34,7 @@ public:
 private:
     int _offset;
     LowLevelDisk& _disk;
+    int _fd;
 };
 
 #endif /* INODELIST_H_ */

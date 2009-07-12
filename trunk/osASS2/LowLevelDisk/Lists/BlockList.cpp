@@ -11,8 +11,8 @@
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-BlockList::BlockList(int fd,int numOfBlocks,int firstBlockAdress,int lastBlockAdress,int blockSize,LowLevelDisk& disk) :
-_fd(fd),_firstBlockAdress(firstBlockAdress),_lastBlockAdress(lastBlockAdress),_blockSize(blockSize),_disk(disk)
+BlockList::BlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk) :
+_fd(fd),_firstBlockPointer(firstEmptyBlock),_lastBlockPointer(lastEmptyBlock),_offset(firstBlockOffset),_disk(disk)
 {
 
 

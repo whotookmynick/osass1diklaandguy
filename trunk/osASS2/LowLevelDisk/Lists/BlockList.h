@@ -23,12 +23,12 @@ public:
 	 *
 	 */
 
-	BlockList(int fd,int numOfBlocks,int firstBlockAdress,int lastBlockAdress,int blockSize,LowLevelDisk& disk);
+	BlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk);
 
 	virtual ~BlockList();
 
 	virtual int size();
-	virtual bool empty();
+	bool empty();
 	virtual bool contains(int v)  ;
 
 
@@ -43,9 +43,9 @@ public:
 
 private:
 	int _fd;
-	int _firstBlockAdress;
-	int _lastBlockAdress;
-	int _blockSize;
+	int _firstBlockPointer;
+	int _lastBlockPointer;
+	int _offset;
 	LowLevelDisk& _disk;
 };
 
