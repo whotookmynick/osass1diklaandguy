@@ -10,6 +10,8 @@ class SystemCalls
 private:
 
 	FileSystem *_fileSys;
+	int _currFD;
+	pthread_mutex_t _currFDMutex;
 
 	list<FileEntry> readPWDDir(string pwd,int *lastInode);
 
@@ -30,12 +32,12 @@ public:
 	/*
 	 * creates a new directory named ‘dir_name’
 	 */
-	int MakeDir(char* dir_name);
+	int MakeDir(char* dir_name,string pwd);
 
 	/*
 	 * removes the directory ‘dir_name’
 	 */
-	int RmDir(char* dir_name);
+	int RmDir(char* dir_name,string pwd);
 	/*
 	 * removes the file ‘file_name’
 	 */
