@@ -401,7 +401,11 @@ void LowLevelDisk::readBlock(int dblockNum, char* buf){
 	cout<<" unimplemented function  readBlock"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	//init empty buffer if block does not exist
-
+	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
+			//TODO
+	}
+	int fromOffset = dblockNum*(_superBlock->blockSize);
+	readDataFromHardDisk(fromOffset,buf,_superBlock->blockSize);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
@@ -409,7 +413,11 @@ void LowLevelDisk::readBlock(int dblockNum, char* buf){
 void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 	cout<<" unimplemented function  writeBlock"<<endl;
 	pthread_mutex_lock(&_RecMutex);
-
+	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
+		//TODO
+	}
+	int fromOffset = dblockNum*(_superBlock->blockSize);
+	writeDataToHardDisk(fromOffset,newdata,_superBlock->blockSize);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
