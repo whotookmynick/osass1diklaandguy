@@ -25,6 +25,17 @@ const int SIZE_OF_SUPER_BLOCK = 5;
 const int SIZE_OF_INODE = sizeof(InodeStruct);
 const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
 
+//SUPER BLOCK CONTROL
+const int BLOCK_SIZE_OFFSET=1;
+const int ROOT_INODE_OFFSET=2;
+const int NUM_OF_FREE_BLOCK_OFFSET=3;
+const int FIRST_EMPTY_BLOCK_POINTER_OFFSET=4;
+const int LAST_EMPTY_BLOCK_POINTER_OFFSET=5;
+const int INODE_TABLE_SIZE_OFFSET=6;
+const int NUM_OF_FREE_INODES_OFFSET=7;
+const int FIRST_EMPTY_INODE_POINTER_OFFSET=8;
+const int LAST_EMPTY_INODE_POINTER_OFFSET=9;
+
 const string SYS_FILE_NAME = "SYS_FILE";
 
 /*
@@ -39,7 +50,23 @@ Note – all services mentioned above should return appropriate error codes to s
 *asking for the file name of a free i-node, asking the 34th data block of a file that contains only 30 data blocks, etc.)
 */
 
+typedef struct{
+	int _numOfBlocks;//offset 0 in file
+	int _blockSize;//offset 1 in file
+	int _rootInode;//offset 2 in file
+	int _numOfFreeBlocks;//offset 3 in file
+	int _firstEmptyBlock;//in offset 4 in file
+	int _lastEmptyBlock;//in offset 5
+	int _numOfInodes;//in offset 6
+	int _numOfFreeInodes;//in offset 7
+	int _firstFreeInode;//offset 8
+	int _lastFreeInode;//offset 9
 
+	BlockList* _freeInodesList;//block 3 in super block
+	BlockList* _freeBlockesList;//block 4 in super block
+
+
+}superBlock;
 
 class LowLevelDisk
 {
@@ -167,13 +194,15 @@ private:
 	void addFreeBlockToFreeBlockList(int dblock);
 	bool existsFileSystem();
 	void createFyleSystem(const string& filename);
-	void  initVars();
+
 	void initFreeBlocksList();
     void initFreeInodesList();
     void initInodesList();
     void* readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);//read data from hard disk
     int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
-    void initVarsFromFile();
+
+    void  initVarsFromConfig();
+    void initVarsFromHardDisk();
 
 	//define recursive mutex
 	pthread_t _mainThread;
@@ -184,23 +213,8 @@ private:
 
 
 	int _fd;
-
-	int _numOfBlocks;//offset 0 in file
-	int _blockSize;//offset 1 in file
-	int _rootInode;//offset 2 in file
-	int _numOfFreeBlocks;//offset 3 in file
-	int _firstEmptyBlock;//in offset 4 in file
-	int _lastEmptyBlock;//in offset 5
-    int _numOfInodes;//in offset 6
-    int _numOfFreeInodes;//in offset 7
-    int _firstFreeInode;//offset 8
-    int _lastFreeInode;//offset 9
-
-
-    BlockList* _freeInodesList;//block 3 in super block
-    BlockList* _freeBlockesList;//block 4 in super block
-    InodeList* _iNodeTable;//block 5
-
+	superBlock* _superBlock;
+	InodeList* _iNodeTable;//block 5
     //rest of the block in block 5 + _numOfInodes/blocksize round up
 
 
