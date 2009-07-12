@@ -18,14 +18,14 @@ int getInodeFromString(const string& elementName){
 int  LowLevelDisk::findFreeNode(){
 	cout<<" unimplemented function findFreeNode "<<endl;
 	LOG_DEBUG("find free node");
-	if (_superBlock->_freeInodesList->empty()) {
+	/*if (((BlockList*)_freeInodesList)->empty()) {
 		throw EmptyListException("FreeInode");
 	}
-	_superBlock->_freeInodesList->head();
-	_superBlock->_freeInodesList->pop_front();
+	((BlockList*)_freeInodesList)->head();
+	((BlockList*)_freeInodesList)->pop_front();
 	//TODO create new inode
 	//_iNodeTable->get(inodeNum).setActive(false);
-
+*/
 	return 1;
 }
 
@@ -134,63 +134,31 @@ int LowLevelDisk::writeDataToHardDisk(int fromOffset,const void* buf,int numOfBy
 
 void LowLevelDisk::initFreeInodesList() {
     LOG_DEBUG("init freeInodeList\n");
-    //set firstBlockOffset = NumOfFreeBlocks * blockSize;
-    //set offset = OFFSET + ((_NumOfFreeInodes)- the first discreptors of disk  );
-    //set freeInodesHead = OFFSET + ( firstBlockInFreeInodes ??? - the first discreptors of disk );
-    //set freeInodesTail = OFFSET + ( lastBlockInFreeInodes???? -_diskDesc );
-    //_freeInodesList = new FreeInodesList(_fd, sizeOffset, headOffset, tailOffset,firstBlockOffset,*this);
-}
-
-void LowLevelDisk::initInodesList() {
-    LOG_DEBUG("init inodesList\n");
-    //offset = NUM_OF_BLOCKS_IN_INODE_LIST * blockSize;
-    //_inodes = new InodesList(_fd, offset, *this);
+    _superBlock->_firstBlockOfFreeInodesOffset = FIRST_FREE_INODE_BLOCK*_superBlock->_blockSize;
+   // _freeInodesList=new FreeInodeList(_fd,_superBlock->_firstBlockOfFreeInodesOffset
+    //		,_superBlock->_firstFreeInode, _superBlock->_lastFreeInode,*this);
 }
 
 void LowLevelDisk::initFreeBlocksList() {
     LOG_DEBUG("init freeBlocksList\n");
-    //set firstBlockOffset = freeBlocksBlockNum *blockSize;
-    //set sizeOffset = OFFSET + freeBlocksCount - the first discreptors of disk );
-	 //set headOffset = OFFSET + (freeBlocksHead - the first discreptors of disk);
-	//set tailOffset = OFFSET + ( freeBlocksTail - the first discreptors of disk );
-    //_freeBlocks = new FreeBlocksList(_fd, sizeOffset, headOffset, tailOffset,firstBlockOffset,*this);
+    _superBlock->_firstBlockOfFreeBlocksOffset = FIRST_FREE_BLOCK_BLOCK*_superBlock->_blockSize;
+
+    _freeBlockesList = new FreeBlockList(_fd,_superBlock->_firstBlockOfFreeBlocksOffset
+    		,_superBlock->_firstEmptyBlock,_superBlock->_lastEmptyBlock,*this);
+}
+
+void LowLevelDisk::initInodesList() {
+    LOG_DEBUG("init inodesList\n");
+    _numOfBlocksInInodeTable = ((_superBlock->_numOfInodes) / (_superBlock->_blockSize))+1;
+    _superBlock->_inodeTableOffset = INODE_TABLE_BLOCK_NUM*(_superBlock->_blockSize);
+
+    _iNodeTable = new InodeList(_fd, _superBlock->_inodeTableOffset, *this);
 }
 
 void LowLevelDisk::initVarsFromHardDisk(){
-
-
-
-	/*	_numOfBlocks;//offset 0 in file
-	_blockSize;//offset 1 in file
-	_rootInode;//offset 2 in file
-	_numOfFreeBlocks;//offset 3 in file
-	_firstEmptyBlock;//in offset 4 in file
-	_lastEmptyBlock;//in offset 5
-	_numOfInodes;//in offset 6
-	_numOfFreeInodes;//in offset 7
-
-
-	_firstFreeInode;//offset 8
-	_lastFreeInode;//offset 9
-
-	    BlockList* _freeInodesList;//block 3 in super block
-	    BlockList* _freeBlockesList;//block 4 in super block
-	    InodeList* _iNodeTable;//block 5
-
-
-
-
-	    // DiskDescriptor();
-	    //initFreeBlocksList();
-
-	    //initFreeInodesList();
-	    //initInodesList();
-*/
-}
-
-void LowLevelDisk::initVarsFromConfig(){
-	const int NUM_OF_BLOCK_OFFSET=0;
-
+	////////////////////////////////////////////////////////////////////
+	//						init super block						  //
+	///////////////////////////////init super block/////////////////////
 	char buf[1];//TODO: check if buf is cahnge
 
 	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*) buf,1);
@@ -224,12 +192,27 @@ void LowLevelDisk::initVarsFromConfig(){
 	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,1);
 	_superBlock->_lastFreeInode=buf[0];
 
-	/*
+	initFreeBlocksList();
+	initFreeInodesList();
+	initInodesList();
 
-	BlockList* _freeInodesList;//block 3 in super block
+	/*	_numOfBlocks;//offset 0 in file
+	_blockSize;//offset 1 in file
+	_rootInode;//offset 2 in file
+	_numOfFreeBlocks;//offset 3 in file
+	_firstEmptyBlock;//in offset 4 in file
+	_lastEmptyBlock;//in offset 5
+	_numOfInodes;//in offset 6
+	_numOfFreeInodes;//in offset 7
+
+
+	_firstFreeInode;//offset 8
+	_lastFreeInode;//offset 9
+
+	    BlockList* _freeInodesList;//block 3 in super block
 	    BlockList* _freeBlockesList;//block 4 in super block
 	    InodeList* _iNodeTable;//block 5
-*/
+
 
 
 
@@ -237,14 +220,26 @@ void LowLevelDisk::initVarsFromConfig(){
 	    //initFreeBlocksList();
 
 	    //initFreeInodesList();
+	    //initInodesList();
+*/
+}
+
+void LowLevelDisk::initVarsFromConfig(){
+
+	/*
+
+	BlockList* _freeInodesList;//block 3 in super block
+	    BlockList* _freeBlockesList;//block 4 in super block
+	    InodeList* _iNodeTable;//block 5
+	    // DiskDescriptor();
+	    //initFreeBlocksList();
+	    //initFreeInodesList();
 	    //initInodesList();	     */
 }
 
 
 LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_iNodeTable()
 {
-	_superBlock->_freeInodesList;
-	_superBlock->_freeBlockesList;
 
 	if (existsFileSystem()){
 			openFileSystem();
@@ -263,8 +258,8 @@ LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_i
 
 LowLevelDisk::~LowLevelDisk()
 {
-	delete _superBlock->_freeInodesList;
-	delete _superBlock->_freeBlockesList;
+	//delete _freeInodesList;
+	delete _freeBlockesList;
 	pthread_mutex_destroy(&_RecMutex);
 	pthread_mutexattr_destroy(&_mtxattr);
 

@@ -10,7 +10,7 @@
 
 
 
-InodeList::InodeList(int offset, LowLevelDisk& disk):_inodesMap(),_offset(offset),_disk(disk){
+InodeList::InodeList(int fd,int offset, LowLevelDisk& disk):_inodesMap(),_offset(offset),_disk(disk){
 
 }
 

@@ -8,11 +8,13 @@
 #ifndef FREEINODELIST_H_
 #define FREEINODELIST_H_
 #include "../BlockList.h"
-#include  "../../LowLevelDisk.h"
+//#include  "../../LowLevelDisk.h"
+
+class LowLevelDisk;
 
 class FreeInodeList : virtual BlockList {
 public:
-	FreeInodeList(int fd,int numOfBlocks,int firstBlockAdress,int lastBlockAdress,int blockSize,LowLevelDisk& disk);
+	FreeInodeList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk);
 
 
 //To freeLists to implement
