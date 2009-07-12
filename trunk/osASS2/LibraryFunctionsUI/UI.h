@@ -16,6 +16,8 @@
 #include <unistd.h>
 #include "../SystemCalls/SystemCalls.h"
 
+const int READ_ONLY = 1;
+const int READ_AND_WRITE = 2;
 
 using namespace std;
 
@@ -30,7 +32,7 @@ private:
 	pthread_t ui_thread;
 	SystemCalls *_systemCallsCaller;
 	string _pwd;
-	vector<int> _fdTable;
+	vector<int>* _fdTable;
 
 	/*------------------------ HELP FUNCTIONS ---------------------*/
 	string getRealPWD();
@@ -52,7 +54,7 @@ public:
         /*
          * creates an empty file. Returns a file descriptor <fd).
          */
-        int create (string file_name);
+        int create (string file_name,string flags);
         /*
          * creates a hard link to file-to-link-to. Making a hard link to directories is not allowed.
          */

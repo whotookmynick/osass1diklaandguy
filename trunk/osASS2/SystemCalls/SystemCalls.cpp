@@ -11,8 +11,9 @@
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize)
+SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize):_currFD(1)
 {
+	pthread_mutex_init(&_currFDMutex, NULL);
 	_fileSys = new FileSystem(dataBlockSize,numberOfInodes,diskSize);
 }
 
@@ -29,7 +30,14 @@ SystemCalls::~SystemCalls(){}
 //								Low Level functions
 //---------------------------------------------------------------------------/
 int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
-	return 1;
+	if (!_fileSys->createFile(flag_access_permissions))
+	{
+		cout<<"Could not create file"<<endl;
+	}
+	pthread_mutex_lock(&_currFDMutex);
+	_currFD++;
+	pthread_mutex_unlock(&_currFDMutex);
+	return _currFD;
 }
 
 
@@ -37,9 +45,9 @@ int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
 	return 1;
 }
 
-int SystemCalls::MakeDir(char* dir_name){
+int SystemCalls::MakeDir(char* dir_name,string pwd){
 	string dir_nameString(dir_name);
-	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+//	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
 	int pwdInode = -1;
 	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
 	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
@@ -78,8 +86,25 @@ list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
 	return currPWD;
 }
 
-int SystemCalls::RmDir(char* dir_name){
-	return 1;
+int SystemCalls::RmDir(char* dir_name,string pwd){
+	list<FileEntry> currPWD;
+	int pwdInode;
+	currPWD = readPWDDir(pwd,&pwdInode);
+	list<FileEntry>::iterator it = currPWD.begin();
+	bool found = false;
+	while (it != currPWD.end() & !found)
+	{
+		FileEntry curr = *it;
+		char* currFileName = curr.getFileName();
+		if (strcmp(dir_name,currFileName) == 0)
+		{
+			found = true;
+			currPWD.erase(it);
+		}
+		++it;
+	}
+	_fileSys->d_write(pwdInode,currPWD);
+
 }
 
 int SystemCalls::RmFile(char* file_name){

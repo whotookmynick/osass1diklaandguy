@@ -31,6 +31,7 @@ static vector<string> splitAroundWhiteSpaces(string line)
 
 OSUI::OSUI(SystemCalls* systemCallsCaller)
 {
+	_fdTable = new vector<int>();
 	_systemCallsCaller = systemCallsCaller;
 	_pwd = getRealPWD();
 	if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
@@ -54,7 +55,7 @@ void OSUI::run(){
 		}
 		else if (args[0].compare("create") == 0)
 		{
-			this->create(args[1]);
+			this->create(args[1],args[2]);
 		}
 		else if (args[0].compare("cd") == 0)
 		{
@@ -72,18 +73,22 @@ void OSUI::run(){
 int OSUI::mkdir (string dir_name)
 {
 	string temp;
-	temp = _pwd;
-	temp.append("/" + dir_name);
 //	char* dir_name_c = (char*)dir_name.c_str();
-	int i_nodeNum = _systemCallsCaller->MakeDir((char*)temp.c_str());
+	int i_nodeNum = _systemCallsCaller->MakeDir((char*)dir_name.c_str(),_pwd);
 	return i_nodeNum;
 }
 
-int OSUI::create(string file_name)
+int OSUI::create(string file_name,string flags)
 {
+	int flagInt = READ_AND_WRITE;
+	if (flags.compare("read-only") == 0)
+	{
+		flagInt = READ_ONLY;
+	}
 	char* file_name_c = (char*)file_name.c_str();
-	int i_nodeNum = _systemCallsCaller->MakeFile(file_name_c,0,0);
-	return i_nodeNum;
+	int fd = _systemCallsCaller->MakeFile(file_name_c,0,flagInt);
+	_fdTable->push_back(fd);
+	return fd;
 }
 
 int OSUI::cd(string new_dir)
