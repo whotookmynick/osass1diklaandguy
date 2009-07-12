@@ -33,15 +33,20 @@ private:
 	SystemCalls *_systemCallsCaller;
 	string _pwd;
 	vector<int>* _fdTable;
+	int _pid;
+	vector<OSUI*>* _processTable;
 
 	/*------------------------ HELP FUNCTIONS ---------------------*/
 	string getRealPWD();
 	void goDownDir();
+	void init();
+	bool processExists(int pid);
 
 	/* END HELP FUNCTIONS */
 public:
 
         OSUI(SystemCalls* systemCallsCaller);
+        OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,int pid,string pwd,vector<OSUI*>* processTable);
         virtual ~OSUI();
 
         void run();
@@ -151,6 +156,26 @@ public:
          * Each space will be exactly one space. Each command is terminated by a '\n'.
          */
         int batch(string file_name);
+
+        string getPwd() const
+        {
+            return _pwd;
+        }
+
+        void setPwd(string _pwd)
+        {
+            this->_pwd = _pwd;
+        }
+
+        int getPid() const
+        {
+            return _pid;
+        }
+
+        void setPid(int _pid)
+        {
+            this->_pid = _pid;
+        }
 
 };
 

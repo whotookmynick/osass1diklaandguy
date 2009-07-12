@@ -30,10 +30,19 @@ SystemCalls::~SystemCalls(){}
 //								Low Level functions
 //---------------------------------------------------------------------------/
 int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
-	if (!_fileSys->createFile(flag_access_permissions))
+	string file_nameString(file_name);
+	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
+	int pwdInode = -1;
+	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
+	int newFile_iNode  = _fileSys->createFile(flag_access_permissions);
+	if (! newFile_iNode)
 	{
 		cout<<"Could not create file"<<endl;
 	}
+	string new_file_name = file_nameString.substr(file_nameString.find_last_of("/") + 1);
+	FileEntry newDirEntry(newFile_iNode,(char*)new_file_name.c_str(),-1);
+	currPWD.push_back(newDirEntry);
+	_fileSys->d_write(pwdInode,currPWD);
 	pthread_mutex_lock(&_currFDMutex);
 	_currFD++;
 	pthread_mutex_unlock(&_currFDMutex);
@@ -45,9 +54,9 @@ int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
 	return 1;
 }
 
-int SystemCalls::MakeDir(char* dir_name,string pwd){
+int SystemCalls::MakeDir(char* dir_name){
 	string dir_nameString(dir_name);
-//	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
 	int pwdInode = -1;
 	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
 	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
@@ -86,7 +95,9 @@ list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
 	return currPWD;
 }
 
-int SystemCalls::RmDir(char* dir_name,string pwd){
+int SystemCalls::RmDir(char* dir_name){
+	string dir_nameString(dir_name);
+	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
 	list<FileEntry> currPWD;
 	int pwdInode;
 	currPWD = readPWDDir(pwd,&pwdInode);

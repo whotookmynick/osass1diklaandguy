@@ -32,12 +32,12 @@ public:
 	/*
 	 * creates a new directory named ‘dir_name’
 	 */
-	int MakeDir(char* dir_name,string pwd);
+	int MakeDir(char* dir_name);
 
 	/*
 	 * removes the directory ‘dir_name’
 	 */
-	int RmDir(char* dir_name,string pwd);
+	int RmDir(char* dir_name);
 	/*
 	 * removes the file ‘file_name’
 	 */
