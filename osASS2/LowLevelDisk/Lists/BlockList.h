@@ -34,7 +34,7 @@ public:
 
 	virtual int head();//reference to the  front
 	virtual void pop_front();
-	virtual void push_back(int& val);
+	virtual void push_back(int val);
 
 //To freeLists to implement
 	virtual void emptyBlock(int blockNum)=0;
