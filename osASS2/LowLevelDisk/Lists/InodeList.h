@@ -15,7 +15,9 @@
 #include <math.h>
 #include <sys/mman.h>
 #include <map>
-class LowLevelDisk;
+#include <vector>
+
+//class LowLevelDisk;
 using namespace std;
 
 class InodeList{
@@ -27,7 +29,7 @@ public:
 
 	iNode& get(int inode);
 
-	map<int,iNode*> _inodesMap;
+	vector<iNode*> _iNodesTable;
 
 	iNode* createInode(int inode);
 	void emptyBlock(int i_node);
