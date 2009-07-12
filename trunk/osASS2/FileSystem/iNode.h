@@ -49,6 +49,9 @@ public:
 
 	void setActive(bool a);
 	bool getActive();
+
+	int getNumOfDataBlock(int dblock);//return the number of data block contain this file
+	void setNumOfDataBlock(int dblockNum,int i);
 };
 
 #endif /* INODE_H_ */
