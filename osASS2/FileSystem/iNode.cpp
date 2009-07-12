@@ -54,3 +54,9 @@ void iNode::setActive(bool a){
 bool iNode::getActive(){
 	return _active;
 	}
+int iNode::getNumOfDataBlock(int dblock){
+	return -1;//TODO
+}
+void iNode::setNumOfDataBlock(int dblockNum,int i){
+
+}
