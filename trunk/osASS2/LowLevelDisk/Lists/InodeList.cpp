@@ -6,30 +6,28 @@
  */
 
 #include "InodeList.h"
+#include "LowLevelDisk.h"
 
 
 
+InodeList::InodeList(int fd,int offset, LowLevelDisk& disk):_iNodesTable(),_offset(offset),_disk(disk){
 
-InodeList::InodeList(int fd,int offset, LowLevelDisk& disk):_inodesMap(),_offset(offset),_disk(disk){
-
+	int tableSize=_disk.getNumOfInodes();
+	_iNodesTable.resize(tableSize);
 }
 
 InodeList::~InodeList(){
-	map<int,iNode*>::iterator it;
-	it = _inodesMap.begin();
-	while (it!=_inodesMap.end()) {
-		LOG_DEBUG("free inode "<<it->first<<"\n");
-		delete it->second;
-		++it;
+	for( int i=0; i<_iNodesTable.size();i++){
+		delete _iNodesTable[i];
 	}//end while
 
 };
 
 iNode& InodeList::get(int inode){
-	if(_inodesMap[inode]==NULL){
-		_inodesMap[inode]=createInode(inode);
+	if(_iNodesTable[inode]==NULL){
+		_iNodesTable[inode]=createInode(inode);
 	}//end if
-	return *(_inodesMap[inode]);
+	return *(_iNodesTable[inode]);
 }
 
 iNode* InodeList::createInode(int inode){
@@ -39,4 +37,7 @@ iNode* InodeList::createInode(int inode){
 }
 
 
-void InodeList::emptyBlock(int i_node){}
+void InodeList::emptyBlock(int i_node){
+
+
+}
