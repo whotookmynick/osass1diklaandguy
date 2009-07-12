@@ -387,7 +387,7 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
 
 
 void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
-	cout<<" unimplemented function setDataBlock "<<endl;
+	cout<<"setDataBlock - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->get(i_node).getActive()) )){
 		//TODO
@@ -398,7 +398,7 @@ void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 
 
 void LowLevelDisk::readBlock(int dblockNum, char* buf){
-	cout<<" unimplemented function  readBlock"<<endl;
+	cout<<" readBlock  - need to finish implement lists"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	//init empty buffer if block does not exist
 	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
@@ -411,7 +411,7 @@ void LowLevelDisk::readBlock(int dblockNum, char* buf){
 
 
 void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
-	cout<<" unimplemented function  writeBlock"<<endl;
+	cout<<"writeBlock - need to finish implement lists"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
 		//TODO
@@ -422,7 +422,7 @@ void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 }
 
 int LowLevelDisk::getFileSize(int i_node){
-	cout<<" unimplemented function getFileSize "<<endl;
+	cout<<"getFileSize - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
 		pthread_mutex_unlock(&_RecMutex);
@@ -432,9 +432,8 @@ int LowLevelDisk::getFileSize(int i_node){
 	pthread_mutex_unlock(&_RecMutex);
 }
 
-
 void LowLevelDisk::setFileSize(int i_node, int newSize){
-	cout<<" unimplemented function setFileSize "<<endl;
+	cout<<" setFileSize - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))|(newSize<0)){
 		//TODO		pthread_mutex_unlock(&_RecMutex);
