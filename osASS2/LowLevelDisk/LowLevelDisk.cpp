@@ -46,23 +46,28 @@ void LowLevelDisk::freeInodeBlocks(int i_node){
 }
 
 int  LowLevelDisk::getFreeBlock(){
-	//LOG_DEBUG("get next free Node ");
-	return 1;
+	LOG_DEBUG("get next free Node ");
+	if (((BlockList*)_freeBlockesList)->empty()) {
+			return -1;
+	}
+	int newFreeBlock=((BlockList*)_freeBlockesList)->head();
+
+	return newFreeBlock;
 }
 
 void LowLevelDisk::initBlock(int block_id){
-	cout<<" unimplemented function  "<<endl;
-	//LOG_DEBUG("init block "<<block_id);
+	LOG_DEBUG("init block "<<block_id);
+	_freeBlockesList->emptyBlock(block_id);
 }
 
 void LowLevelDisk::rmvBlockFromFreeBlock(){
-	cout<<" unimplemented function  "<<endl;
-	//LOG_DEBUG("remove Block from free Block table");
+	LOG_DEBUG("remove Block from free Block table");
+	((BlockList*)_freeBlockesList)->pop_front();
 }
 
 void LowLevelDisk::addFreeBlockToFreeBlockList(int dblock){
-	cout<<" unimplemented function  "<<endl;
-	//LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
+	LOG_DEBUG("add  Block "<<dblock<<" To Free Block List ");
+	((BlockList*)_freeBlockesList)->push_back(dblock);
 }
 
 
@@ -274,11 +279,11 @@ int LowLevelDisk::getDataBlockSize(){
 //TODO: inform the super block
 //TODO: Log msg and exception
 int  LowLevelDisk::allocateInode(){
-	cout<<" unimplemented function allocateInode -just implemente lists "<<endl;
+	cout<<"  allocateInode - need to finish implement lists "<<endl;
 
 	pthread_mutex_lock(&_RecMutex);
 	LOG_DEBUG("allocateInodet\n");
-	int node_id = LowLevelDisk::findFreeNode();
+	int node_id = findFreeNode();
 	rmvNodeFromFreeNode();//remove the node frome free node list
 	initNode(node_id);//init node details to defult
     pthread_mutex_unlock(&_RecMutex);
@@ -287,71 +292,78 @@ int  LowLevelDisk::allocateInode(){
 
 
 void LowLevelDisk::freeInode(int i_node){
-	cout<<" unimplemented function freeInode "<<endl;
-	pthread_mutex_lock(&_RecMutex);
+	cout<<" freeInode-  need to finish implement lists "<<endl;
 
 	LOG_DEBUG("freeInode"<<i_node<<"\n");
-
-	initNode(i_node);//init node details to defult
-	addFreeNodeToFreeNodeList(i_node);
-	freeInodeBlocks(i_node);//directly and indirectly
-// ==
+	pthread_mutex_lock(&_RecMutex);
+	 if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
+		 //pthread_mutex_unlock(&_RecMutex);
+//		 return -1;
+	 }
+	 else if ((_iNodeTable->get(i_node)).getActive())
+	 {
+		 initNode(i_node);//init node details to defult
+		 addFreeNodeToFreeNodeList(i_node);
+		 freeInodeBlocks(i_node);//directly and indirectly
+	 }
+	 else{
+		 //the inode is allready free
+	 }
 	pthread_mutex_unlock(&_RecMutex);
 }
 
 
 int LowLevelDisk::allocateDataBlock(){
-	cout<<" unimplemented function  allocateDataBlock "<<endl;
+	cout<<"  allocateDataBlock -  need to finish implement lists "<<endl;
+
 	pthread_mutex_lock(&_RecMutex);
-
-
-	int block_id=LowLevelDisk::getFreeBlock();
-	LowLevelDisk::initBlock(block_id);
-	LowLevelDisk::rmvBlockFromFreeBlock();//remove the Block frome free Block list
+	int block_id=getFreeBlock();
+	//initBlock(block_id);
+	rmvBlockFromFreeBlock();//remove the Block frome free Block list
 	pthread_mutex_unlock(&_RecMutex);
 	return block_id;
 }
 
 
 void LowLevelDisk::freeDataBlock(int dblock){
-	cout<<" unimplemented function freeDataBlock "<<endl;
+	cout<<"freeDataBlock -  need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
-
-
-	LowLevelDisk::initBlock(dblock);
-	LowLevelDisk::addFreeBlockToFreeBlockList(dblock);
+	if((dblock<(_superBlock->numOfBlocks)) | (dblock<0)){
+		//
+	}else{
+		initBlock(dblock);
+		addFreeBlockToFreeBlockList(dblock);
+	}
 	pthread_mutex_unlock(&_RecMutex);
 }
 
 
 int LowLevelDisk::getInodeType(int i_node){
-	cout<<" unimplemented function  getInodeType "<<endl;
+	cout<<" getInodeType -  need to finish implement lists "<<endl;
+	int type=-1;
 	pthread_mutex_lock(&_RecMutex);
-
+	 if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
+		 //
+	 }
+	 else{
+		 type =_iNodeTable->get(i_node).getFileType();;
+	 }
+	return type;
 	pthread_mutex_unlock(&_RecMutex);
-	iNode inodeN = _iNodeTable->get(i_node);
-
-	return inodeN.getFileType();
 }
 
 
 void LowLevelDisk::setInodeType(int i_node, int filetype){
 	cout<<" unimplemented function setInodeType "<<endl;
 	pthread_mutex_lock(&_RecMutex);
-	if (filetype<0 | filetype>2 ){
-	//	cerr<<"no such file type"<<endl
-		pthread_mutex_unlock(&_RecMutex);
+	if ((filetype<0) | (filetype>2 ) | (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
+	//cerr<<"no such file type"<<endl\
+	//pthread_mutex_unlock(&_RecMutex);
 	//	throw invalid_argument("no such file type");//TODO: add exception
-
 	}
-	if (i_node<0){//TODO::other illegal inodes numbers
-		pthread_mutex_unlock(&_RecMutex);
-	//	cerr<<"no such i_node"<<endl;
-	//	throw invalid_argument("no such i_node");
-
+	else{
+		_iNodeTable->get(i_node).setFileType(filetype);
 	}
-
-	_iNodeTable->get(i_node).setFileType(filetype);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
