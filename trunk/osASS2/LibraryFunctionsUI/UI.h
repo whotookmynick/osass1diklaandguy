@@ -11,6 +11,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <map>
 #include <pthread.h>
 #include <sstream>
 #include <unistd.h>
@@ -31,22 +32,26 @@ private:
 
 	pthread_t ui_thread;
 	SystemCalls *_systemCallsCaller;
-	string _pwd;
 	vector<int>* _fdTable;
 	int _pid;
-	vector<OSUI*>* _processTable;
+	int _fatherPid;
+	string _pwd;
+	map<int,OSUI*>* _processTable;
+	pthread_mutex_t _contextMutex;
 
 	/*------------------------ HELP FUNCTIONS ---------------------*/
 	string getRealPWD();
 	void goDownDir();
 	void init();
 	bool processExists(int pid);
+	void switchToProcess(int newPid);
+	void keepRunning();
 
 	/* END HELP FUNCTIONS */
 public:
 
         OSUI(SystemCalls* systemCallsCaller);
-        OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,int pid,string pwd,vector<OSUI*>* processTable);
+        OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,int pid,int fatherPid,string pwd,map<int,OSUI*>* processTable);
         virtual ~OSUI();
 
         void run();

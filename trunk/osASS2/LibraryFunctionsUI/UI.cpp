@@ -29,7 +29,8 @@ static vector<string> splitAroundWhiteSpaces(string line)
 
 }
 
-OSUI::OSUI(SystemCalls* systemCallsCaller):_systemCallsCaller(systemCallsCaller)
+OSUI::OSUI(SystemCalls* systemCallsCaller):
+_systemCallsCaller(systemCallsCaller),_pid(0),_fatherPid(-1)
 {
 	_fdTable = new vector<int>();
 //	_systemCallsCaller = systemCallsCaller;
@@ -37,20 +38,24 @@ OSUI::OSUI(SystemCalls* systemCallsCaller):_systemCallsCaller(systemCallsCaller)
 	init();
 }
 
-OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,int pid,string pwd,vector<OSUI*>* processTable):
-_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_pwd(pwd),_processTable(processTable)
+OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
+		   int pid,int fatherPid,string pwd,map<int,OSUI*>* processTable):
+_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_fatherPid(fatherPid),
+_pwd(pwd),_processTable(processTable)
 {
 	init();
+	pthread_mutex_lock(&_contextMutex);
 }
 
 void OSUI::init()
 {
-	_processTable->push_back(this);
+	(*_processTable)[_pid] = this;
 	if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
 	{
 		perror("UI thread creation failed");
 		exit(1);
 	}
+	pthread_mutex_init(&_contextMutex, NULL);
 }
 
 void OSUI::run(){
@@ -71,8 +76,22 @@ void OSUI::run(){
 		}
 		else if (args[0].compare("cd") == 0)
 		{
-			cout<<"run found cd and args[1] = "<<args[1]<<endl;
+//			cout<<"run found cd and args[1] = "<<args[1]<<endl;
 			this->cd(args[1]);
+		}
+		else if (args[0].compare("crprc") == 0)
+		{
+			int newPid;
+			newPid = atoi(args[1].c_str());
+			int newParentPid;
+			newParentPid = atoi(args[2].c_str());
+			this->crprc(newPid,_pid);
+		}
+		else if (args[0].compare("swprc") == 0)
+		{
+			int newPid = atoi(args[1].c_str());
+			switchToProcess(newPid);
+			pthread_mutex_lock(&_contextMutex);
 		}
 		stopWhile = input.compare("Exit") == 0;
 	}
@@ -150,21 +169,31 @@ int OSUI::crprc(int id, int parent)
 		cout<<"process id already exists"<<endl;
 		return -1;
 	}
-	new OSUI(_systemCallsCaller,_fdTable,id,_pwd,_processTable);
+	new OSUI(_systemCallsCaller,_fdTable,id,parent,_pwd,_processTable);
 }
 
 bool OSUI::processExists(int pid)
 {
-
-	for(int i = 0; i < _processTable->size();i++)
+	map<int,OSUI*>::iterator proc = _processTable->find(pid);
+	if (proc == _processTable->end())
 	{
-		OSUI* curr = _processTable->at(i);
-		if (curr->getPid() == pid)
-		{
-			return true;
-		}
+		return false;
 	}
-	return false;
+	else
+	{
+		return true;
+	}
+}
+
+void OSUI::switchToProcess(int newPid)
+{
+	OSUI* newProc = (*_processTable)[newPid];
+	newProc->keepRunning();
+}
+
+void OSUI::keepRunning()
+{
+	pthread_mutex_unlock(&_contextMutex);
 }
 
 string OSUI::getRealPWD()
