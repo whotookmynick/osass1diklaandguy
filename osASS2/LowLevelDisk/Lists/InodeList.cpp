@@ -97,6 +97,10 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
 
 }
 
+http://www.cplusplus.com/reference/iostream/ofstream/ofstream/
+
+http://www.java2s.com/Tutorial/Cpp/0240__File-Stream/Saveandreadstructure.htm
+
 
 void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 	cout<<"setDataBlock - need to finish implement lists "<<endl;
