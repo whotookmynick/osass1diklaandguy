@@ -43,10 +43,8 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	FileEntry newDirEntry(newFile_iNode,(char*)new_file_name.c_str(),-1);
 	currPWD.push_back(newDirEntry);
 	_fileSys->d_write(pwdInode,currPWD);
-	pthread_mutex_lock(&_currFDMutex);
-	_currFD++;
-	pthread_mutex_unlock(&_currFDMutex);
-	return _currFD;
+	int newFD = this->Open((char*)new_file_name.c_str(),flag_access_permissions);
+	return newFD;
 }
 
 
@@ -98,24 +96,32 @@ list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
 int SystemCalls::RmDir(char* dir_name){
 	string dir_nameString(dir_name);
 	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	string dir_nameShort = dir_nameString.substr(dir_nameString.find_last_of("/")+1);
 	list<FileEntry> currPWD;
 	int pwdInode;
 	currPWD = readPWDDir(pwd,&pwdInode);
+	list<FileEntry>::iterator it;// = currPWD.begin();
+	it = getFileEntryFromDir(currPWD,dir_nameShort.c_str());
+	_fileSys->d_write(pwdInode,currPWD);
+
+}
+
+list<FileEntry>::iterator SystemCalls::getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name)
+{
 	list<FileEntry>::iterator it = currPWD.begin();
 	bool found = false;
 	while (it != currPWD.end() & !found)
 	{
 		FileEntry curr = *it;
 		char* currFileName = curr.getFileName();
-		if (strcmp(dir_name,currFileName) == 0)
+		if (strcmp(file_name,currFileName) == 0)
 		{
 			found = true;
-			currPWD.erase(it);
+			return it;
 		}
 		++it;
 	}
-	_fileSys->d_write(pwdInode,currPWD);
-
+	return it;
 }
 
 int SystemCalls::RmFile(char* file_name){
@@ -127,15 +133,45 @@ int SystemCalls::ls(char*dir_name, char * buf){
 }
 
 
-int SystemCalls::Open(char* filename, int flag_access_permissions){
-	return 1;
+int SystemCalls::Open(char* file_name, int flag_access_permissions){
+	if (_openFileTable.size() == MAX_OPEN_FILES)
+	{
+		cerr<<"Too many open files"<<endl;
+		throw new TooManyFilesException();
+	}
+	string file_nameString(file_name);
+	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
+	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
+	int pwdInode = -1;
+	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
+	list<FileEntry>::iterator it = getFileEntryFromDir(currPWD,file_nameShort.c_str());
+	int ret = -1;
+	if (it != currPWD.end())
+	{
+		int file_inode = (*it).getInodeNum();
+		Descriptor* newDesc = new Descriptor(flag_access_permissions,file_inode);
+		pthread_mutex_lock(&_currFDMutex);
+		_currFD++;
+		_openFileTable[_currFD] = newDesc;
+		ret = _currFD;
+		pthread_mutex_unlock(&_currFDMutex);
+
+	}
+	return ret;
 }
 
 int SystemCalls::Close(int fd){
+	pthread_mutex_lock(&_currFDMutex);
+	_openFileTable.erase(fd);
+	pthread_mutex_unlock(&_currFDMutex);
 	return 1;
 }
 
 int SystemCalls::Seek(int fd, int location){
+	pthread_mutex_lock(&_currFDMutex);
+	Descriptor *desc = _openFileTable[fd];
+	desc->_filePosition = location;
+	pthread_mutex_unlock(&_currFDMutex);
 	return 1;
 }
 

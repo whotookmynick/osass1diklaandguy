@@ -19,18 +19,24 @@
 <folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1852896873." name="/" resourcePath="">
 <toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.988842219" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 <targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.965947129" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
-<builder buildPath="${workspace_loc:/OS2/Debug}" id="cdt.managedbuild.target.gnu.builder.exe.debug.884325936" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
+<builder buildPath="${workspace_loc:/OS2/Debug}" id="cdt.managedbuild.target.gnu.builder.exe.debug.884325936" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug">
+<outputEntries>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release"/>
+</outputEntries>
+</builder>
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.1387945887" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.2088126326" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.671089844" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1267258238" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.option.other.other.1431016038" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
 <option id="gnu.cpp.compiler.option.include.paths.1755355364" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="../OS2/Exception"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/Exception}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LowLevelDisk/Lists}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LowLevelDisk/Lists}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/FileSystem}&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LogMessages}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LogMessages}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LibraryFunctionsUI}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/LowLevelDisk}&quot;"/>
 </option>
@@ -39,6 +45,15 @@
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.851131478" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 <option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.2027640404" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 <option id="gnu.c.compiler.exe.debug.option.debugging.level.25584853" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+<option id="gnu.c.compiler.option.include.paths.846175880" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="../OS2/Exception"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LowLevelDisk/Lists}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/FileSystem}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LogMessages}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LibraryFunctionsUI}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LowLevelDisk}&quot;"/>
+</option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1401059738" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1778918183" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
@@ -51,16 +66,47 @@
 </inputType>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1680301403" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
+<option id="gnu.both.asm.option.include.paths.396862765" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="../OS2/Exception"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LowLevelDisk/Lists}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/FileSystem}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LogMessages}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LibraryFunctionsUI}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/OS2/OS2/LowLevelDisk}&quot;"/>
+</option>
 <inputType id="cdt.managedbuild.tool.gnu.assembler.input.1467623985" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 </tool>
 </toolChain>
 </folderInfo>
+<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1852896873.1151052915" name="/" resourcePath="Main">
+<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1292134404" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.archiver.base.423755258" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1387945887"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1973847560" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.2088126326">
+<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.180136747" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1122851507" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1879670151" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1488658993" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.851131478">
+<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1176931495" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
+<option id="gnu.c.compiler.exe.debug.option.debugging.level.960968538" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.374704739" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1085376733" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1778918183"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.866494460" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1391318966"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1996203293" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1680301403">
+<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1138500355" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+</tool>
+</toolChain>
+</folderInfo>
 <sourceEntries>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="SystemCalls"/>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FileSystem"/>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LowLevelDisk"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LibraryFunctionsUI"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Exception"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LowLevelDisk"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FileSystem"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -525,11 +571,12 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FileSystem"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Exception"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Main"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LowLevelDisk"/>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="SystemCalls"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LibraryFunctionsUI"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="SystemCalls"/>
 </sourceEntries>
 </configuration>
 </storageModule>

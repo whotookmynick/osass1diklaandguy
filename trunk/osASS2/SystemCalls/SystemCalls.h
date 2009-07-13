@@ -1,9 +1,13 @@
 #ifndef SYSTEMCALLS_H_
 #define SYSTEMCALLS_H_
 
+#include <map>
 #include "FileSystem.h"
+#include "Descriptor.h"
+#include "TooManyFilesException.h"
 
 const int ROOT_PWD_INODE = 2;
+const int MAX_OPEN_FILES = 128;
 
 class SystemCalls
 {
@@ -11,10 +15,11 @@ private:
 
 	FileSystem *_fileSys;
 	int _currFD;
-	pthread_mutex_t _currFDMutex;
+	pthread_mutex_t _currFDMutex;	//protects the _currFD and the _openFileTable.
+	map<int,Descriptor*> _openFileTable;//maps between the file descriptor number and the descriptor itself
 
 	list<FileEntry> readPWDDir(string pwd,int *lastInode);
-
+	list<FileEntry>::iterator getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name);
 public:
 	SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~SystemCalls();
