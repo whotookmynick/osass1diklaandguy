@@ -36,6 +36,7 @@ public:
 
 private:
     int _offset;
+    int _inodeSizeInBytes;
     LowLevelDisk& _disk;
     int _fd;
 };
