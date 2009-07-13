@@ -1,1 +1,2 @@
-I don't have any problem using the logger but I need you to upload it to the svn so we can use it- Done
+I know exactly where I'm going to handle exceptions, in the worst case I will make sure the UI catches them
+and then keeps on working so don't worry about them
