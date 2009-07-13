@@ -9,8 +9,8 @@
 #include <string>
 #include <stdlib.h>
 #include <fstream>
-#include "UI.h"
-#include "SystemCalls/SystemCalls.h"
+#include "../LibraryFunctionsUI/UI.h"
+#include "../SystemCalls/SystemCalls.h"
 
 using namespace std;
 
