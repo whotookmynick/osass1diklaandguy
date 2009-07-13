@@ -200,10 +200,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			ifstream *myfile = new ifstream(file_name.c_str());
 			while (!myfile->eof())
 			{
-				string command;
-				getline(*myfile,command);
+				string *command;
+				getline(*myfile,*command);
 				pthread_t* batchCommandThread;
-
+				_batchCommandsQueue.push(command);
 				pthread_create(batchCommandThread, NULL, batch_Command_Wrapper, this);
 			}
 			return 1;
