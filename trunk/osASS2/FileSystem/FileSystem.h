@@ -7,7 +7,7 @@
 #include <string>
 #include "FileEntry.h"
 #include "LowLevelDisk.h"
-#include "OpenFileDescriptor.h"
+//#include "OpenFileDescriptor.h"
 
 #define SOFT_LINK 1;
 #define DIR 2;
@@ -21,7 +21,7 @@ class FileSystem
 {
 private:
 	LowLevelDisk* _lldisk;
-	vector<OpenFileDescriptor*> _openFilesTable;
+//	vector<OpenFileDescriptor*> _openFilesTable;
 
 	/* ------------------------- HELP FUNCTIONS ---------------------------------*/
 	int createSoftLink();

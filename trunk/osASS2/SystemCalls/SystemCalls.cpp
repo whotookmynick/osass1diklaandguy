@@ -193,7 +193,46 @@ bool SystemCalls::isDir(char * address){
 }
 
 int SystemCalls::lockRead(int fd){
+	int fd_inode = _openFileTable[fd]->_inode;
+	if (isLockedRead(fd_inode) | isLockedWrite(fd_inode))
+	{
+		cerr<<"File is already locked"<<endl;
+		return -1;
+	}
+	_readLocks.push_back(fd_inode);
 	return 1;
+}
+
+bool SystemCalls::isLockedRead(int i_node_num)
+{
+	for (int i = 0; i < _readLocks.size(); i++)
+	{
+		if (_readLocks[i] == i_node_num)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool SystemCalls::isLockedWrite(int i_node_num)
+{
+	for (int i = 0; i < _writeLocks.size(); i++)
+	{
+		if (_writeLocks[i] == i_node_num)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+int SystemCalls::lockRead(int fd,int pid)
+{
+	pthread_mutex_lock(&lock_mutex);
+	lockingFd = pid;
+	lockRead(fd);
+	pthread_mutex_unlock(&lock_mutex);
 }
 
 int SystemCalls::lockWrite(int fd){

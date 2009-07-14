@@ -93,6 +93,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			}else if(args[0].compare("close") == 0){
 				int fdToClose = atoi(args[1].c_str());
 				close(fdToClose);
+			}else if (args[0].compare("lck_rd") == 0)
+			{
+				int fileToLock = atoi(args[1].c_str());
+				lck_rd(fileToLock);
 			}
 
 		}
@@ -207,6 +211,15 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				pthread_create(batchCommandThread, NULL, batch_Command_Wrapper, this);
 			}
 			return 1;
+		}
+
+		int OSUI::lck_rd(int fd)
+		{
+			int ans = _systemCallsCaller->lockRead(fd,_pid);
+			if (ans > 0)
+			{
+				_lockedReadFile.push_back(fd);
+			}
 		}
 
 		bool OSUI::processExists(int pid)
