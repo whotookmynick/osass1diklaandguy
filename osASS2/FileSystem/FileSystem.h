@@ -7,6 +7,7 @@
 #include <string>
 #include "FileEntry.h"
 #include "LowLevelDisk.h"
+#include "../Main/Util.cpp"
 //#include "OpenFileDescriptor.h"
 
 #define SOFT_LINK 1;
@@ -28,9 +29,6 @@ private:
 
 	int createRegularFile();
 
-	int turnBytesToInt(char* bytes);
-
-	void intToByte(int val, char *bytes );
 	/* END HELP FUNCTIONS */
 
 public:
