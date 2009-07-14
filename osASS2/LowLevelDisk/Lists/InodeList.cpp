@@ -114,6 +114,9 @@ int InodeList::getDataBlockNum(int i_node,int blockIndex){
 	if((blockIndex<0) | (blockIndex>(_numOfTotalBlocks) )){
 		return -1;
 	}
+	if(is->numOfFullBlocks<=blockIndex){
+		return -1;
+	}
 
 	if (blockIndex<(Num_DirectBlocks-1)){
 		blockoffset = getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
