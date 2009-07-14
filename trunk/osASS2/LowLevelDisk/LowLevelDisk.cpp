@@ -98,7 +98,7 @@ bool LowLevelDisk::existsFileSystem() {
   return(blnReturn);
 }
 
-void* LowLevelDisk::createFileSystem(){
+void LowLevelDisk::createFileSystem(){
 	_fd = open(SYS_FILE_NAME.c_str(), O_RDWR | O_CREAT, (mode_t)0600);
 	//cannot create
 	//initSuperBlock();
