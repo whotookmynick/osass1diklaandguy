@@ -77,11 +77,9 @@ typedef struct{
 	int numOfFreeInodes;//in offset 7
 	int firstFreeInode;//offset 8
 	int lastFreeInode;//offset 9
-
 	int firstBlockOfFreeInodesOffset;
 	int firstBlockOfFreeBlocksOffset;
 	int inodeTableOffset;
-
 	int firstFreeBlockNumber;
 
 }superBlock;
@@ -173,6 +171,10 @@ public:
 	void setFileSize(int i_node, int newSize);
 
 	//------------------------------------------------------------//
+
+		void initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize);
+
+
 		int getNumOfBlocks();
 		int getNumOfInodes();
 	//    void setNumOfBlocks();
