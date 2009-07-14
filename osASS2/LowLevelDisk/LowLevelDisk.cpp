@@ -152,6 +152,18 @@ void LowLevelDisk::initFreeInodesList() {
 void LowLevelDisk::initFreeBlocksList() {
     LOG_DEBUG("init freeBlocksList\n");
     _superBlock->firstBlockOfFreeBlocksOffset = FIRST_FREE_BLOCK_BLOCK*_superBlock->blockSize;
+    //the first free block is after the inode table
+
+    //start fill the first Block in list
+    int offset = (_superBlock->firstFreeBlockNumber)*(_superBlock->blockSize);
+    writeDataToHardDisk(offset, (void*)_superBlock->firstFreeBlockNumber,OFFSET_SIZE_IN_BYTES);
+
+//start fill the rest of inodes
+   // while(!eof(_fd)){
+
+
+
+//    }
 
     _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
     		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
@@ -200,8 +212,21 @@ void LowLevelDisk::initSuperBlockFromHardDisk(){
 	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,1);
 	_superBlock->lastFreeInode=buf[0];
 
+	_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
+
 }
 
+int LowLevelDisk::getNumOfBlocksInInodeTable(){
+	//calac number of block in inodetable:
+	int tableSizeInBytes = sizeof(InodeStruct)*(_superBlock->numOfInodes);
+	int numOfBlocks;
+	if((tableSizeInBytes % _superBlock->blockSize) !=0 ){
+		numOfBlocks = (tableSizeInBytes/_superBlock->blockSize)+1;
+	}else{
+		numOfBlocks = tableSizeInBytes/_superBlock->blockSize;
+	}
+	return numOfBlocks;
+}
 /*
 void LowLevelDisk::initVarsFromHardDisk(){
 	initSuperBlockFromHardDisk();
