@@ -7,3 +7,22 @@ the Logger is in LogMessage directory
 i add struct to inode so we can malloc it
 
 i add int methodes to iNode
+
+
+LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize)
+{
+	_iNodeTable = (InodeList*)malloc(sizeof(InodeList));
+	_superBlock = (superBlock*)malloc(sizeof(superBlock));
+
+	
+	
+	/////////////////////////////////////
+void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize){
+
+	_superBlock->numOfBlocks = (diskSize/dataBlockSize);//TODO=round up? down??
+	
+	char bufferToWrite[4];
+	
+	intToByte(_superBlock->numOfBlocks,numOfBlocksChar);
+	writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)numOfBlocksChar,OFFSET_SIZE_IN_BYTES);
+	
