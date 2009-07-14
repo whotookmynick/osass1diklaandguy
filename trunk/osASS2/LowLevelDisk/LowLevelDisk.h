@@ -2,7 +2,7 @@
 #define LOWLEVELDISK_H_
 
 #include "Lists/BlockList.h"
-#include "../FileSystem/iNode.h"
+//#include "../FileSystem/iNode.h"
 #include  "../LogMessages/Logger.h"
 #include "../Exception/Exception.cpp"
 #include "Lists/FreeBlocks/FreeBlockList.h"
@@ -17,26 +17,38 @@
 #include <unistd.h>
 #include  "Lists/InodeList.h"
 
+const int Num_DirectBlocksHelp = 10;
+typedef struct {
+	int  directBlock[Num_DirectBlocksHelp];
+	int  indirectBlockAdress;
+	int  type;
+	int  numOfHardLinks;
+	int  numOfFullBlocks;
+	bool active;
+
+} InodeStructHelp;
+
+//class InodeList;
 using namespace std;
 
 const int OFFSET = 0;
 //const int SIZE_OF_ENTRY = sizeof(int);
 const int ROOT_INODE = 0;
 const int SIZE_OF_SUPER_BLOCK = 5;
-const int SIZE_OF_INODE = sizeof(InodeStruct);
+const int SIZE_OF_INODE = sizeof(InodeStructHelp);
 const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
 
 //SUPER BLOCK CONTROL
 const int NUM_OF_BLOCK_OFFSET=0;
 const int BLOCK_SIZE_OFFSET=1;
 const int ROOT_INODE_OFFSET=2;
-const int NUM_OF_FREE_BLOCK_OFFSET=3;
-const int FIRST_EMPTY_BLOCK_POINTER_OFFSET=4;
-const int LAST_EMPTY_BLOCK_POINTER_OFFSET=5;
-const int INODE_TABLE_SIZE_OFFSET=6;
-const int NUM_OF_FREE_INODES_OFFSET=7;
-const int FIRST_EMPTY_INODE_POINTER_OFFSET=8;
-const int LAST_EMPTY_INODE_POINTER_OFFSET=9;
+const int NUM_OF_FREE_BLOCK_OFFSET=3*4;
+const int FIRST_EMPTY_BLOCK_POINTER_OFFSET=4*4;
+const int LAST_EMPTY_BLOCK_POINTER_OFFSET=5*4;
+const int INODE_TABLE_SIZE_OFFSET=6*4;
+const int NUM_OF_FREE_INODES_OFFSET=7*4;
+const int FIRST_EMPTY_INODE_POINTER_OFFSET=8*4;
+const int LAST_EMPTY_INODE_POINTER_OFFSET=9*4;
 const int FIRST_FREE_BLOCK_BLOCK =  3;//block 3
 const int FIRST_FREE_INODE_BLOCK =  4;//block 4
 const string SYS_FILE_NAME = "SYS_FILE";
@@ -172,7 +184,7 @@ public:
 
 		int getDataBlockSize();
 		int getInodeFromString(const string& elementName);//find the inode concted to the file name or directory name
-
+		superBlock* getSuperBlock();
 
 private:
 
