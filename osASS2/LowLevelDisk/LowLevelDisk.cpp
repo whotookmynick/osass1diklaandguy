@@ -104,7 +104,6 @@ void* LowLevelDisk::createFileSystem(){
 	//initSuperBlock();
 	writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)_superBlock->numOfBlocks,OFFSET_SIZE_IN_BYTES);
 	writeDataToHardDisk(BLOCK_SIZE_OFFSET,(void*)_superBlock->blockSize,OFFSET_SIZE_IN_BYTES);
-
 }
 
 
@@ -216,6 +215,7 @@ void LowLevelDisk::initFreeBlocksList() {
     		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
 }
 
+
 void LowLevelDisk::initInodesList() {
     LOG_DEBUG("init inodesList\n");
     _numOfBlocksInInodeTable = ((_superBlock->numOfInodes) / (_superBlock->blockSize))+1;
@@ -275,7 +275,6 @@ int LowLevelDisk::getNumOfBlocksInInodeTable(){
 	return numOfBlocks;
 }
 
-
 LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_iNodeTable()
 {
 
@@ -332,6 +331,7 @@ int LowLevelDisk::getNumOfInodes(){
 void LowLevelDisk::setNumOfFreeBlocks(int i){
 	_superBlock->numOfBlocks=i;
 }
+
 
 void LowLevelDisk::setNumOfFreeInodes(int i){
 	_superBlock->numOfInodes=i;
