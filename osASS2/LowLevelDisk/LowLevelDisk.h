@@ -31,17 +31,15 @@ typedef struct {
 //class InodeList;
 using namespace std;
 
-const int OFFSET = 0;
-//const int SIZE_OF_ENTRY = sizeof(int);
-const int ROOT_INODE = 0;
+//const int OFFSET = 0;
 const int SIZE_OF_SUPER_BLOCK = 5;
 const int SIZE_OF_INODE = sizeof(InodeStructHelp);
-const int NUM_OF_BLOCKS_IN_INODE_LIST = 5;
-
+const int ROOT_INODE=0;
 //SUPER BLOCK CONTROL
 const int NUM_OF_BLOCK_OFFSET=0;
-const int BLOCK_SIZE_OFFSET=1;
-const int ROOT_INODE_OFFSET=2;
+const int BLOCK_SIZE_OFFSET=1*4;
+const int ROOT_INODE_OFFSET=2*4;
+
 const int NUM_OF_FREE_BLOCK_OFFSET=3*4;
 const int FIRST_EMPTY_BLOCK_POINTER_OFFSET=4*4;
 const int LAST_EMPTY_BLOCK_POINTER_OFFSET=5*4;
@@ -49,10 +47,14 @@ const int INODE_TABLE_SIZE_OFFSET=6*4;
 const int NUM_OF_FREE_INODES_OFFSET=7*4;
 const int FIRST_EMPTY_INODE_POINTER_OFFSET=8*4;
 const int LAST_EMPTY_INODE_POINTER_OFFSET=9*4;
+
+
 const int FIRST_FREE_BLOCK_BLOCK =  3;//block 3
 const int FIRST_FREE_INODE_BLOCK =  4;//block 4
-const string SYS_FILE_NAME = "SYS_FILE";
 const int INODE_TABLE_BLOCK_NUM = 5;
+
+const string SYS_FILE_NAME = "SYS_FILE";
+
 
 /*
 * Regular files simply store the data written to them by user programs.
