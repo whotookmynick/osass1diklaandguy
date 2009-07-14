@@ -41,6 +41,7 @@ private:
 	map<int,OSUI*>* _processTable;
 	pthread_mutex_t _contextMutex;
 	queue<string*> _batchCommandsQueue;
+	vector<int> _lockedReadFile;
 
     string getRealPWD();
     void goDownDir();
@@ -92,11 +93,19 @@ public:
       */
      int writeFile (int fd,string fileName);
      /*
-      *locks file, so that only read operations are allowed. There is no limit on the number of processes permitted to read the file. No processes are allowed to write to the file while a process holds a read lock to the file. It is not obligatory to lock the file to read it. You should not block if it is locked, rather return an error.
+      * locks file, so that only read operations are allowed.
+      * There is no limit on the number of processes permitted to read the file.
+      * No processes are allowed to write to the file while a process holds a read lock to the file.
+      * It is not obligatory to lock the file to read it.
+      * You should not block if it is locked, rather return an error.
       */
      int lck_rd (int fd);
      /*
-      * locks file, so that only one process may hold the lock. This process may write to the file, and no other processes may write to it or read from it. A child does not inherit this lock. It is not obligatory to lock the file to write to it. You should not block if it is locked, rather return an error.
+      * locks file, so that only one process may hold the lock.
+      * This process may write to the file, and no other processes may write to it or read from it.
+      * A child does not inherit this lock.
+      * It is not obligatory to lock the file to write to it.
+      * You should not block if it is locked, rather return an error.
       */
      int lck_wr(int fd);
      /*

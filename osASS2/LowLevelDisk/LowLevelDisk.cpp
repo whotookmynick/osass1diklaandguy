@@ -150,7 +150,7 @@ void LowLevelDisk::initFreeInodesList() {
 }
 
 void LowLevelDisk::initFreeBlocksList() {
-    LOG_DEBUG("init freeBlocksList\n");
+	LOG_DEBUG("init freeBlocksList\n");
     _superBlock->firstBlockOfFreeBlocksOffset = FIRST_FREE_BLOCK_BLOCK*_superBlock->blockSize;
     //the first free block is after the inode table
 

@@ -17,9 +17,21 @@ private:
 	int _currFD;
 	pthread_mutex_t _currFDMutex;	//protects the _currFD and the _openFileTable.
 	map<int,Descriptor*> _openFileTable;//maps between the file descriptor number and the descriptor itself
+//	map<int,int> _readLocks;
+//	map<int,int> _writeLocks;
+	vector<int> _readLocks; //remembers all the i_node of the read locked files;
+	vector<int> _writeLocks; //remembers all the i_node of the write locked files;
 
 	list<FileEntry> readPWDDir(string pwd,int *lastInode);
 	list<FileEntry>::iterator getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name);
+	bool isLockedRead(int i_node_num);
+	bool isLockedWrite(int i_node_num);
+	/* This is for design pattern arab
+	 *
+	 */
+	pthread_mutex_t lock_mutex;
+	int lockingFd;
+
 public:
 	SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize);
 	virtual ~SystemCalls();
@@ -91,6 +103,7 @@ public:
 	 * It is not obligatory to lock the file to read it. You should not block if it is locked rather return an error.
 	 */
 	int lockRead(int fd);
+	int lockRead(int fd,int pid);
 	/*
 	 * locks file, so that only one process may hold the lock.
 	 * This process may write to the file, and no other files may write to it or read from it.
@@ -106,6 +119,7 @@ public:
 	 * releases the writing lock held by this process. Only the process that locked the file may release this lock.
 	 */
 	int releaseLockWrite(int fd);
+
 };
 
 #endif /*SYSTEMCALLS_H_*/
