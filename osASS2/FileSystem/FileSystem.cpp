@@ -10,7 +10,7 @@
 
 FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize)
 {
-	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
+//	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
 }
 
 /*

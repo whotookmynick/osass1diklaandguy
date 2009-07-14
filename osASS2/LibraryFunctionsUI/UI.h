@@ -49,6 +49,7 @@ private:
     bool processExists(int pid);
     void switchToProcess(int newPid);
     void keepRunning();
+    string getFullPath(string path,string currPath);
 
 public:
     OSUI(SystemCalls *systemCallsCaller);
