@@ -40,6 +40,22 @@ void InodeList::writeInodeToHardDisk(InodeStruct* is,int offset){
 	pwrite(_fd,&is,sizeof(is),offset);
 }
 
+
+void* InodeList::readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes){
+	off_t offset = fromOffset;
+	size_t size = numOfBytes;
+	pread(_fd,buf,size,offset);
+	return buf;
+}
+
+int InodeList::writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes){
+	off_t offset = fromOffset;
+	size_t size = numOfBytes;
+	size_t sizeWriten = pwrite(_fd,buf,size,offset);
+	int sizeW = sizeWriten;
+	return sizeW;
+}
+
 //---------------------------------------------------------------------------/
 //								OFFSETS CALC
 //---------------------------------------------------------------------------/
@@ -55,7 +71,7 @@ int InodeList::getBlockOffsetInInode(int blockIndex,int i_node){
 
 	//iNode& i_node = getInode()
 
-	if (blockIndex<9)
+	if (blockIndex<(Num_DirectBlocks-1))
 		return getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
 
 	else{
@@ -85,13 +101,55 @@ void InodeList::emptyBlock(int i_node){
 
 }
 
-int InodeList::getDataBlockNum(int i_node,int dblock){
-	return -1;
+int InodeList::getDataBlockNum(int i_node,int blockIndex){
+	int blockoffset;
+	int blockNum ;
+	void* buf [1];
+	InodeStruct* is=readInodeToStruct(i_node);
+
+	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+			//TODO
+			return -1;
+	}
+	if((blockIndex<0) | (blockIndex>(_numOfTotalBlocks) )){
+		return -1;
+	}
+
+	if (blockIndex<(Num_DirectBlocks-1)){
+		blockoffset = getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
+		readDataFromHardDisk(blockoffset,buf,OFFSET_SIZE_IN_BYTES);
+	}
+	else{
+		int indirectBlock= is->indirectBlockAdress;
+		int inDirectBlockOffset = indirectBlock*_disk.getDataBlockSize();
+		blockoffset = inDirectBlockOffset+(blockIndex-NUM_OF_DIRECT_BLOCKS)*OFFSET_SIZE_IN_BYTES;
+		readDataFromHardDisk(blockoffset,buf,OFFSET_SIZE_IN_BYTES);
+	}
+	blockNum = (int)buf[0];
+	return blockNum;
 }
 
-void InodeList::setNumOfDataBlock(int i_node, int i, int dblockNum ){
-	//TODO
+void InodeList::setNumOfDataBlock(int i_node, int blockIndex, int dblockNum ){
+	int blockoffset;
+	InodeStruct* is=readInodeToStruct(i_node);
 
+	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+			//TODO
+	}
+	if((blockIndex<0) | (blockIndex>(_numOfTotalBlocks) )){
+		//TODO
+	}
+
+	if (blockIndex<(Num_DirectBlocks-1)){
+		blockoffset = getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
+		writeDataToHardDisk(blockoffset,(void*)dblockNum,OFFSET_SIZE_IN_BYTES);
+	}
+	else{
+		int indirectBlock= is->indirectBlockAdress;
+		int inDirectBlockOffset = indirectBlock*_disk.getDataBlockSize();
+		blockoffset = inDirectBlockOffset+(blockIndex-NUM_OF_DIRECT_BLOCKS)*OFFSET_SIZE_IN_BYTES;
+		writeDataToHardDisk(blockoffset,(void*)dblockNum,OFFSET_SIZE_IN_BYTES);
+	}
 }
 //---------------------------------------------------------------------------/
 //								Getters and setters For i_Node
@@ -165,76 +223,3 @@ bool InodeList::getActive(int i_node){
 }
 
 
-
-//find the inode offset
-	//int inodeOfsset = _offset+(_inodeSizeInBytes*(inode-1));
-	//i_node._inodeStruct=
-	//iNode i_node = new iNode(inodeOfsset,_disk);
-	//InodeStruct inodeStruct= pread(_fd,)
-	//read the inode from the SYS_FILE to new inodeStruct
-
-
-/*
-int LowLevelDisk::getInodeType(int i_node){
-	cout<<" getInodeType -  need to finish implement lists "<<endl;
-	int type=-1;
-	pthread_mutex_lock(&_RecMutex);
-	 if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
-		 //
-	 }
-	 else{
-		 type =_iNodeTable->get(i_node).getFileType();;
-	 }
-	return type;
-	pthread_mutex_unlock(&_RecMutex);
-}
-
-
-void LowLevelDisk::setInodeType(int i_node, int filetype){
-	cout<<"setInodeType-  need to finish implement lists "<<endl;
-	pthread_mutex_lock(&_RecMutex);
-
-	if ((filetype<0) | (filetype>2 ) | (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
-	//cerr<<"no such file type"<<endl\
-	//pthread_mutex_unlock(&_RecMutex);
-	//	throw invalid_argument("no such file type");//TODO: add exception
-	}
-	else{
-		_iNodeTable->get(i_node).setFileType(filetype);
-	}
-	pthread_mutex_unlock(&_RecMutex);
-}
-
-
-int LowLevelDisk::getDataBlock (int i_node, int dblock){
-	cout<<" getDataBlock--  need to finish implement lists  "<<endl;
-	pthread_mutex_lock(&_RecMutex);
-	if ((dblock>=0) | (dblock<=9) |  (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
-		pthread_mutex_unlock(&_RecMutex);
-		//return the i enter in the i_node
-		return -1 ;
-	}
-	else{
-
-        return _iNodeTable->get(i_node).getNumOfDataBlock(dblock);
-        //TODO: if not allocated yet??? allocate and delete the block in the file?????
-	}
-	pthread_mutex_unlock(&_RecMutex);
-
-}
-
-http://www.cplusplus.com/reference/iostream/ofstream/ofstream/
-
-http://www.java2s.com/Tutorial/Cpp/0240__File-Stream/Saveandreadstructure.htm
-
-
-void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
-	cout<<"setDataBlock - need to finish implement lists "<<endl;
-	pthread_mutex_lock(&_RecMutex);
-	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->get(i_node).getActive()) )){
-		//TODO
-	}
-	_iNodeTable->get(i_node).setNumOfDataBlock(dblockNum,i);
-	pthread_mutex_unlock(&_RecMutex);
-}
-*/

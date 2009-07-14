@@ -60,6 +60,9 @@ public:
 	void writeInodeToHardDisk(InodeStruct* is,int offset);
 	int getDataBlockNum(int i_node,int dblock);
 	void setNumOfDataBlock(int i_node, int i, int dblockNum );
+	void* readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);//read data from hard disk
+	int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
+
 	//---------------------------------------------------//
 
 	int getInodeOffset(int i_node);
