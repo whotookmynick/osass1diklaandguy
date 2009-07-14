@@ -42,6 +42,7 @@ int main(int argc,char** argv)
 	if (myfile->is_open())
 	{
 		parseConfigFile(myfile,configargs);
+		myfile->close();
 		cout <<"finished parsing" <<endl;
 	}
 	else

@@ -10,7 +10,7 @@
 
 FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize)
 {
-//	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
+	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
 }
 
 /*
@@ -118,25 +118,6 @@ list<FileEntry> FileSystem::d_read(int i_node)
 		currOffset += 16;
 	}
 	return ans;
-}
-
-int FileSystem::turnBytesToInt(char* bytes)
-{
-	int Int32 = 0;
-	Int32 = (Int32 << 8) + bytes[3];
-	Int32 = (Int32 << 8) + bytes[2];
-	Int32 = (Int32 << 8) + bytes[1];
-	Int32 = (Int32 << 8) + bytes[0];
-	return Int32;
-}
-
-
-void FileSystem::intToByte(int val, char *bytes )
-{
-bytes[0] = (char)val;
-bytes[1] = (char)(val >> 8);
-bytes[2] = (char)(val >> 16);
-bytes[3] = (char)(val >> 24);
 }
 
 void FileSystem::d_write(int i_node,list<FileEntry> dlist)
