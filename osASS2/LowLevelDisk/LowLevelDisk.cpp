@@ -99,20 +99,37 @@ bool LowLevelDisk::existsFileSystem() {
 }
 
 void* LowLevelDisk::createFileSystem(){
+	_fd = open(SYS_FILE_NAME.c_str(), O_RDWR | O_CREAT, (mode_t)0600);
+	//cannot create
+	//initSuperBlock();
+	writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)_superBlock->numOfBlocks,OFFSET_SIZE_IN_BYTES);
+	writeDataToHardDisk(BLOCK_SIZE_OFFSET,(void*)_superBlock->blockSize,OFFSET_SIZE_IN_BYTES);
 
-	return NULL;
+}
+void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize){
+
+		_superBlock->blockSize=dataBlockSize;
+		_superBlock->numOfInodes=numberOfInodes;
+		_superBlock->numOfFreeInodes=numberOfInodes;
+		//write to file
+
+//		_superBlock->rootInode=buf[0];
+//		_superBlock->numOfFreeBlocks=buf[0];
+//		_superBlock->firstEmptyBlock=buf[0];
+		//_superBlock->lastEmptyBlock=buf[0];
+		//_superBlock->firstFreeInode=buf[0];
+		//_superBlock->lastFreeInode=buf[0];
+		//_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
+
+
+	//TODO : FINISH write the super block
 }
 
 void LowLevelDisk::openFileSystem(){
-
 	_fd = open(SYS_FILE_NAME.c_str(),O_RDWR);
 	  if (_fd!=-1){
 		  throw OpenFileExcemption(SYS_FILE_NAME);
 	  }
-
-
-
-
 }
 
 void* LowLevelDisk::readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes){
@@ -180,36 +197,36 @@ void LowLevelDisk::initInodesList() {
 void LowLevelDisk::initSuperBlockFromHardDisk(){
 
 	char buf[1];//TODO: check if buf is cahnge
-	initSuperBlockFromHardDisk();
-	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*) buf,1);
+
+	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfBlocks=buf[0];
 
 
-	readDataFromHardDisk(BLOCK_SIZE_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(BLOCK_SIZE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->blockSize=buf[0];
 
-	readDataFromHardDisk(ROOT_INODE_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(ROOT_INODE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->rootInode=buf[0];
 
-	readDataFromHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfFreeBlocks=buf[0];
 
-	readDataFromHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->firstEmptyBlock=buf[0];
 
-	readDataFromHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->lastEmptyBlock=buf[0];
 
-	readDataFromHardDisk(INODE_TABLE_SIZE_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(INODE_TABLE_SIZE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfInodes=buf[0];
 
-	readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfFreeInodes=buf[0];
 
-	readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->firstFreeInode=buf[0];
 
-	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,1);
+	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->lastFreeInode=buf[0];
 
 	_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
@@ -244,6 +261,7 @@ void LowLevelDisk::initVarsFromConfig(){
 
 LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_iNodeTable()
 {
+	initSuperBlock(dataBlockSize,numberOfInodes,diskSize);
 
 	if (existsFileSystem()){
 			openFileSystem();
