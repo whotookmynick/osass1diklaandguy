@@ -31,10 +31,13 @@ void LowLevelDisk::rmvNodeFromFreeNode(){
 	((BlockList*)_freeInodesList)->pop_front();
 }
 
+
 void LowLevelDisk::initNode(int node_id){
 	LOG_DEBUG("init node " << node_id);
-	_iNodeTable->get(node_id).setActive(false);
+	_iNodeTable->setActive(node_id,false);
+	//get(node_id).setActive(false);
 }
+
 
 void LowLevelDisk::addFreeNodeToFreeNodeList(int i_node){
 	LOG_DEBUG("add  Node "<<i_node<<" To Free Node List ");
@@ -250,6 +253,12 @@ LowLevelDisk::~LowLevelDisk()
 //---------------------------------------------------------------------------/
 //								Getters and setters
 //---------------------------------------------------------------------------/
+
+superBlock* LowLevelDisk::getSuperBlock(){
+	return _superBlock;
+}
+
+
 int LowLevelDisk::getNumOfBlocks(){
 	return _superBlock->numOfBlocks;
 }
@@ -300,7 +309,7 @@ void LowLevelDisk::freeInode(int i_node){
 		 //pthread_mutex_unlock(&_RecMutex);
 //		 return -1;
 	 }
-	 else if ((_iNodeTable->get(i_node)).getActive())
+	 else if (_iNodeTable->getActive(i_node))
 	 {
 		 initNode(i_node);//init node details to defult
 		 addFreeNodeToFreeNodeList(i_node);
@@ -346,7 +355,7 @@ int LowLevelDisk::getInodeType(int i_node){
 		 //
 	 }
 	 else{
-		 type =_iNodeTable->get(i_node).getFileType();;
+		 type =_iNodeTable->getFileType(i_node);;
 	 }
 	return type;
 	pthread_mutex_unlock(&_RecMutex);
@@ -362,7 +371,6 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 	//	throw invalid_argument("no such file type");//TODO: add exception
 	}
 	else{
-		_iNodeTable->get(i_node).setFileType(filetype);
 	}
 	pthread_mutex_unlock(&_RecMutex);
 }
@@ -378,7 +386,8 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
 	}
 	else{
 
-        return _iNodeTable->get(i_node).getNumOfDataBlock(dblock);
+        return _iNodeTable->getDataBlockNum(i_node,dblock);
+        //getNumOfDataBlock(i_node,dblock);
         //TODO: if not allocated yet??? allocate and delete the block in the file?????
 	}
 	pthread_mutex_unlock(&_RecMutex);
@@ -389,10 +398,10 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
 void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 	cout<<"setDataBlock - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
-	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->get(i_node).getActive()) )){
+	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->getActive(i_node)) )){
 		//TODO
 	}
-	_iNodeTable->get(i_node).setNumOfDataBlock(dblockNum,i);
+	_iNodeTable->setNumOfDataBlock(i_node,dblockNum,i);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
@@ -421,6 +430,7 @@ void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 	pthread_mutex_unlock(&_RecMutex);
 }
 
+
 int LowLevelDisk::getFileSize(int i_node){
 	cout<<"getFileSize - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
@@ -428,7 +438,7 @@ int LowLevelDisk::getFileSize(int i_node){
 		pthread_mutex_unlock(&_RecMutex);
 		return -1;
 	}
-	return _iNodeTable->get(i_node).getFileSize();
+	return _iNodeTable->getFileSize(i_node);
 	pthread_mutex_unlock(&_RecMutex);
 }
 
@@ -439,6 +449,7 @@ void LowLevelDisk::setFileSize(int i_node, int newSize){
 		//TODO		pthread_mutex_unlock(&_RecMutex);
 		//return -1;
 	}
-	_iNodeTable->get(i_node).setFileSize(newSize);
+	_iNodeTable->setFileSize(i_node,newSize);
 	pthread_mutex_unlock(&_RecMutex);
 }
+
