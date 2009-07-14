@@ -102,8 +102,7 @@ void LowLevelDisk::createFileSystem(){
 	_fd = open(SYS_FILE_NAME.c_str(), O_RDWR | O_CREAT, (mode_t)0600);
 	//cannot create
 	//initSuperBlock();
-	writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)_superBlock->numOfBlocks,OFFSET_SIZE_IN_BYTES);
-	writeDataToHardDisk(BLOCK_SIZE_OFFSET,(void*)_superBlock->blockSize,OFFSET_SIZE_IN_BYTES);
+
 }
 
 
@@ -203,13 +202,59 @@ void LowLevelDisk::initFreeBlocksList() {
     //start fill the first Block in list
     int offset = (_superBlock->firstFreeBlockNumber)*(_superBlock->blockSize);
     writeDataToHardDisk(offset, (void*)_superBlock->firstFreeBlockNumber,OFFSET_SIZE_IN_BYTES);
+    int blockSize = _superBlock->blockSize;
+    int numOfInodes = _superBlock->numOfInodes;
+    int numOfBlockInFreeBlockList;
+    if(numOfInodes%blockSize>0){
+    	numOfBlockInFreeBlockList =numOfInodes/blockSize+1;
+    }else{
+    	numOfBlockInFreeBlockList = numOfInodes/blockSize;
+    }//end else
 
-//start fill the rest of inodes
-   // while(!eof(_fd)){
+   int numOfBlockInInodeTable;
+   int inodeTableSize = (_superBlock->numOfFreeInodes)*SIZE_OF_INODE;
+   if(inodeTableSize%blockSize>0){
+   numOfBlockInInodeTable =inodeTableSize/blockSize+1;
+   }else{
+   numOfBlockInInodeTable = inodeTableSize/blockSize;
+   }//end else
 
 
+    int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
+    		-numOfBlockInInodeTable-numOfBlockInFreeBlockList;
 
-//    }
+    _superBlock->firstBlockOfFreeBlocksOffset = ((_superBlock->numOfBlocks) - numOfFreeBlocks)*blockSize;
+    int firstEmptyBlockNumber =(_superBlock->numOfBlocks) - numOfFreeBlocks;
+
+    //start fill the first block in the freeBlockList
+
+    int nextFreeBlock = firstEmptyBlockNumber;
+    int offset = FIRST_FREE_BLOCK_BLOCK*blockSize;
+    writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+    int i=0;
+
+
+    //calac how much blocks
+    while(numOfFreeBlocks>blockSize){
+
+    }
+    //for(int i=1; i<numOfFreeBlocks;i++){
+    	if(i==blockSize-1){
+    		//insert the next block of free blocks
+    		writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+    		//jump to next block and fill it
+    		offset=nextFreeBlock*blockSize;
+    		numOfFreeBlocks= numOfFreeBlocks-1;
+    		i=0;
+    	//}
+    	i++;
+    	offset=offset+OFFSET_SIZE_IN_BYTES;
+    	nextFreeBlock=nextFreeBlock+1;
+    	writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+
+    }
+
+    _superBlock->numOfFreeBlocks=numOfFreeBlocks;
 
     _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
     		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
