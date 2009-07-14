@@ -9,7 +9,12 @@
 
 
 FreeBlockList::FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
-: BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {};
+: BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
+
+
+
+
+};
 
 
 

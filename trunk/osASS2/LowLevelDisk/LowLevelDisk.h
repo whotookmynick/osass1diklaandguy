@@ -82,6 +82,8 @@ typedef struct{
 	int firstBlockOfFreeBlocksOffset;
 	int inodeTableOffset;
 
+	int firstFreeBlockNumber;
+
 }superBlock;
 
 class LowLevelDisk
@@ -189,7 +191,7 @@ public:
 private:
 
 
-
+		int getNumOfBlocksInInodeTable();
 		void* createFileSystem();
 		void openFileSystem();
 
