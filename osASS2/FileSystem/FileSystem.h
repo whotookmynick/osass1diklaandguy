@@ -88,6 +88,10 @@ public:
 	 **/
 	virtual void d_delete(int i_node);
 
+	virtual int getNumOfHardLinks(int i_node);
+
+	virtual void setNumOfHardLinks(int i_node,int num);
+
 };
 
 #endif /**FILESYSTEM_H_**/
