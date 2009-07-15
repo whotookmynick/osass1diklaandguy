@@ -6,9 +6,13 @@
  */
 
 #include "FreeInodeList.h"
+#include "LowLevelDisk.h"
 
   FreeInodeList::FreeInodeList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
-    : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {};
+    : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
+
+	  _size=_disk.getSuperBlock()->numOfFreeInodes;
+  };
 
 
 
