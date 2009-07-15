@@ -147,40 +147,40 @@ int LowLevelDisk::writeDataToHardDisk(int fromOffset,const void* buf,int numOfBy
 
 }*/
 
-//---------------------------------------------------------------------------------
-//							constarctors and distractor and inits
-//--------------------------------- -----------------------------------------------
+ //---------------------------------------------------------------------------------
+ //							constarctors and distractor and inits
+ //--------------------------------- -----------------------------------------------
 void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize){
 
 		_superBlock->numOfBlocks=diskSize/dataBlockSize;//TODO=round up? down??
-		writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)_superBlock->numOfBlocks,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(NUM_OF_BLOCK_OFFSET,(void*)&_superBlock->numOfBlocks,OFFSET_SIZE_IN_BYTES);
 
 
 		_superBlock->blockSize=dataBlockSize;//offset 1 in file
-		writeDataToHardDisk(BLOCK_SIZE_OFFSET,(void*)_superBlock->blockSize,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(BLOCK_SIZE_OFFSET,(void*)&_superBlock->blockSize,OFFSET_SIZE_IN_BYTES);
 
 		_superBlock->rootInode=ROOT_INODE;//offset 2 in file
-			writeDataToHardDisk(INODE_TABLE_BLOCK_NUM*_superBlock->blockSize,(void*)_superBlock->rootInode,OFFSET_SIZE_IN_BYTES);
+			writeDataToHardDisk(INODE_TABLE_BLOCK_NUM*_superBlock->blockSize,(void*)&_superBlock->rootInode,OFFSET_SIZE_IN_BYTES);
 
 
 		//	int numOfFreeBlocks;//offset 3 in file
 
 		//in offset 4 in file - in freeblock init
 		_superBlock->firstEmptyBlock=FIRST_FREE_BLOCK_BLOCK*_superBlock->blockSize;
-		writeDataToHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*)_superBlock->firstEmptyBlock,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*)&_superBlock->firstEmptyBlock,OFFSET_SIZE_IN_BYTES);
 
 		// lastEmptyBlock;//in offset 5  in freeblock init
 
 		_superBlock->numOfInodes=numberOfInodes;//in offset 6
-		writeDataToHardDisk(INODE_TABLE_SIZE_OFFSET,(void*)_superBlock->numOfInodes,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(INODE_TABLE_SIZE_OFFSET,(void*)&_superBlock->numOfInodes,OFFSET_SIZE_IN_BYTES);
 
 		_superBlock->numOfFreeInodes=numberOfInodes;//in offset 7
-		writeDataToHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)_superBlock->numOfFreeInodes,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)&_superBlock->numOfFreeInodes,OFFSET_SIZE_IN_BYTES);
 
 
 		//offset 8
 		_superBlock->firstFreeInode=FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
-		writeDataToHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*)_superBlock->firstFreeInode,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*)&_superBlock->firstFreeInode,OFFSET_SIZE_IN_BYTES);
 
 		//int lastFreeInode;//offset 9  - in freeinode init
 
@@ -195,42 +195,37 @@ void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskS
 void LowLevelDisk::initFreeInodesList() {
     LOG_DEBUG("init freeInodeList\n");
     _superBlock->firstBlockOfFreeInodesOffset = FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
-    int offset=_superBlock->firstBlockOfFreeInodesOffset;
-    int blockSize=_superBlock->blockSize;
 
-    int numOfBlockInFreeInodeList=getNumOfBlocksInFreeInodeList();
     int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
-       		-getNumOfBlocksInInodeTable();
+           		-getNumOfBlocksInInodeTable();
 
+    int offset=_superBlock->firstBlockOfFreeInodesOffset;
+    int nextBlockToWriteFreeInodes= _superBlock->numOfBlocks-numOfFreeBlocks;//the end of InodeTable
 
+    int inodeIndex=0;
+    int numOfinodeTowrite = _superBlock->numOfInodes;
 
+    //int nextOffset=	firstAvailbleBlockOffset
+    for(int j=0;j<_superBlock->numOfFreeInodes;j++){
 
-    int i=0;
-    writeDataToHardDisk(offset, (void*)i,OFFSET_SIZE_IN_BYTES);
-    offset++;
+       	if((j==(_superBlock->blockSize-1))and(numOfinodeTowrite>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
+       		//insert the next blockNumber of free inodes to the end of this block
+   			writeDataToHardDisk(offset,(void*)&nextBlockToWriteFreeInodes,OFFSET_SIZE_IN_BYTES);
+   			//jump to next block and fill it
+   		//	offset=nextFreeBlock*blockSize;
+   			offset=nextBlockToWriteFreeInodes*_superBlock->blockSize;//set next place to write list
+   			writeDataToHardDisk(offset,(void*)&inodeIndex,OFFSET_SIZE_IN_BYTES);
+   			numOfinodeTowrite--;
+   		}//end if
+       	else{
+       		writeDataToHardDisk(offset,(void*)&inodeIndex,OFFSET_SIZE_IN_BYTES);
+       	}
+       	inodeIndex++;
+       	offset=offset+OFFSET_SIZE_IN_BYTES;
 
-   // int nextFreeBlock=
-    for(int i=1;i<_superBlock->numOfFreeInodes;i++){
-
-    	if((i==blockSize-1)and(numOfBlockInFreeInodeList>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
-    		//insert the next block of free blocks
-			writeDataToHardDisk(offset,(void*)i,OFFSET_SIZE_IN_BYTES);
-			//jump to next block and fill it
-		//	offset=nextFreeBlock*blockSize;
-			numOfFreeBlocks= numOfFreeBlocks-1;
-			i=-1;//go to begining of the new block in list
-		}//end if
-
-    	i++;
-//		numOfFreeBlocksToWrite--;
-
-    }
-
-
-
-    //TODO int lastFreeInode;//offset 9  - in freeinode init
-
-
+       }//end for
+    _superBlock->lastFreeInode=offset;
+    writeDataToHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET*_superBlock->blockSize,(void*)&offset,OFFSET_SIZE_IN_BYTES);
    _freeInodesList=new FreeInodeList(_fd,_superBlock->firstBlockOfFreeInodesOffset
     	,_superBlock->firstFreeInode, _superBlock->lastFreeInode,*this);
 }
@@ -245,7 +240,7 @@ void LowLevelDisk::initFreeBlocksList() {
 
     //start fill the first Block in list
     int offset = (_superBlock->firstFreeBlockNumber)*(_superBlock->blockSize);
-    writeDataToHardDisk(offset, (void*)_superBlock->firstFreeBlockNumber,OFFSET_SIZE_IN_BYTES);
+    writeDataToHardDisk(offset, (void*)&_superBlock->firstFreeBlockNumber,OFFSET_SIZE_IN_BYTES);
 
     int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
     		-getNumOfBlocksInInodeTable()-getNumOfBlocksInFreeInodeList();
@@ -258,7 +253,7 @@ void LowLevelDisk::initFreeBlocksList() {
 
     int nextFreeBlock = firstEmptyBlockNumber;
     int freeOffset = FIRST_FREE_BLOCK_BLOCK*blockSize;
-    writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+    writeDataToHardDisk(freeOffset,(void*)&nextFreeBlock,OFFSET_SIZE_IN_BYTES);
     int i=0;
     int numOfBlockInFreeBlockList=numOfFreeBlocks;
     int numOfFreeBlocksToWrite=numOfFreeBlocks;
@@ -267,7 +262,7 @@ void LowLevelDisk::initFreeBlocksList() {
     while(numOfFreeBlocksToWrite>0){//(blockSize-i-1)//while there are blocks to store in freeBlockList
     	if((i==blockSize-1)and(numOfBlockInFreeBlockList>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
 			//insert the next block of free blocks
-			writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+			writeDataToHardDisk(freeOffset,(void*)&nextFreeBlock,OFFSET_SIZE_IN_BYTES);
 			//jump to next block and fill it
 			freeOffset=nextFreeBlock*blockSize;
 			numOfFreeBlocks= numOfFreeBlocks-1;
@@ -277,7 +272,7 @@ void LowLevelDisk::initFreeBlocksList() {
     	numOfFreeBlocksToWrite--;
 		freeOffset=freeOffset+OFFSET_SIZE_IN_BYTES;
 		nextFreeBlock=nextFreeBlock+1;
-		writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(freeOffset,(void*)&nextFreeBlock,OFFSET_SIZE_IN_BYTES);
     }//end while
 
     _superBlock->numOfFreeBlocks=numOfFreeBlocks;
@@ -291,7 +286,6 @@ void LowLevelDisk::initInodesList() {
     LOG_DEBUG("init inodesList\n");
     _numOfBlocksInInodeTable = ((_superBlock->numOfInodes) / (_superBlock->blockSize))+1;
     _superBlock->inodeTableOffset = INODE_TABLE_BLOCK_NUM*(_superBlock->blockSize);
-
     _iNodeTable = new InodeList(_fd, _superBlock->inodeTableOffset, *this);
 }
 
@@ -299,35 +293,35 @@ void LowLevelDisk::initSuperBlockFromHardDisk(){
 
 	char buf[1];//TODO: check if buf is cahnge
 
-	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfBlocks=buf[0];
 
 
-	readDataFromHardDisk(BLOCK_SIZE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(BLOCK_SIZE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->blockSize=buf[0];
 
-	readDataFromHardDisk(ROOT_INODE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(ROOT_INODE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->rootInode=buf[0];
 
-	readDataFromHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfFreeBlocks=buf[0];
 
-	readDataFromHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->firstEmptyBlock=buf[0];
 
-	readDataFromHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->lastEmptyBlock=buf[0];
 
-	readDataFromHardDisk(INODE_TABLE_SIZE_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(INODE_TABLE_SIZE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfInodes=buf[0];
 
-	readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->numOfFreeInodes=buf[0];
 
 	readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->firstFreeInode=buf[0];
 
-	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
 	_superBlock->lastFreeInode=buf[0];
 
 	_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
@@ -348,8 +342,8 @@ int LowLevelDisk::getNumOfBlocksInInodeTable(){
 
 LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_iNodeTable()
 {
-
-
+	_superBlock=(superBlock*)malloc(sizeof(superBlock));
+	_iNodeTable=(InodeList*)malloc(sizeof(InodeList));
 	if (existsFileSystem()){
 			openFileSystem();
 			initSuperBlockFromHardDisk();
