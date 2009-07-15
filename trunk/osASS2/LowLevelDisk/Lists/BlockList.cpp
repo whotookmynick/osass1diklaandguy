@@ -15,7 +15,6 @@ BlockList::BlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmp
 _fd(fd),_firstBlockPointer(firstEmptyBlock),_lastBlockPointer(lastEmptyBlock),_offset(firstBlockOffset),_disk(disk)
 {
 
-
 }
 
 BlockList::~BlockList() {
@@ -84,7 +83,7 @@ void BlockList::copyNextBlockToSuperBlock(){
 //--------------------------------- -----------------------------------------------
 
 int BlockList::size(){
-	return 1;
+	return _size;
 }
 
 bool BlockList::empty(){
@@ -96,13 +95,21 @@ bool BlockList::contains(int v)  {
 }
 
 int BlockList::head(){
-	return 1;
+	int element;
+	readDataFromHardDisk(_head,(void*)&element,OFFSET_SIZE_IN_BYTES);
+	return element;
 }//reference to the  front
 
 void BlockList::pop_front(){
-
-
+	int null=0;
+	writeDataToHardDisk(_head,(void*)&null,OFFSET_SIZE_IN_BYTES);
+	updateHead();
+	_size--;
 }
 
 
-void BlockList::push_back(int val){}
+void BlockList::push_back(int val){
+	readDataFromHardDisk(_tail,(void*)&val,OFFSET_SIZE_IN_BYTES);
+	updateTail();
+	_size++;
+}

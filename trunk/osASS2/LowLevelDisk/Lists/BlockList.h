@@ -45,6 +45,9 @@ public:
 	virtual int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
 	virtual void*  readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);
 	virtual void copyNextBlockToSuperBlock();
+	int _size;
+	LowLevelDisk& _disk;
+
 private:
 	int _fd;
 	int _firstBlockPointer;
@@ -52,7 +55,7 @@ private:
 	int _offset;
 	int _tail;
 	int _head;
-	LowLevelDisk& _disk;
+
 
 
 };

@@ -6,12 +6,12 @@
  */
 
 #include "FreeBlockList.h"
-
+#include "LowLevelDisk.h"
 
 FreeBlockList::FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
 : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
 
-
+	_size=_disk.getSuperBlock()->numOfFreeBlocks;
 
 
 };
