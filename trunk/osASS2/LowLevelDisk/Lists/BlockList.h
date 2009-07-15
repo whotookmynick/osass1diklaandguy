@@ -43,13 +43,15 @@ public:
 	virtual void updateTail();
 	virtual void updateHead();
 	virtual int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
+	virtual void*  readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);
+	virtual void copyNextBlockToSuperBlock();
 private:
 	int _fd;
 	int _firstBlockPointer;
 	int _lastBlockPointer;
 	int _offset;
 	int _tail;
-	int _haed;
+	int _head;
 	LowLevelDisk& _disk;
 
 
