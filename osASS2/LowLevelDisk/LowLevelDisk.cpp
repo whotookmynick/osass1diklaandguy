@@ -8,6 +8,17 @@
 //---------------------------------------------------------------------------/
 //								Help function
 //---------------------------------------------------------------------------/
+int LowLevelDisk::getNumOfBlocksInFreeInodeList(){
+	int numOfInodes=_superBlock->numOfFreeInodes;
+	int blockSize=_superBlock->blockSize;
+	int numOfBlockInFreeInodeList;
+	if(numOfInodes%blockSize>0){
+		numOfBlockInFreeInodeList =numOfInodes/blockSize+1;
+   }else{
+	numOfBlockInFreeInodeList = numOfInodes/blockSize;
+   }//end else
+	return numOfBlockInFreeInodeList;
+ }
 
 int getInodeFromString(const string& elementName){
 
@@ -183,9 +194,40 @@ void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskS
 
 void LowLevelDisk::initFreeInodesList() {
     LOG_DEBUG("init freeInodeList\n");
-
-
     _superBlock->firstBlockOfFreeInodesOffset = FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
+    int offset=_superBlock->firstBlockOfFreeInodesOffset;
+    int blockSize=_superBlock->blockSize;
+
+    int numOfBlockInFreeInodeList=getNumOfBlocksInFreeInodeList();
+    int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
+       		-getNumOfBlocksInInodeTable();
+
+
+
+
+    int i=0;
+    writeDataToHardDisk(offset, (void*)i,OFFSET_SIZE_IN_BYTES);
+    offset++;
+
+   // int nextFreeBlock=
+    for(int i=1;i<_superBlock->numOfFreeInodes;i++){
+
+    	if((i==blockSize-1)and(numOfBlockInFreeInodeList>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
+    		//insert the next block of free blocks
+			writeDataToHardDisk(offset,(void*)i,OFFSET_SIZE_IN_BYTES);
+			//jump to next block and fill it
+		//	offset=nextFreeBlock*blockSize;
+			numOfFreeBlocks= numOfFreeBlocks-1;
+			i=-1;//go to begining of the new block in list
+		}//end if
+
+    	i++;
+//		numOfFreeBlocksToWrite--;
+
+    }
+
+
+
     //TODO int lastFreeInode;//offset 9  - in freeinode init
 
 
@@ -196,34 +238,20 @@ void LowLevelDisk::initFreeInodesList() {
 void LowLevelDisk::initFreeBlocksList() {
 	LOG_DEBUG("init freeBlocksList\n");
     _superBlock->firstBlockOfFreeBlocksOffset = FIRST_FREE_BLOCK_BLOCK*_superBlock->blockSize;
-    //the first free block is after the inode table
     //TODO init super block var in offset 4 in file - in freeblock init
-    //TODO:init super block var lastEmptyBlock;//in offset 5  in freeblock init
+    int blockSize = _superBlock->blockSize;
+    //the first free block is after the inode table
+
+
     //start fill the first Block in list
     int offset = (_superBlock->firstFreeBlockNumber)*(_superBlock->blockSize);
     writeDataToHardDisk(offset, (void*)_superBlock->firstFreeBlockNumber,OFFSET_SIZE_IN_BYTES);
-    int blockSize = _superBlock->blockSize;
-    int numOfInodes = _superBlock->numOfInodes;
-    int numOfBlockInFreeBlockList;
-    if(numOfInodes%blockSize>0){
-    	numOfBlockInFreeBlockList =numOfInodes/blockSize+1;
-    }else{
-    	numOfBlockInFreeBlockList = numOfInodes/blockSize;
-    }//end else
-
-   int numOfBlockInInodeTable;
-   int inodeTableSize = (_superBlock->numOfFreeInodes)*SIZE_OF_INODE;
-   if(inodeTableSize%blockSize>0){
-   numOfBlockInInodeTable =inodeTableSize/blockSize+1;
-   }else{
-   numOfBlockInInodeTable = inodeTableSize/blockSize;
-   }//end else
-
 
     int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
-    		-numOfBlockInInodeTable-numOfBlockInFreeBlockList;
+    		-getNumOfBlocksInInodeTable()-getNumOfBlocksInFreeInodeList();
 
     _superBlock->firstBlockOfFreeBlocksOffset = ((_superBlock->numOfBlocks) - numOfFreeBlocks)*blockSize;
+
     int firstEmptyBlockNumber =(_superBlock->numOfBlocks) - numOfFreeBlocks;
 
     //start fill the first block in the freeBlockList
@@ -232,9 +260,10 @@ void LowLevelDisk::initFreeBlocksList() {
     int freeOffset = FIRST_FREE_BLOCK_BLOCK*blockSize;
     writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
     int i=0;
-
+    int numOfBlockInFreeBlockList=numOfFreeBlocks;
     int numOfFreeBlocksToWrite=numOfFreeBlocks;
     //calac how much blocks
+
     while(numOfFreeBlocksToWrite>0){//(blockSize-i-1)//while there are blocks to store in freeBlockList
     	if((i==blockSize-1)and(numOfBlockInFreeBlockList>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
 			//insert the next block of free blocks
@@ -250,8 +279,9 @@ void LowLevelDisk::initFreeBlocksList() {
 		nextFreeBlock=nextFreeBlock+1;
 		writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
     }//end while
-    _superBlock->numOfFreeBlocks=numOfFreeBlocks;
 
+    _superBlock->numOfFreeBlocks=numOfFreeBlocks;
+    _superBlock->lastEmptyBlock=numOfFreeBlocks-1;
     _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
     		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
 }
@@ -468,7 +498,6 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 	cout<<"setInodeType-  need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((filetype<0) | (filetype>2 ) | (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
-	//cerr<<"no such file type"<<endl\
 	//pthread_mutex_unlock(&_RecMutex);
 	//	throw invalid_argument("no such file type");//TODO: add exception
 	}
