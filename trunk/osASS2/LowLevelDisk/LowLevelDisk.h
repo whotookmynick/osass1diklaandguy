@@ -173,7 +173,8 @@ public:
 	void setFileSize(int i_node, int newSize);
 
 	//------------------------------------------------------------//
-
+		int getHardLink(int i_node);
+		void setHardLink(int i_node);
 		void initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize);
 
 
