@@ -183,13 +183,12 @@ void FileSystem::d_delete(int i_node)
 
 int FileSystem::getNumOfHardLinks(int i_node)
 {
-	//TODO: IMPLEMEMNT HERE
-	return 1;
+	return _lldisk->getHardLink(i_node);
 }
 
 void FileSystem::setNumOfHardLinks(int i_node,int num)
 {
-
+	_lldisk->setHardLink(i_node,num);
 }
 
 FileSystem::~FileSystem()
