@@ -181,6 +181,17 @@ void FileSystem::d_delete(int i_node)
 	}
 }
 
+int FileSystem::getNumOfHardLinks(int i_node)
+{
+	//TODO: IMPLEMEMNT HERE
+	return 1;
+}
+
+void FileSystem::setNumOfHardLinks(int i_node,int num)
+{
+
+}
+
 FileSystem::~FileSystem()
 {
 

@@ -144,7 +144,13 @@ int SystemCalls::RmFile(char* fileName){
 	int pwdInode = -1;
 	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
 	FileEntry currEntry = (*getFileEntryFromDir(currPWD,file_nameShort.c_str()));
-	_fileSys->f_delete(currEntry.getInodeNum());
+	int numOfHardLinks = _fileSys->getNumOfHardLinks(currEntry.getInodeNum());
+	if (numOfHardLinks == 1)
+	{
+		_fileSys->f_delete(currEntry.getInodeNum());
+	}
+	numOfHardLinks--;
+	_fileSys->setNumOfHardLinks(currEntry.getInodeNum(),numOfHardLinks);
 	return 1;
 }
 
@@ -229,6 +235,7 @@ int SystemCalls::Write (int fd, int nBytes,char * Buffer){
 }
 
 int SystemCalls::moveFile(char* parendDir, char * new_dest){
+
 	return 1;
 }
 
