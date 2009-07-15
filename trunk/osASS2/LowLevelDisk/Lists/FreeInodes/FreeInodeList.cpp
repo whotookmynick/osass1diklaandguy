@@ -12,7 +12,7 @@
     : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
 	  superBlock *super = _disk.getSuperBlock();
 	  _size=super->numOfFreeInodes;
-	  _head=(super->firstBlockOfFreeInodesOffset) * super->blockSize;
+	  _head=(super->firstBlockOfFreeInodesOffset);// * super->blockSize;
 	  _tail= super->lastFreeInode;
   };
 
