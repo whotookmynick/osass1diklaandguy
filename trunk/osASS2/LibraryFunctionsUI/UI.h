@@ -19,9 +19,6 @@
 #include <queue>
 #include "../SystemCalls/SystemCalls.h"
 
-const int READ_ONLY = 1;
-const int READ_AND_WRITE = 2;
-
 using namespace std;
 
 /*
@@ -134,7 +131,11 @@ public:
       */
      int rmdir_r(string dir_name);
      /*
-      *returns a list of the files in the given directory, each file in a different line and including the file_name and its size (in bytes). If ls is given without an argument, the ls of the current directory should be returned. Output should be as follows: each file/dir in the given directory in a separate line, directories have the "/" char appended to the end of their name.
+      * returns a list of the files in the given directory,
+      * each file in a different line and including the file_name and its size (in bytes).
+      * If ls is given without an argument, the ls of the current directory should be returned.
+      * Output should be as follows: each file/dir in the given directory in a separate line,
+      * directories have the "/" char appended to the end of their name.
       */
      list<string> ls (string dir_name);
      /*

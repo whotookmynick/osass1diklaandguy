@@ -7,6 +7,13 @@
 #ifndef UTIL_CPP_
 #define UTIL_CPP_
 
+const int REGULARE_FILE = 0;
+const int SOFT_LINK = 1;
+const int DIR_TYPE = 3;
+
+const int READ_ONLY = 1;
+const int READ_AND_WRITE = 2;
+
 	static int turnBytesToInt(char* bytes)
 	{
 		int Int32 = 0;

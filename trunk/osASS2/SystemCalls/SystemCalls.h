@@ -2,6 +2,7 @@
 #define SYSTEMCALLS_H_
 
 #include <map>
+#include <sstream>
 #include "FileSystem.h"
 #include "Descriptor.h"
 #include "TooManyFilesException.h"

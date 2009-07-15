@@ -10,11 +10,7 @@
 #include "../Main/Util.cpp"
 //#include "OpenFileDescriptor.h"
 
-#define SOFT_LINK 1;
-#define DIR 2;
-#define REGULAR_FILE 3;
-
-const int BLOCK_SIZE = 64;
+//const int BLOCK_SIZE = 64;
 
 
 using namespace std;
@@ -22,12 +18,11 @@ class FileSystem
 {
 private:
 	LowLevelDisk* _lldisk;
+	int BLOCK_SIZE;
 //	vector<OpenFileDescriptor*> _openFilesTable;
 
 	/* ------------------------- HELP FUNCTIONS ---------------------------------*/
-	int createSoftLink();
 
-	int createRegularFile();
 
 	/* END HELP FUNCTIONS */
 
@@ -50,9 +45,11 @@ public:
 	 **/
 	virtual int getFileType(int i_node);
 	/**
-	 **reads nBytes (at most) from the given file (represented by this i_node) at the given offset inside the file into the buffer.
+	 * reads nBytes (at most) from the given file (represented by this i_node) at the given offset inside the file
+	 * into the buffer.
+	 * returns the number of bytes read
 	 **/
-	virtual void f_read(int i_node,char* buffer,int offset,int nBytes);
+	virtual int f_read(int i_node,char* buffer,int offset,int nBytes);
 
 	/**
 	 ** writes nBytes (at most) to the given file (represented by this i_node)
@@ -60,7 +57,7 @@ public:
 	 **  If the amount to be written exceeds the current allocated block,
 	 **  a new block should be allocated to accommodate the rest of the data.
 	 **/
-	virtual void f_write(int i_node,char* buffer,int offset,int nBytes );
+	virtual int f_write(int i_node,char* buffer,int offset,int nBytes );
 
 	/**
 	 ** Notice that both f_read and f_write only work on normal files (not directories).
@@ -71,6 +68,7 @@ public:
 	 ** This information is then entered into a data structure (a vector or list)
 	 ** that lists the files in this directory.
 	 ** Each element in this list therefore contains a filename and i_node number.
+	 ** returns the number of bytes written.
 	 **/
 	virtual list<FileEntry> d_read(int i_node);
 

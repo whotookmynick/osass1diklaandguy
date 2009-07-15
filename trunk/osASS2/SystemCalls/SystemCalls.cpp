@@ -48,8 +48,21 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 }
 
 
-int SystemCalls::MakeHLink(char* target_file_name, char*file_name){
-	return 1;
+int SystemCalls::MakeHLink(char* target_file_name, char *sourcefile_name){
+	string targetFileNameString(targetFileNameString);
+	string sourceFileNameString(sourcefile_name);
+	string targetPwdString = targetFileNameString.substr(0,targetFileNameString.find_last_of("/"));
+	int pwdInode = -1;
+	list<FileEntry> targetPWD = readPWDDir(targetPwdString,&pwdInode);
+	string targetShortName = targetFileNameString.substr(targetFileNameString.find_last_of("/") + 1);
+	FileEntry targetFileEntry = (*getFileEntryFromDir(targetPWD,targetShortName.c_str()));
+	string sourcePwdString = sourceFileNameString.substr(0,sourceFileNameString.find_last_of("/"));
+	list<FileEntry> sourcePWD = readPWDDir(sourcePwdString,&pwdInode);
+	string sourceShortName = sourceFileNameString.substr(sourceFileNameString.find_last_of("/") + 1);;
+	targetFileEntry.setFileName((char*)sourceShortName.c_str());
+	sourcePWD.push_back(targetFileEntry);
+	_fileSys->d_write(pwdInode,sourcePWD);
+	return this->Open(sourcefile_name,READ_AND_WRITE);
 }
 
 int SystemCalls::MakeDir(char* dir_name){
@@ -124,11 +137,36 @@ list<FileEntry>::iterator SystemCalls::getFileEntryFromDir(list<FileEntry>& curr
 	return it;
 }
 
-int SystemCalls::RmFile(char* file_name){
+int SystemCalls::RmFile(char* fileName){
+	string file_nameString(fileName);
+	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
+	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
+	int pwdInode = -1;
+	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
+	FileEntry currEntry = (*getFileEntryFromDir(currPWD,file_nameShort.c_str()));
+	_fileSys->f_delete(currEntry.getInodeNum());
 	return 1;
 }
 
-int SystemCalls::ls(char*dir_name, char * buf){
+int SystemCalls::ls(char *dir_name, char * buf){
+	string dir_nameString(dir_name);
+	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	list<FileEntry> currPWD;
+	int pwdInode;
+	currPWD = readPWDDir(pwd,&pwdInode);
+	ostringstream answerString;
+	list<FileEntry>::iterator it = currPWD.begin();
+	while (it != currPWD.end())
+	{
+		FileEntry currEntry = *it;
+		answerString<<currEntry.getFileName();
+		if (this->isDir(currEntry.getFileName()))
+		{
+			answerString<<"/";
+		}
+		answerString<<"\t"<<currEntry.getFileSize() <<endl;
+	}
+	strcpy(buf,answerString.str().c_str());
 	return 1;
 }
 
@@ -153,7 +191,7 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 		pthread_mutex_lock(&_currFDMutex);
 		_currFD++;
 		_openFileTable[_currFD] = newDesc;
-		ret = _currFD;
+		ret = _currFD;return
 		pthread_mutex_unlock(&_currFDMutex);
 
 	}
@@ -176,19 +214,33 @@ int SystemCalls::Seek(int fd, int location){
 }
 
 int SystemCalls::Read (int fd, int nBytes, char *Buffer){
-	return 1;
+	Descriptor* desc = _openFileTable[fd];
+	int bytesRead = _fileSys->f_read(desc->_inode,Buffer,desc->_filePosition,nBytes);
+	desc->_filePosition += bytesRead;
+	return bytesRead;
 }
 
 
 int SystemCalls::Write (int fd, int nBytes,char * Buffer){
-	return 1;
+	Descriptor* desc = _openFileTable[fd];
+	int bytesWritten = _fileSys->f_write(desc->_inode,Buffer,desc->_filePosition,nBytes);
+	desc->_filePosition += bytesWritten;
+	return bytesWritten;
 }
 
 int SystemCalls::moveFile(char* parendDir, char * new_dest){
 	return 1;
 }
 
-bool SystemCalls::isDir(char * address){
+bool SystemCalls::isDir(char * fileName){
+	string file_nameString(fileName);
+	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
+	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
+	int pwdInode = -1;
+	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
+	FileEntry currEntry = (*getFileEntryFromDir(currPWD,file_nameShort.c_str()));
+	if (_fileSys->getFileType(currEntry.getInodeNum()) == DIR_TYPE)
+		return true;
 	return false;
 }
 
@@ -224,6 +276,7 @@ bool SystemCalls::isLockedWrite(int i_node_num)
 			return true;
 		}
 	}
+
 	return false;
 }
 

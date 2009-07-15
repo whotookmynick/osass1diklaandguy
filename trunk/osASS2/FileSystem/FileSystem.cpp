@@ -8,7 +8,7 @@
 #include "FileSystem.h"
 
 
-FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize)
+FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize):BLOCK_SIZE(dataBlockSize)
 {
 	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
 }
@@ -20,33 +20,23 @@ FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize)
 int FileSystem::createFile(int flag)
 {
 	int ans = 0;
+	ans = _lldisk->allocateInode();
 	if (flag)
 	{
-		ans = createSoftLink();
+		_lldisk->setInodeType(ans,SOFT_LINK);
 	}
 	else
 	{
-		ans = createRegularFile();
+		_lldisk->setInodeType(ans,REGULARE_FILE);
 	}
 	return ans;
-}
-
-int FileSystem::createSoftLink()
-{
-	cout<<"FileSystem::createSoftLink not implemented yet"<<endl;
-	return 0;
-}
-
-int FileSystem::createRegularFile()
-{
-	int newInodeNumber = _lldisk->allocateInode();
-	return newInodeNumber;
 }
 
 
 int FileSystem::createDir()
 {
-	int newDirNum = this->createRegularFile();
+	int newDirNum = _lldisk->allocateInode();
+	_lldisk->setInodeType(newDirNum,DIR_TYPE);
 	return newDirNum;
 }
 
@@ -55,49 +45,55 @@ int FileSystem::getFileType(int i_node)
 	return _lldisk->getInodeType(i_node);
 }
 
-void FileSystem::f_read(int i_node,char* buffer,int offset,int nBytes)
+int FileSystem::f_read(int i_node,char* buffer,int offset,int nBytes)
 {
 	int bytesRead = 0;
-	int blockNum = offset/BLOCK_SIZE;
+	int blockNumInFile = offset/BLOCK_SIZE;
+	int physicalBlockNum = _lldisk->getDataBlock(i_node,blockNumInFile);
 	char currBuffer[BLOCK_SIZE];
-	_lldisk->readBlock(blockNum,currBuffer);
-	int blockStartOffset = offset - (blockNum * BLOCK_SIZE);
-	while (strlen(currBuffer)==0 & bytesRead < nBytes)
+	_lldisk->readBlock(physicalBlockNum,currBuffer);
+	int blockStartOffset = offset - (blockNumInFile * BLOCK_SIZE);
+	while (physicalBlockNum!=-1 & bytesRead < nBytes)
 	{
 		for (int bufferIndex = blockStartOffset; bufferIndex < BLOCK_SIZE & bytesRead < nBytes; bufferIndex++)
 		{
 			buffer[bytesRead] = currBuffer[bufferIndex];
+			bytesRead++;
 		}
-		blockNum++;
-		_lldisk->readBlock(blockNum,currBuffer);
+		blockNumInFile++;
+		physicalBlockNum = _lldisk->getDataBlock(i_node,blockNumInFile);
+		_lldisk->readBlock(physicalBlockNum,currBuffer);
 		blockStartOffset = 0;
 	}
+	return bytesRead;
 
 }
 
-void FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
+int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 {
 	int bytesWritten = 0;
-	int blockNum = offset/BLOCK_SIZE;
+	int blockNumInFile = offset/BLOCK_SIZE;
 	char currBuffer[BLOCK_SIZE];
-	while (bytesWritten < nBytes & buffer[bytesWritten] != '\0')
+	while (bytesWritten < nBytes )
 	{
-		int physicalBlockNum = _lldisk->getDataBlock(i_node,blockNum);
-
-		if (physicalBlockNum == -1)
+		int physicalBlock = _lldisk->getDataBlock(i_node,blockNumInFile);
+		if (physicalBlock == -1)
 		{
-			physicalBlockNum = _lldisk->allocateDataBlock();
+			physicalBlock = _lldisk->allocateDataBlock();
+			_lldisk->setDataBlock(i_node,blockNumInFile,physicalBlock);
 		}
-		_lldisk->readBlock(physicalBlockNum,currBuffer);
+		_lldisk->readBlock(physicalBlock,currBuffer);
 		int i;
 		for (i = 0; i<BLOCK_SIZE & bytesWritten < nBytes & buffer[bytesWritten+i] != '\0'; i++)
 		{
 			currBuffer[i] = buffer[bytesWritten+i];
+			bytesWritten++;
 		}
-		bytesWritten += i;
-		_lldisk->writeBlock(physicalBlockNum,currBuffer);
-		offset += bytesWritten;
+//		bytesWritten += i;
+		_lldisk->writeBlock(physicalBlock,currBuffer);
+		blockNumInFile++;
 	}
+	return bytesWritten;
 }
 
 list<FileEntry> FileSystem::d_read(int i_node)
@@ -106,9 +102,9 @@ list<FileEntry> FileSystem::d_read(int i_node)
 	int fileSize = _lldisk->getFileSize(i_node);
 	int currOffset = 0;
 	char fileEntryBuffer[20];
-	while (currOffset < fileSize)
+	this->f_read(i_node,fileEntryBuffer,currOffset,16);
+	while (fileEntryBuffer[0] != '\0')
 	{
-		this->f_read(i_node,fileEntryBuffer,currOffset,16);
 		int entryInode = turnBytesToInt(fileEntryBuffer);
 		char entryName[12];
 		strcpy(entryName,fileEntryBuffer+4);
@@ -116,6 +112,7 @@ list<FileEntry> FileSystem::d_read(int i_node)
 		FileEntry entry(entryInode,entryName,entrySize);
 		ans.push_back(entry);
 		currOffset += 16;
+		this->f_read(i_node,fileEntryBuffer,currOffset,16);
 	}
 	return ans;
 }
@@ -127,6 +124,7 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 	list<FileEntry> oldDir = this->d_read(i_node);
 	list<FileEntry>::iterator it;
 	it = dlist.begin();
+
 	while( it != dlist.end() ) {
 		FileEntry currEntry = *it;
 		intToByte(currEntry.getInodeNum(),currEntryBuffer);
@@ -135,6 +133,8 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 		currOffset += 16;
 	    ++it;
     }
+	this->f_write(i_node,"\0",currOffset+1,1);
+	/*
 	if (currOffset < _lldisk->getFileSize(i_node))
 	{
 		int currBlockInFile = currOffset / BLOCK_SIZE;
@@ -156,11 +156,19 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 		}
 	}
 // Now to check if no old data is left.
-
+*/
 }
 
 void FileSystem::f_delete(int i_node)
 {
+	int blockNumInFile = 0;
+	int physicalBlockNum = _lldisk->getDataBlock(i_node,blockNumInFile);
+	while(physicalBlockNum != -1)
+	{
+		_lldisk->freeDataBlock(physicalBlockNum);
+		blockNumInFile++;
+		physicalBlockNum = _lldisk->getDataBlock(i_node,blockNumInFile);
+	}
 	_lldisk->freeInode(i_node);
 }
 
