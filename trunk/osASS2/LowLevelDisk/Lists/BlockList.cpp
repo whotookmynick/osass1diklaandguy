@@ -31,10 +31,14 @@ int BlockList::writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes
 	int sizeW = sizeWriten;
 	return sizeW;
 }
-
+void* BlockList::readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes){
+	off_t offset = fromOffset;
+	size_t size = numOfBytes;
+	pread(_fd,buf,size,offset);
+	return buf;
+}
 void BlockList::updateTail(){
 	int newBlock;
-	_disk.getSuperBlock();
 	if((_tail%((_disk.getSuperBlock())->blockSize)) == 0){
 		newBlock = _disk.allocateDataBlock();
 		writeDataToHardDisk(_tail,(void*)&newBlock,OFFSET_SIZE_IN_BYTES);
@@ -46,16 +50,34 @@ void BlockList::updateTail(){
 }
 
 void BlockList::updateHead(){
-	/*int newBlock;
-	_disk.getSuperBlock();
-	if((_tail%((_disk.getSuperBlock())->blockSize)) == 0){
-		newBlock = _disk.allocateDataBlock();
-		writeDataToHardDisk(_tail,(void*)&newBlock,OFFSET_SIZE_IN_BYTES);
-		_tail=newBlock*_disk.getSuperBlock()->blockSize;
+	if((_head%((_disk.getSuperBlock())->blockSize)) == 0){
+		copyNextBlockToSuperBlock();
 	}else{
-		_tail=_tail+OFFSET_SIZE_IN_BYTES;
-	}*/
+		_head=_head+OFFSET_SIZE_IN_BYTES;
+	}
 
+}
+
+void BlockList::copyNextBlockToSuperBlock(){
+	int nextBlock;
+	int blocksize=_disk.getSuperBlock()->blockSize;
+	readDataFromHardDisk(_head,(void*)&nextBlock,OFFSET_SIZE_IN_BYTES);
+	int content ;
+	int copyFromOffset=nextBlock*blocksize;
+	_head = _head-blocksize+1;
+
+
+	int writeToOffset=_head-(blocksize)+1;
+	for(int i=0;i<blocksize;i=i+OFFSET_SIZE_IN_BYTES){
+		readDataFromHardDisk(copyFromOffset,(void*)&content,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(writeToOffset,(void*)&content,OFFSET_SIZE_IN_BYTES);
+		copyFromOffset++;
+		writeToOffset++;
+	}
+	//if the tail is in the second block
+	if(_tail<nextBlock*blocksize+blocksize-1){
+		_tail=_tail%blocksize+_head;
+	}
 }
 //---------------------------------------------------------------------------------
 //
