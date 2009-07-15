@@ -197,6 +197,8 @@ private:
 
 		int getNumOfBlocksInInodeTable();
 		void createFileSystem();
+		int getNumOfBlocksInFreeInodeList();
+
 		void openFileSystem();
 
 		/////////////////////////////////////////////
