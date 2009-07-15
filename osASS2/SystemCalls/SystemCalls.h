@@ -7,7 +7,7 @@
 #include "Descriptor.h"
 #include "TooManyFilesException.h"
 
-const int ROOT_PWD_INODE = 2;
+const int ROOT_PWD_INODE = 0;
 const int MAX_OPEN_FILES = 128;
 
 class SystemCalls
