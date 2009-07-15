@@ -11,8 +11,10 @@
 FreeBlockList::FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
 : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
 
-	_size=_disk.getSuperBlock()->numOfFreeBlocks;
-
+	superBlock *super = _disk.getSuperBlock();
+	_size=super->numOfFreeBlocks;
+	_head=(super->firstBlockOfFreeBlocksOffset) * super->blockSize;
+	_tail= super->lastEmptyBlock;
 
 };
 

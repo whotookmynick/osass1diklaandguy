@@ -51,7 +51,10 @@ int FileSystem::f_read(int i_node,char* buffer,int offset,int nBytes)
 	int blockNumInFile = offset/BLOCK_SIZE;
 	int physicalBlockNum = _lldisk->getDataBlock(i_node,blockNumInFile);
 	char currBuffer[BLOCK_SIZE];
-	_lldisk->readBlock(physicalBlockNum,currBuffer);
+	if (physicalBlockNum != -1)
+	{
+		_lldisk->readBlock(physicalBlockNum,currBuffer);
+	}
 	int blockStartOffset = offset - (blockNumInFile * BLOCK_SIZE);
 	while (physicalBlockNum!=-1 & bytesRead < nBytes)
 	{
@@ -102,8 +105,8 @@ list<FileEntry> FileSystem::d_read(int i_node)
 	int fileSize = _lldisk->getFileSize(i_node);
 	int currOffset = 0;
 	char fileEntryBuffer[20];
-	this->f_read(i_node,fileEntryBuffer,currOffset,16);
-	while (fileEntryBuffer[0] != '\0')
+	int bytesRead = this->f_read(i_node,fileEntryBuffer,currOffset,16);
+	while (fileEntryBuffer[0] != '\0' & bytesRead == 16)
 	{
 		int entryInode = turnBytesToInt(fileEntryBuffer);
 		char entryName[12];

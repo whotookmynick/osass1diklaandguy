@@ -10,8 +10,10 @@
 
   FreeInodeList::FreeInodeList(int fd,int firstBlockOffset,int firstEmptyBlock,int lastEmptyBlock,LowLevelDisk& disk)
     : BlockList(fd,firstBlockOffset,firstEmptyBlock,lastEmptyBlock,disk) {
-
-	  _size=_disk.getSuperBlock()->numOfFreeInodes;
+	  superBlock *super = _disk.getSuperBlock();
+	  _size=super->numOfFreeInodes;
+	  _head=(super->firstBlockOfFreeInodesOffset) * super->blockSize;
+	  _tail= super->lastFreeInode;
   };
 
 

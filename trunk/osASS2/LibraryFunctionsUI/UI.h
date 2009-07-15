@@ -83,11 +83,14 @@ public:
       */
      int read (int fd,int num_bytes);
      /*
-      *  writes the string to the file. Returns the number of bytes actually written.  Remember write uses the current file pointer to know where to start writing from, and the operation advances the file pointer.
+      *  writes the string to the file. Returns the number of bytes actually written.
+      *  Remember write uses the current file pointer to know where to start writing from,
+      *  and the operation advances the file pointer.
       */
      int write (int fd,string buffer);
      /*
-      *imports a real file from linux's file system from the given address into the file int fd. In this way files can be imported into the system.
+      *imports a real file from linux's file system from the given address into the file int fd.
+      *imports In this way files can be imported into the system.
       */
      int writeFile (int fd,string fileName);
      /*

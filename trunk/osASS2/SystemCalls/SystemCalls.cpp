@@ -86,6 +86,7 @@ list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
 	while (!done)
 	{
 		string currDir = pwd.substr(0, pwd.find("/"));
+		cout<<"readPWDDir currDir = "<<currDir<<endl;
 		currPWD = _fileSys->d_read(pwdInode);
 		pwdInode = -1;
 		list<FileEntry>::iterator it = currPWD.begin();
@@ -99,7 +100,12 @@ list<FileEntry> SystemCalls::readPWDDir(string pwd,int *lastInode)
 			}
 			++it;
 		}
-		done = pwd.empty();
+		pwd = pwd.substr(pwd.find("/") + 1);
+		done = pwd.find("/") == string::npos;
+	}
+	if (pwdInode == -1)
+	{
+		pwdInode = 0;
 	}
 	currPWD = _fileSys->d_read(pwdInode);
 	*lastInode = pwdInode;
