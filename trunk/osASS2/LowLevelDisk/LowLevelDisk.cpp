@@ -229,31 +229,27 @@ void LowLevelDisk::initFreeBlocksList() {
     //start fill the first block in the freeBlockList
 
     int nextFreeBlock = firstEmptyBlockNumber;
-    int offset = FIRST_FREE_BLOCK_BLOCK*blockSize;
-    writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+    int freeOffset = FIRST_FREE_BLOCK_BLOCK*blockSize;
+    writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
     int i=0;
 
-
+    int numOfFreeBlocksToWrite=numOfFreeBlocks;
     //calac how much blocks
-    while(numOfFreeBlocks>blockSize){
-
-    }
-    //for(int i=1; i<numOfFreeBlocks;i++){
-    	if(i==blockSize-1){
-    		//insert the next block of free blocks
-    		writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
-    		//jump to next block and fill it
-    		offset=nextFreeBlock*blockSize;
-    		numOfFreeBlocks= numOfFreeBlocks-1;
-    		i=0;
-    	//}
+    while(numOfFreeBlocksToWrite>0){//(blockSize-i-1)//while there are blocks to store in freeBlockList
+    	if((i==blockSize-1)and(numOfBlockInFreeBlockList>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
+			//insert the next block of free blocks
+			writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+			//jump to next block and fill it
+			freeOffset=nextFreeBlock*blockSize;
+			numOfFreeBlocks= numOfFreeBlocks-1;
+			i=-1;//go to begining of the new block in list
+		}//end if
     	i++;
-    	offset=offset+OFFSET_SIZE_IN_BYTES;
-    	nextFreeBlock=nextFreeBlock+1;
-    	writeDataToHardDisk(offset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
-
-    }
-
+    	numOfFreeBlocksToWrite--;
+		freeOffset=freeOffset+OFFSET_SIZE_IN_BYTES;
+		nextFreeBlock=nextFreeBlock+1;
+		writeDataToHardDisk(freeOffset,(void*)nextFreeBlock,OFFSET_SIZE_IN_BYTES);
+    }//end while
     _superBlock->numOfFreeBlocks=numOfFreeBlocks;
 
     _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
