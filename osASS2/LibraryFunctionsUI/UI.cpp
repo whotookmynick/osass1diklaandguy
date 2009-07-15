@@ -52,19 +52,19 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		int pid,int fatherPid,string pwd,map<int,OSUI*>* processTable):
 			_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_fatherPid(fatherPid),
 			_pwd(pwd),_processTable(processTable)
-			{
+		{
 			init();
 			pthread_mutex_lock(&_contextMutex);
-			}
+		}
 
 		void OSUI::init()
 		{
 			(*_processTable)[_pid] = this;
-			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
-			{
-				perror("UI thread creation failed");
-				exit(1);
-			}
+//			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
+//			{
+//				perror("UI thread creation failed");
+//				exit(1);
+//			}
 			pthread_mutex_init(&_contextMutex, NULL);
 		}
 

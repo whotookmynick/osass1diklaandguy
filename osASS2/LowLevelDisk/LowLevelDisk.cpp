@@ -205,7 +205,7 @@ void LowLevelDisk::initFreeInodesList() {
     int offset=_superBlock->firstBlockOfFreeInodesOffset;
     int nextBlockToWriteFreeInodes= _superBlock->numOfBlocks-numOfFreeBlocks;//the end of InodeTable
 
-    int inodeIndex=0;
+    int inodeIndex=1;
     int numOfinodeTowrite = _superBlock->numOfInodes;
 
     //int nextOffset=	firstAvailbleBlockOffset
@@ -432,7 +432,7 @@ int LowLevelDisk::getDataBlockSize(){
 //TODO: inform the super block
 //TODO: Log msg and exception
 int  LowLevelDisk::allocateInode(){
-	cout<<"  allocateInode - need to finish implement lists "<<endl;
+//	cout<<"  allocateInode - need to finish implement lists "<<endl;
 
 	pthread_mutex_lock(&_RecMutex);
 	LOG_DEBUG("allocateInodet\n");

@@ -48,7 +48,7 @@ public:
 	int _size;
 	LowLevelDisk& _disk;
 
-private:
+
 	int _fd;
 	int _firstBlockPointer;
 	int _lastBlockPointer;
