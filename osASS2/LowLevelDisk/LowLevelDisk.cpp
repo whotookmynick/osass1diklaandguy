@@ -119,7 +119,7 @@ void LowLevelDisk::createFileSystem(){
 
 void LowLevelDisk::openFileSystem(){
 	_fd = open(SYS_FILE_NAME.c_str(),O_RDWR);
-	  if (_fd!=-1){
+	  if (_fd==-1){
 		  throw OpenFileExcemption(SYS_FILE_NAME);
 	  }
 }
@@ -182,6 +182,7 @@ void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskS
 		_superBlock->firstFreeInode=FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
 		writeDataToHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*)&_superBlock->firstFreeInode,OFFSET_SIZE_IN_BYTES);
 
+		_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
 		//int lastFreeInode;//offset 9  - in freeinode init
 
 		//	int firstBlockOfFreeInodesOffset;-in freeinode init
@@ -225,7 +226,7 @@ void LowLevelDisk::initFreeInodesList() {
 
        }//end for
     _superBlock->lastFreeInode=offset;
-    writeDataToHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET*_superBlock->blockSize,(void*)&offset,OFFSET_SIZE_IN_BYTES);
+    writeDataToHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*)&offset,OFFSET_SIZE_IN_BYTES);
    _freeInodesList=new FreeInodeList(_fd,_superBlock->firstBlockOfFreeInodesOffset
     	,_superBlock->firstFreeInode, _superBlock->lastFreeInode,*this);
 }
@@ -276,7 +277,10 @@ void LowLevelDisk::initFreeBlocksList() {
     }//end while
 
     _superBlock->numOfFreeBlocks=numOfFreeBlocks;
+    writeDataToHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*)&(_superBlock->numOfFreeBlocks),OFFSET_SIZE_IN_BYTES);
     _superBlock->lastEmptyBlock=numOfFreeBlocks-1;
+    writeDataToHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*)&(_superBlock->lastEmptyBlock),OFFSET_SIZE_IN_BYTES);
+
     _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
     		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
 }
@@ -291,38 +295,38 @@ void LowLevelDisk::initInodesList() {
 
 void LowLevelDisk::initSuperBlockFromHardDisk(){
 
-	char buf[1];//TODO: check if buf is cahnge
-
+//	char buf[1];//TODO: check if buf is cahnge
+	int buf;
 	readDataFromHardDisk(NUM_OF_BLOCK_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->numOfBlocks=buf[0];
+	_superBlock->numOfBlocks=buf;
 
 
 	readDataFromHardDisk(BLOCK_SIZE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->blockSize=buf[0];
+	_superBlock->blockSize=buf;
 
 	readDataFromHardDisk(ROOT_INODE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->rootInode=buf[0];
+	_superBlock->rootInode=buf;
 
 	readDataFromHardDisk(NUM_OF_FREE_BLOCK_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->numOfFreeBlocks=buf[0];
+	_superBlock->numOfFreeBlocks=buf;
 
 	readDataFromHardDisk(FIRST_EMPTY_BLOCK_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->firstEmptyBlock=buf[0];
+	_superBlock->firstEmptyBlock=buf;
 
 	readDataFromHardDisk(LAST_EMPTY_BLOCK_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->lastEmptyBlock=buf[0];
+	_superBlock->lastEmptyBlock=buf;
 
 	readDataFromHardDisk(INODE_TABLE_SIZE_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->numOfInodes=buf[0];
+	_superBlock->numOfInodes=buf;
 
 	readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->numOfFreeInodes=buf[0];
+	_superBlock->numOfFreeInodes=buf;
 
 	readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->firstFreeInode=buf[0];
+	_superBlock->firstFreeInode=buf;
 
 	readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
-	_superBlock->lastFreeInode=buf[0];
+	_superBlock->lastFreeInode=buf;
 
 	_superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
 

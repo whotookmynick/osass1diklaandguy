@@ -53,7 +53,7 @@ const int FIRST_FREE_BLOCK_BLOCK =  3;//block 3
 const int FIRST_FREE_INODE_BLOCK =  4;//block 4
 const int INODE_TABLE_BLOCK_NUM = 5;
 
-const string SYS_FILE_NAME = "SYS_FILE";
+const string SYS_FILE_NAME = "FILE_SYS";
 
 
 /*
