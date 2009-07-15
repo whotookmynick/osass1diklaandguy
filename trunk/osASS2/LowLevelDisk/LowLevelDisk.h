@@ -19,9 +19,9 @@
 
 const int Num_DirectBlocksHelp = 10;
 typedef struct {
-	int  directBlock[Num_DirectBlocksHelp];
-	int  indirectBlockAdress;
-	int  type;
+	int  directBlock[Num_DirectBlocksHelp];//40
+	int  indirectBlockAdress;//4
+	int  type;//4
 	int  numOfHardLinks;
 	int  numOfFullBlocks;
 	bool active;
@@ -55,6 +55,7 @@ const int INODE_TABLE_BLOCK_NUM = 5;
 
 const string SYS_FILE_NAME = "FILE_SYS";
 
+const int HARD_LINK_OFFSET = 48;
 
 /*
 * Regular files simply store the data written to them by user programs.
@@ -174,7 +175,7 @@ public:
 
 	//------------------------------------------------------------//
 		int getHardLink(int i_node);
-		void setHardLink(int i_node);
+		void setHardLink(int i_node,int val);
 		void initSuperBlock(int dataBlockSize,int numberOfInodes,int diskSize);
 
 

@@ -6,14 +6,6 @@
 //---------------------------------------------------------------------------/
 //								TODO
 //---------------------------------------------------------------------------/
-int LowLevelDisk::getHardLink(int i_node){
-	return 1;
-}
-
-void LowLevelDisk::setHardLink(int i_node){
-
-}
-
 
 //---------------------------------------------------------------------------/
 //								Help function
@@ -392,6 +384,18 @@ LowLevelDisk::~LowLevelDisk()
 //---------------------------------------------------------------------------/
 //								Getters and setters
 //---------------------------------------------------------------------------/
+int LowLevelDisk::getHardLink(int i_node){
+	int offset = (INODE_TABLE_BLOCK_NUM*_superBlock->blockSize)+(SIZE_OF_INODE*i_node)+HARD_LINK_OFFSET;
+	int ans;
+	readDataFromHardDisk(offset,(void*)&ans,OFFSET_SIZE_IN_BYTES);
+	return ans;
+}
+
+void LowLevelDisk::setHardLink(int i_node,int val){
+	int offset = (INODE_TABLE_BLOCK_NUM*_superBlock->blockSize)+(SIZE_OF_INODE*i_node)+HARD_LINK_OFFSET;
+	writeDataToHardDisk(offset,(void*)&val,OFFSET_SIZE_IN_BYTES);
+}
+
 
 superBlock* LowLevelDisk::getSuperBlock(){
 	return _superBlock;
