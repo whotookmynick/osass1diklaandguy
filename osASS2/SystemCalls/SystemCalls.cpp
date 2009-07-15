@@ -34,7 +34,7 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
 	int pwdInode = -1;
 	list<FileEntry> currPWD = readPWDDir(pwd,&pwdInode);
-	int newFile_iNode  = _fileSys->createFile(flag_access_permissions);
+	int newFile_iNode  = _fileSys->createFile(type);
 	if (! newFile_iNode)
 	{
 		cout<<"Could not create file"<<endl;
