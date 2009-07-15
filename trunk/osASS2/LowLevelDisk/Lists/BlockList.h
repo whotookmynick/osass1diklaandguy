@@ -7,9 +7,10 @@
 
 #ifndef BlockList_H_
 #define BlockList_H_
-#include "vector"
+#include <vector>
 #include <iostream>
 #include <list>
+//#include "LowLevelDisk.h"
 using namespace std;
 
 class LowLevelDisk;
@@ -39,14 +40,19 @@ public:
 //To freeLists to implement
 	virtual void emptyBlock(int blockNum)=0;
 	virtual int  insertBlock()=0;
-
-
+	virtual void updateTail();
+	virtual void updateHead();
+	virtual int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
 private:
 	int _fd;
 	int _firstBlockPointer;
 	int _lastBlockPointer;
 	int _offset;
+	int _tail;
+	int _haed;
 	LowLevelDisk& _disk;
+
+
 };
 
 
