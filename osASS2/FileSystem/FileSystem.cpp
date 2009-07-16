@@ -77,6 +77,7 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 	int bytesWritten = 0;
 	int blockNumInFile = offset/BLOCK_SIZE;
 	char currBuffer[BLOCK_SIZE];
+	int offsetInFile = offset - (BLOCK_SIZE*blockNumInFile);
 	while (bytesWritten < nBytes )
 	{
 		int physicalBlock = _lldisk->getDataBlock(i_node,blockNumInFile);
@@ -87,7 +88,7 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 		}
 		_lldisk->readBlock(physicalBlock,currBuffer);
 		int i;
-		for (i = 0; i<BLOCK_SIZE & bytesWritten < nBytes & buffer[bytesWritten+i] != '\0'; i++)
+		for (i = offsetInFile; i<BLOCK_SIZE & bytesWritten < nBytes; i++)
 		{
 			currBuffer[i] = buffer[bytesWritten+i];
 			bytesWritten++;
@@ -95,6 +96,7 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 //		bytesWritten += i;
 		_lldisk->writeBlock(physicalBlock,currBuffer);
 		blockNumInFile++;
+		offsetInFile = 0;
 	}
 	return bytesWritten;
 }
@@ -124,7 +126,7 @@ void FileSystem::d_write(int i_node,list<FileEntry> dlist)
 {
 	char currEntryBuffer[20];
 	int currOffset = 0;
-	list<FileEntry> oldDir = this->d_read(i_node);
+//	list<FileEntry> oldDir = this->d_read(i_node);
 	list<FileEntry>::iterator it;
 	it = dlist.begin();
 
