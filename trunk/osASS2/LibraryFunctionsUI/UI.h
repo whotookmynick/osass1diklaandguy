@@ -140,7 +140,7 @@ public:
       * Output should be as follows: each file/dir in the given directory in a separate line,
       * directories have the "/" char appended to the end of their name.
       */
-     list<string> ls (string dir_name);
+     void ls (string dir_name);
      /*
       * changes the old_file_name to new file name. This can be just changing its name in the same directory, or even moving the file to a different directory.
       */

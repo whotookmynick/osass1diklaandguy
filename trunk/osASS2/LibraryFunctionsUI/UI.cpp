@@ -111,6 +111,9 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			{
 				int fileToLock = atoi(args[1].c_str());
 //				lck_wr(fileToLock);
+			} else if (args[0].compare("ls") == 0)
+			{
+				ls(args[1]);
 			}
 
 		}
@@ -271,6 +274,17 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		{
 			OSUI* newProc = (*_processTable)[newPid];
 			newProc->keepRunning();
+		}
+
+		void OSUI::ls(string dir_name)
+		{
+			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
+			char buff[5000];
+			string temp;
+			temp = _pwd;
+			temp.append("/" + dir_name);
+			_systemCallsCaller->ls((char*)temp.c_str(),buff);
+			cout<<buff<<endl;
 		}
 
 		void OSUI::keepRunning()

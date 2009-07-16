@@ -248,7 +248,8 @@ void LowLevelDisk::initFreeBlocksList() {
     int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
     		-getNumOfBlocksInInodeTable()-getNumOfBlocksInFreeInodeList();
 
-    _superBlock->firstBlockOfFreeBlocksOffset = ((_superBlock->numOfBlocks) - numOfFreeBlocks)*blockSize;
+//    _superBlock->firstBlockOfFreeBlocksOffset = ((_superBlock->numOfBlocks) - numOfFreeBlocks)*blockSize;
+
 
     int firstEmptyBlockNumber =(_superBlock->numOfBlocks) - numOfFreeBlocks;
 
@@ -445,7 +446,7 @@ int  LowLevelDisk::allocateInode(){
 
 
 void LowLevelDisk::freeInode(int i_node){
-	cout<<" freeInode-  need to finish implement lists "<<endl;
+//	cout<<" freeInode-  need to finish implement lists "<<endl;
 
 	LOG_DEBUG("freeInode"<<i_node<<"\n");
 	pthread_mutex_lock(&_RecMutex);
@@ -467,7 +468,7 @@ void LowLevelDisk::freeInode(int i_node){
 
 
 int LowLevelDisk::allocateDataBlock(){
-	cout<<"  allocateDataBlock -  need to finish implement lists "<<endl;
+//	cout<<"  allocateDataBlock -  need to finish implement lists "<<endl;
 
 	pthread_mutex_lock(&_RecMutex);
 	int block_id=getFreeBlock();
@@ -479,7 +480,7 @@ int LowLevelDisk::allocateDataBlock(){
 
 
 void LowLevelDisk::freeDataBlock(int dblock){
-	cout<<"freeDataBlock -  need to finish implement lists "<<endl;
+//	cout<<"freeDataBlock -  need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if((dblock<(_superBlock->numOfBlocks)) | (dblock<0)){
 		//
@@ -492,7 +493,7 @@ void LowLevelDisk::freeDataBlock(int dblock){
 
 
 int LowLevelDisk::getInodeType(int i_node){
-	cout<<" getInodeType -  need to finish implement lists "<<endl;
+//	cout<<" getInodeType -  need to finish implement lists "<<endl;
 	int type=-1;
 	pthread_mutex_lock(&_RecMutex);
 	 if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
@@ -520,7 +521,7 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 
 
 int LowLevelDisk::getDataBlock (int i_node, int dblock){
-	cout<<" getDataBlock--  need to finish implement lists  "<<endl;
+//	cout<<" getDataBlock--  need to finish implement lists  "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((dblock>=0) | (dblock<=9) |  (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
 		pthread_mutex_unlock(&_RecMutex);
@@ -539,7 +540,7 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
 
 
 void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
-	cout<<"setDataBlock - need to finish implement lists "<<endl;
+//	cout<<"setDataBlock - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->getActive(i_node)) )){
 		//TODO
@@ -550,7 +551,7 @@ void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 
 
 void LowLevelDisk::readBlock(int dblockNum, char* buf){
-	cout<<" readBlock  - need to finish implement lists"<<endl;
+//	cout<<" readBlock  - need to finish implement lists"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	//init empty buffer if block does not exist
 	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
@@ -563,7 +564,7 @@ void LowLevelDisk::readBlock(int dblockNum, char* buf){
 
 
 void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
-	cout<<"writeBlock - need to finish implement lists"<<endl;
+//	cout<<"writeBlock - need to finish implement lists"<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((dblockNum<0) | (dblockNum<=_superBlock->numOfBlocks)) {
 		//TODO
@@ -575,7 +576,7 @@ void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 
 
 int LowLevelDisk::getFileSize(int i_node){
-	cout<<"getFileSize - need to finish implement lists "<<endl;
+//	cout<<"getFileSize - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
 		pthread_mutex_unlock(&_RecMutex);
@@ -586,7 +587,7 @@ int LowLevelDisk::getFileSize(int i_node){
 }
 
 void LowLevelDisk::setFileSize(int i_node, int newSize){
-	cout<<" setFileSize - need to finish implement lists "<<endl;
+//	cout<<" setFileSize - need to finish implement lists "<<endl;
 	pthread_mutex_lock(&_RecMutex);
 	if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))|(newSize<0)){
 		//TODO		pthread_mutex_unlock(&_RecMutex);
