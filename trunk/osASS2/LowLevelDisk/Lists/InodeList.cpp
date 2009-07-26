@@ -29,8 +29,8 @@ InodeList::~InodeList(){
 //---------------------------------------------------------------------------/
 InodeStruct* InodeList::readInodeToStruct(int i_node){
 	int offset = getInodeOffset(i_node);
-	InodeStruct* is;
-	pread(_fd,&is,sizeof(is),offset);
+	InodeStruct* is = (InodeStruct*)malloc(sizeof(InodeStruct));
+	pread(_fd,is,sizeof(InodeStruct),offset);
 	return is;
 }
 
@@ -83,7 +83,7 @@ int InodeList::getBlockOffsetInInode(int blockIndex,int i_node){
 }
 
 int InodeList::getInodeOffset(int i_node){
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node > _disk.getNumOfInodes())|(i_node < 0)){
 				//TODO
 		return -1;
 	}
@@ -107,7 +107,7 @@ int InodeList::getDataBlockNum(int i_node,int blockIndex){
 	void* buf [1];
 	InodeStruct* is=readInodeToStruct(i_node);
 
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 			//TODO
 			return -1;
 	}

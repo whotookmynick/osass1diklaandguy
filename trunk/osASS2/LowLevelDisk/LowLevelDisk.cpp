@@ -196,7 +196,7 @@ void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskS
 }
 
 void LowLevelDisk::initFreeInodesList() {
-    LOG_DEBUG("init freeInodeList\n");
+//    LOG_DEBUG("init freeInodeList\n");
     _superBlock->firstBlockOfFreeInodesOffset = FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
 
     int numOfFreeBlocks = (_superBlock->numOfBlocks) - SIZE_OF_SUPER_BLOCK
@@ -205,24 +205,26 @@ void LowLevelDisk::initFreeInodesList() {
     int offset=_superBlock->firstBlockOfFreeInodesOffset;
     int nextBlockToWriteFreeInodes= _superBlock->numOfBlocks-numOfFreeBlocks;//the end of InodeTable
 
-    int inodeIndex=1;
+    int inodeIndex=0;
     int numOfinodeTowrite = _superBlock->numOfInodes;
 
     //int nextOffset=	firstAvailbleBlockOffset
     for(int j=0;j<_superBlock->numOfFreeInodes;j++){
 
-       	if((j==(_superBlock->blockSize-1))and(numOfinodeTowrite>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
+       	if((j==(_superBlock->blockSize-1))&(numOfinodeTowrite>1)){//if we get the one befor last offset in block and there is more then one freeBlock to add
        		//insert the next blockNumber of free inodes to the end of this block
    			writeDataToHardDisk(offset,(void*)&nextBlockToWriteFreeInodes,OFFSET_SIZE_IN_BYTES);
+   			nextBlockToWriteFreeInodes++;
    			//jump to next block and fill it
    		//	offset=nextFreeBlock*blockSize;
-   			offset=nextBlockToWriteFreeInodes*_superBlock->blockSize;//set next place to write list
+   			offset = nextBlockToWriteFreeInodes*_superBlock->blockSize;//set next place to write list
    			writeDataToHardDisk(offset,(void*)&inodeIndex,OFFSET_SIZE_IN_BYTES);
-   			numOfinodeTowrite--;
+
    		}//end if
        	else{
        		writeDataToHardDisk(offset,(void*)&inodeIndex,OFFSET_SIZE_IN_BYTES);
        	}
+       	numOfinodeTowrite--;
        	inodeIndex++;
        	offset=offset+OFFSET_SIZE_IN_BYTES;
 
@@ -366,9 +368,9 @@ LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_i
 	else{
 			createFileSystem();
 			initSuperBlock(dataBlockSize,numberOfInodes,diskSize);
-			initFreeBlocksList();
 			initFreeInodesList();
 			initInodesList();
+			initFreeBlocksList();
 	}
 	pthread_mutexattr_init(&_mtxattr);
 	pthread_mutexattr_settype(&_mtxattr, PTHREAD_MUTEX_RECURSIVE_NP);
@@ -528,7 +530,7 @@ void LowLevelDisk::setInodeType(int i_node, int filetype){
 int LowLevelDisk::getDataBlock (int i_node, int dblock){
 //	cout<<" getDataBlock--  need to finish implement lists  "<<endl;
 	pthread_mutex_lock(&_RecMutex);
-	if ((dblock>=0) | (dblock<=9) |  (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
+	if ((i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){ //(dblock>=0) | (dblock<=9) |
 		pthread_mutex_unlock(&_RecMutex);
 		//return the i enter in the i_node
 		return -1 ;
