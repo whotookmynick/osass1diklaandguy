@@ -550,7 +550,7 @@ void LowLevelDisk::setDataBlock (int i_node, int i, int dblockNum ){
 	if ((dblockNum<0) | (i_node<0) |(i_node>=(_superBlock->numOfInodes))|(!(_iNodeTable->getActive(i_node)) )){
 		//TODO
 	}
-	_iNodeTable->setNumOfDataBlock(i_node,dblockNum,i);
+	_iNodeTable->setNumOfDataBlock(i_node,i,dblockNum);
 	pthread_mutex_unlock(&_RecMutex);
 }
 

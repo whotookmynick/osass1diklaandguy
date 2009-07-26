@@ -7,6 +7,19 @@
 #ifndef UTIL_CPP_
 #define UTIL_CPP_
 
+#include <iostream>
+#include <string>
+#include <list>
+#include <vector>
+#include <map>
+#include <pthread.h>
+#include <sstream>
+#include <unistd.h>
+#include <fstream>
+#include <queue>
+
+using namespace std;
+
 const int REGULARE_FILE = 0;
 const int SOFT_LINK = 1;
 const int DIR_TYPE = 3;
@@ -27,12 +40,30 @@ const int READ_AND_WRITE = 2;
 
 	static void intToByte(int val, char *bytes )
 	{
-	bytes[0] = (char)val;
-	bytes[1] = (char)(val >> 8);
-	bytes[2] = (char)(val >> 16);
-	bytes[3] = (char)(val >> 24);
+	bytes[3] = (char)val;
+	bytes[2] = (char)(val >> 8);
+	bytes[1] = (char)(val >> 16);
+	bytes[0] = (char)(val >> 24);
 	}
 
+	static void printBuffer(char* buff,int size)
+	{
+		for (int i = 0; i < size;i++)
+			{
+	//			cout<<buff[i];
+				printf("%x",buff[i]);
+			}
+		cout<<endl;
+	}
 
+	static void myStrCopy(char* target,char* source)
+	{
+		int i = 0;
+		while (source[i] != '\0')
+		{
+			target[i] = source[i];
+			i++;
+		}
+	}
 
 #endif /*LOWLEVELDISK_H_*/
