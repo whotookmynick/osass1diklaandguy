@@ -354,9 +354,14 @@ LowLevelDisk::LowLevelDisk(int dataBlockSize,int numberOfInodes,int diskSize):_i
 	if (existsFileSystem()){
 			openFileSystem();
 			initSuperBlockFromHardDisk();
-			initFreeBlocksList();
-			initFreeInodesList();
-			initInodesList();
+			 _freeBlockesList = new FreeBlockList(_fd,_superBlock->firstBlockOfFreeBlocksOffset
+			    		,_superBlock->firstEmptyBlock,_superBlock->lastEmptyBlock,*this);
+			 _freeInodesList=new FreeInodeList(_fd,_superBlock->firstBlockOfFreeInodesOffset
+			     	,_superBlock->firstFreeInode, _superBlock->lastFreeInode,*this);
+			 _iNodeTable = new InodeList(_fd, _superBlock->inodeTableOffset, *this);
+			//initFreeBlocksList();
+			//initFreeInodesList();
+			//initInodesList();
 	}
 	else{
 			createFileSystem();
