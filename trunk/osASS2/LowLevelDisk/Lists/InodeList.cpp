@@ -16,7 +16,33 @@ InodeList::InodeList(int fd,int offset, LowLevelDisk& disk):_offset(offset),
 _inodeSizeInBytes(sizeof(InodeStruct)),_disk(disk),
 _fd(fd),_numOfTotalBlocks((disk.getSuperBlock()->blockSize)+NUM_OF_DIRECT_BLOCKS){
 
-	int tableSize=_disk.getNumOfInodes();
+	int tableSize = _disk.getNumOfInodes();
+	int sizeOfInodeStruct = sizeof(InodeStruct);
+	//TODO inode 0 active
+	InodeStruct* inodeStruct = (InodeStruct*) malloc(sizeOfInodeStruct);
+
+	//to init all direct block
+	for (int i=0; i<_disk.getNumOfInodes(); i++){
+		inodeStruct->directBlock[i]=-1;
+	}
+	inodeStruct->indirectBlockAdress = -1;
+	inodeStruct->type = 2;
+	inodeStruct->numOfFullBlocks = 0;
+	inodeStruct->numOfFullBlocks = 0;
+	inodeStruct->active = 1;
+
+	//write inode 0 to disk
+	writeDataToHardDisk(_offset,(void*)inodeStruct,sizeOfInodeStruct);
+
+	inodeStruct->type = 0;
+	inodeStruct->active = 0;
+
+	//to rest of inodes write them to disk with:
+	int newOffset = _offset+sizeOfInodeStruct;
+	for (int j=0; j<_disk.getNumOfInodes(); j++){
+		writeDataToHardDisk(newOffset,(void*)inodeStruct,sizeOfInodeStruct);
+		newOffset = _offset+sizeOfInodeStruct;
+	}
 
 }
 
