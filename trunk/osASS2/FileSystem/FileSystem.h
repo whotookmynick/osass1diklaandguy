@@ -77,7 +77,7 @@ public:
 	 ** with the information stored in the list.
 	 ** The list has the same format as that returned by d_read().
 	 **/
-	virtual void d_write(int i_node,list<FileEntry> dlist);
+	virtual void d_write(int i_node,list<FileEntry> &dlist);
 
 	/**
 	 ** delete the file.
