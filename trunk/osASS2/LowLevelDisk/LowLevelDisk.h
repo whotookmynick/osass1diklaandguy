@@ -19,7 +19,7 @@
 
 const int Num_DirectBlocksHelp = 10;
 typedef struct {
-	int  directBlock[Num_DirectBlocksHelp];//40
+	int  directBlock[Num_DirectBlocksHelp];//40 ~56
 	int  indirectBlockAdress;//4
 	int  type;//4
 	int  numOfHardLinks;
