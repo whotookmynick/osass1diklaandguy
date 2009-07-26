@@ -84,19 +84,23 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 		if (physicalBlock == -1)
 		{
 			physicalBlock = _lldisk->allocateDataBlock();
-			cout<<"f_write physicalBlock = "<<physicalBlock<<endl;
+//			cout<<"f_write physicalBlock = "<<physicalBlock<<endl;
 			_lldisk->setDataBlock(i_node,blockNumInFile,physicalBlock);
 		}
 		_lldisk->readBlock(physicalBlock,currBuffer);
-		cout<<"f_write blockDataThatWasRead = "<<currBuffer<<endl;
-		int i;
-		for (i = offsetInFile; i<BLOCK_SIZE & bytesWritten < nBytes; i++)
+//		cout<<"f_write block Data That Was Read = ";
+//		printBuffer(currBuffer,BLOCK_SIZE);
+		int i,bytesWrittenInIteration = 0;
+		for (i = offsetInFile; i<BLOCK_SIZE & bytesWritten + bytesWrittenInIteration < nBytes; i++)
 		{
 			currBuffer[i] = buffer[bytesWritten+i];
-			bytesWritten++;
+			bytesWrittenInIteration++;
 		}
+		bytesWritten += bytesWrittenInIteration;
 //		bytesWritten += i;
-		cout<<"f_write blockDataThatWas Written = "<<currBuffer<<endl;
+//		cout<<"f_write blockDataThatWas Written = "<<currBuffer<<endl;
+//		cout<<"f_write blockDataThatWas Written = ";
+//		printBuffer(currBuffer,BLOCK_SIZE);
 		_lldisk->writeBlock(physicalBlock,currBuffer);
 		blockNumInFile++;
 		offsetInFile = 0;
@@ -136,7 +140,10 @@ void FileSystem::d_write(int i_node,list<FileEntry> &dlist)
 	while( it != dlist.end() ) {
 		FileEntry currEntry = *it;
 		intToByte(currEntry.getInodeNum(),currEntryBuffer);
+//		cout<<"d_write currEntry.getFileName() = "<<currEntry.getFileName()<<endl;
 		strcpy(currEntryBuffer+4,currEntry.getFileName());
+//		cout<<"d_write currEntryBuffer = ";
+//		printBuffer(currEntryBuffer,16);
 		this->f_write(i_node,currEntryBuffer,currOffset,16);
 		currOffset += 16;
 	    ++it;
