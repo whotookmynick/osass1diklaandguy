@@ -136,7 +136,7 @@ void InodeList::setNumOfDataBlock(int i_node, int blockIndex, int dblockNum ){
 	int blockoffset;
 	InodeStruct* is=readInodeToStruct(i_node);
 
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 			//TODO
 	}
 	if((blockIndex<0) | (blockIndex>(_numOfTotalBlocks) )){
