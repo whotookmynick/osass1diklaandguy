@@ -18,11 +18,11 @@ _fd(fd),_numOfTotalBlocks((disk.getSuperBlock()->blockSize)+NUM_OF_DIRECT_BLOCKS
 
 	int tableSize = _disk.getNumOfInodes();
 	int newOffset = INODE_TABLE_BLOCK_NUM*_disk.getSuperBlock()->blockSize;
-	//TODO inode 0 active
+
 	InodeStruct* inodeStruct = (InodeStruct*) malloc(_inodeSizeInBytes);
 
 	//to init all direct block
-	for (int i=0; i<_disk.getNumOfInodes(); i++){
+	for (int i=0; i<NUM_OF_DIRECT_BLOCKS; i++){
 		inodeStruct->directBlock[i]=-1;
 	}
 	inodeStruct->indirectBlockAdress = -1;
@@ -32,16 +32,16 @@ _fd(fd),_numOfTotalBlocks((disk.getSuperBlock()->blockSize)+NUM_OF_DIRECT_BLOCKS
 	inodeStruct->active = 1;
 
 	//write inode 0 to disk
-	writeDataToHardDisk(_offset,(void*)inodeStruct,_inodeSizeInBytes);
+	writeDataToHardDisk(newOffset,(void*)inodeStruct,_inodeSizeInBytes);
 
 	inodeStruct->type = 0;
 	inodeStruct->active = 0;
 
 	//to rest of inodes write them to disk with:
-	newOffset = _offset+_inodeSizeInBytes;
-	for (int j=0; j<_disk.getNumOfInodes(); j++){
+	newOffset = newOffset+_inodeSizeInBytes;
+	for (int j=0; j<_disk.getNumOfInodes()-1; j++){
 		writeDataToHardDisk(newOffset,(void*)inodeStruct,_inodeSizeInBytes);
-		newOffset = _offset+_inodeSizeInBytes;
+		newOffset =newOffset+_inodeSizeInBytes;
 	}
 
 }
