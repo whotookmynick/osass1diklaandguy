@@ -193,10 +193,10 @@ public:
 		int getDataBlockSize();
 		int getInodeFromString(const string& elementName);//find the inode concted to the file name or directory name
 		superBlock* getSuperBlock();
-
+		bool existHardDisk();
 private:
 
-
+		bool _existHardDisk;
 		int getNumOfBlocksInInodeTable();
 		void createFileSystem();
 		int getNumOfBlocksInFreeInodeList();
