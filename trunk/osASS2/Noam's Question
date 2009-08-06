@@ -2,3 +2,5 @@ I know exactly where I'm going to handle exceptions, in the worst case I will ma
 and then keeps on working so don't worry about them
 
 od -Ad -w24 -j0 -N8 -i FILE_SYS
+
+create test.txt read-only

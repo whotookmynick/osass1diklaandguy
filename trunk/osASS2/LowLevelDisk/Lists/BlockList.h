@@ -40,8 +40,8 @@ public:
 //To freeLists to implement
 	virtual void emptyBlock(int blockNum)=0;
 	virtual int  insertBlock()=0;
-	virtual void updateTail();
-	virtual void updateHead();
+	virtual void updateTail()=0;
+	virtual void updateHead()=0;
 	virtual int writeDataToHardDisk(int fromOffset,const void* buf,int numOfBytes);
 	virtual void*  readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes);
 	virtual void copyNextBlockToSuperBlock();

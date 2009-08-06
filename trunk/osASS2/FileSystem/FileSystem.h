@@ -70,7 +70,7 @@ public:
 	 ** Each element in this list therefore contains a filename and i_node number.
 	 ** returns the number of bytes written.
 	 **/
-	virtual list<FileEntry> d_read(int i_node);
+	virtual list<FileEntry>* d_read(int i_node);
 
 	/**
 	 ** replaces the content of the given directory file (specified by i_node)

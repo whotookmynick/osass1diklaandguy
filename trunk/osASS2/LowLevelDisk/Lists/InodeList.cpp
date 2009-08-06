@@ -67,7 +67,7 @@ InodeStruct* InodeList::readInodeToStruct(int i_node){
 //TODO:what if inode is not active?
 //TODO:need to clear inode first???
 void InodeList::writeInodeToHardDisk(InodeStruct* is,int offset){
-	pwrite(_fd,&is,sizeof(is),offset);
+	pwrite(_fd,is,sizeof(InodeStruct),offset);
 }
 
 
@@ -117,7 +117,7 @@ int InodeList::getInodeOffset(int i_node){
 				//TODO
 		return -1;
 	}
-	return _offset+(_inodeSizeInBytes*(i_node-1));
+	return _offset+(_inodeSizeInBytes*(i_node));
 }
 
 
@@ -173,15 +173,20 @@ void InodeList::setNumOfDataBlock(int i_node, int blockIndex, int dblockNum ){
 		//TODO
 	}
 
+	blockoffset = getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
 	if (blockIndex<(Num_DirectBlocks-1)){
-		blockoffset = getInodeOffset(i_node)+OFFSET_SIZE_IN_BYTES*blockIndex;
-		writeDataToHardDisk(blockoffset,(void*)dblockNum,OFFSET_SIZE_IN_BYTES);
+		is->directBlock[blockIndex] = dblockNum;
+		is->numOfFullBlocks++;
+//		writeDataToHardDisk(blockoffset,(void*)&dblockNum,OFFSET_SIZE_IN_BYTES);
+		writeInodeToHardDisk(is,blockoffset);
 	}
 	else{
 		int indirectBlock= is->indirectBlockAdress;
 		int inDirectBlockOffset = indirectBlock*_disk.getDataBlockSize();
 		blockoffset = inDirectBlockOffset+(blockIndex-NUM_OF_DIRECT_BLOCKS)*OFFSET_SIZE_IN_BYTES;
-		writeDataToHardDisk(blockoffset,(void*)dblockNum,OFFSET_SIZE_IN_BYTES);
+		writeDataToHardDisk(blockoffset,(void*)&dblockNum,OFFSET_SIZE_IN_BYTES);
+		is->numOfFullBlocks++;
+		writeInodeToHardDisk(is,blockoffset);
 	}
 }
 //---------------------------------------------------------------------------/
@@ -238,8 +243,9 @@ int InodeList::getFileSize(int i_node)
 
 //--------------------------------------------------------------------------//
 void InodeList::setActive(int i_node,bool a){
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
-				//TODO
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
+		cout<<"InodeList::setActive should not be in this if"<<endl;
+		return;
 	}
 	InodeStruct* is=readInodeToStruct(i_node);
 	is->active=a;
@@ -249,7 +255,7 @@ void InodeList::setActive(int i_node,bool a){
 }
 bool InodeList::getActive(int i_node){
 	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
-				//TODO
+
 	}
 	InodeStruct* is= readInodeToStruct(i_node);
 	return is->active;

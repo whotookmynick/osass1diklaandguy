@@ -23,10 +23,12 @@ private:
 	vector<int> _readLocks; //remembers all the i_node of the read locked files;
 	vector<int> _writeLocks; //remembers all the i_node of the write locked files;
 
-	list<FileEntry> readPWDDir(string pwd,int *lastInode);
+	list<FileEntry>* readPWDDir(string pwd,int *lastInode);
 	list<FileEntry>::iterator getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name);
 	bool isLockedRead(int i_node_num);
 	bool isLockedWrite(int i_node_num);
+
+	bool isDirFromInode(int i_node);
 	/* This is for design pattern arab
 	 *
 	 */

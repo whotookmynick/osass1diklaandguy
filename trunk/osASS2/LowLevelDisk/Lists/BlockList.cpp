@@ -36,7 +36,7 @@ void* BlockList::readDataFromHardDisk(int fromOffset,void* buf,int numOfBytes){
 	pread(_fd,buf,size,offset);
 	return buf;
 }
-void BlockList::updateTail(){
+/*void BlockList::updateTail(){
 	int newBlock;
 	if((_tail%((_disk.getSuperBlock())->blockSize)) == 0){
 		newBlock = _disk.allocateDataBlock();
@@ -46,17 +46,20 @@ void BlockList::updateTail(){
 		_tail=_tail+OFFSET_SIZE_IN_BYTES;
 	}
 
-}
+}*/
 
+/*
 void BlockList::updateHead(){
-	if((_head%((_disk.getSuperBlock())->blockSize)) == 0){
+//	if((_head%((_disk.getSuperBlock())->blockSize)) == 0){
+	if(((_head%((_disk.getSuperBlock())->blockSize))-1) == 0){
 		copyNextBlockToSuperBlock();
 	}else{
 		_head=_head+OFFSET_SIZE_IN_BYTES;
+
 	}
 
 }
-
+*/
 void BlockList::copyNextBlockToSuperBlock(){
 	int nextBlock;
 	int blocksize=_disk.getSuperBlock()->blockSize;
@@ -97,6 +100,7 @@ bool BlockList::contains(int v)  {
 int BlockList::head(){
 	int element;
 	readDataFromHardDisk(_head,(void*)&element,OFFSET_SIZE_IN_BYTES);
+	pop_front();
 	return element;
 }//reference to the  front
 
