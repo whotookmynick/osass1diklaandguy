@@ -13,7 +13,7 @@ FreeBlockList::FreeBlockList(int fd,int firstBlockOffset,int firstEmptyBlock,int
 
 	superBlock *super = _disk.getSuperBlock();
 	_size=super->numOfFreeBlocks;
-	_head=(super->firstBlockOfFreeBlocksOffset);// * super->blockSize;
+	_head=(super->firstEmptyBlock);// * super->blockSize;
 	_tail= super->lastEmptyBlock;
 
 };
