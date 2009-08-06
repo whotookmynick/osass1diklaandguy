@@ -48,6 +48,8 @@ private:
     void keepRunning();
     string getFullPath(string path,string currPath);
 
+    string appendPWDToFileName(string fileName);
+
 public:
     OSUI(SystemCalls *systemCallsCaller);
     OSUI(SystemCalls *systemCallsCaller, vector<int> *fdTable, int pid, int fatherPid, string pwd, map<int,OSUI*> *processTable);
@@ -140,7 +142,7 @@ public:
       * Output should be as follows: each file/dir in the given directory in a separate line,
       * directories have the "/" char appended to the end of their name.
       */
-     void ls (string dir_name);
+     void ls (string dir_name,int numOfArgs);
      /*
       * changes the old_file_name to new file name. This can be just changing its name in the same directory, or even moving the file to a different directory.
       */

@@ -25,6 +25,8 @@ private:
 
 	list<FileEntry>* readPWDDir(string pwd,int *lastInode);
 	list<FileEntry>::iterator getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name);
+	bool readPWDDirForCD(string pwd,int *lastInode);
+
 	bool isLockedRead(int i_node_num);
 	bool isLockedWrite(int i_node_num);
 
