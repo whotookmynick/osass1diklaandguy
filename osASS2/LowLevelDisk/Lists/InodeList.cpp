@@ -222,7 +222,7 @@ int InodeList::getFileType(int i_node)
 //--------------------------------------------------------------------------//
 void InodeList::setFileSize(int i_node,int _fileSize)
 {
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 			//TODO
 	}
 	InodeStruct* is=readInodeToStruct(i_node);
@@ -233,7 +233,7 @@ void InodeList::setFileSize(int i_node,int _fileSize)
 }
 int InodeList::getFileSize(int i_node)
 {
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 		//TODO
 		return -1;
 	}

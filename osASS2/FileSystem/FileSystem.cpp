@@ -150,34 +150,14 @@ void FileSystem::d_write(int i_node,list<FileEntry> &dlist)
 //		cout<<"d_write currEntryBuffer = ";
 //		printBuffer(currEntryBuffer,16);
 		this->f_write(i_node,currEntryBuffer,currOffset,16);
+		_lldisk->setFileSize(currEntry.getInodeNum(),currEntry.getFileSize());
 		currOffset += 16;
 	    ++it;
     }
 	char* endOfFileEntriesString = "$";
 	this->f_write(i_node,endOfFileEntriesString,currOffset,1);
-	/*
-	if (currOffset < _lldisk->getFileSize(i_node))
-	{
-		int currBlockInFile = currOffset / BLOCK_SIZE;
-		int currBlock = _lldisk->getDataBlock(i_node, currBlockInFile);
-		char currBlockBuffer[BLOCK_SIZE];
-		_lldisk->readBlock(currBlock,currBlockBuffer);
-		for(int i = currOffset - (currBlockInFile * BLOCK_SIZE); i < BLOCK_SIZE; i++)
-		{
-			currBlockBuffer[i] = 0;
-		}
-		_lldisk->writeBlock(currBlock,currBlockBuffer);
-		currBlockInFile++;
-		currBlock = _lldisk->getDataBlock(i_node,currBlockInFile);
-		while (currBlock != -1)
-		{
-			_lldisk->freeDataBlock(currBlock);
-			currBlockInFile++;
-			currBlock = _lldisk->getDataBlock(i_node,currBlockInFile);
-		}
-	}
-// Now to check if no old data is left.
-*/
+	_lldisk->setFileSize(i_node,currOffset);
+
 }
 
 void FileSystem::f_delete(int i_node)

@@ -4,3 +4,5 @@ and then keeps on working so don't worry about them
 od -Ad -w24 -j0 -N8 -i FILE_SYS
 
 create test.txt read-only
+
+ls

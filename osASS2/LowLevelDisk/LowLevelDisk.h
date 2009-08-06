@@ -7,6 +7,7 @@
 #include "../Exception/Exception.cpp"
 #include "Lists/FreeBlocks/FreeBlockList.h"
 #include "Lists/FreeInodes/FreeInodeList.h"
+#include "../Main/Util.cpp"
 #include <iostream>
 #include <string>
 #include <string.h>
