@@ -113,7 +113,13 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 //				lck_wr(fileToLock);
 			} else if (args[0].compare("ls") == 0)
 			{
-				ls(args[1]);
+				string &working_directory = _pwd;
+				if (args.size() == 2)
+				{
+					working_directory = args[1];
+					working_directory = _pwd + working_directory;
+				}
+				ls(working_directory);
 			}
 
 		}
@@ -278,7 +284,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		void OSUI::ls(string dir_name)
 		{
-			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
+//			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
 			char buff[5000];
 			string temp;
 			temp = _pwd;

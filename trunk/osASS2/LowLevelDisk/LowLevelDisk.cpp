@@ -612,6 +612,10 @@ int LowLevelDisk::getFileSize(int i_node){
     pthread_mutex_unlock(&_RecMutex);
 }
 
+
+ /**
+  * this function receives a new file size in bytes and turns it into number of blocks
+  **/
 void LowLevelDisk::setFileSize(int i_node, int newSize){
 //    cout<<" setFileSize - need to finish implement lists "<<endl;
     pthread_mutex_lock(&_RecMutex);
@@ -619,7 +623,8 @@ void LowLevelDisk::setFileSize(int i_node, int newSize){
         //TODO        pthread_mutex_unlock(&_RecMutex);
         //return -1;
     }
-    _iNodeTable->setFileSize(i_node,newSize);
+    int new_size_in_blocks = roundUpNumber(((float)newSize) / _superBlock->blockSize);
+    _iNodeTable->setFileSize(i_node,new_size_in_blocks);
     pthread_mutex_unlock(&_RecMutex);
 }
 

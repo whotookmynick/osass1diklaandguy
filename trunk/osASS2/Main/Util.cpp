@@ -72,4 +72,14 @@ const int READ_AND_WRITE = 2;
 		}
 	}
 
+	static int roundUpNumber(float num)
+	{
+		int ans = num;
+		if (num == ans)
+			return ans;
+		num = num + 1;
+		ans = num;
+		return ans;
+	}
+
 #endif /*LOWLEVELDISK_H_*/

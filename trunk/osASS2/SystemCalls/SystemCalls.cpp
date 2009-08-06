@@ -40,8 +40,8 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 		cout<<"Could not create file"<<endl;
 	}
 	string new_file_name = file_nameString.substr(file_nameString.find_last_of("/") + 1);
-	FileEntry newDirEntry(newFile_iNode,(char*)new_file_name.c_str(),-1);
-	currPWD->push_back(newDirEntry);
+	FileEntry *newDirEntry = new FileEntry(newFile_iNode,(char*)new_file_name.c_str(),0);
+	currPWD->push_back(*newDirEntry);
 	_fileSys->d_write(pwdInode,*currPWD);
 	int newFD = this->Open((char*)new_file_name.c_str(),flag_access_permissions);
 	return newFD;
@@ -86,7 +86,7 @@ list<FileEntry>* SystemCalls::readPWDDir(string pwd,int *lastInode)
 	while (!done)
 	{
 		string currDir = pwd.substr(0, pwd.find("/"));
-		cout<<"readPWDDir currDir = "<<currDir<<endl;
+//		cout<<"readPWDDir currDir = "<<currDir<<endl;
 		currPWD = _fileSys->d_read(pwdInode);
 		pwdInode = -1;
 		list<FileEntry>::iterator it = currPWD->begin();
@@ -138,7 +138,7 @@ list<FileEntry>::iterator SystemCalls::getFileEntryFromDir(list<FileEntry>& curr
 	{
 		FileEntry curr = *it;
 		char* currFileName = curr.getFileName();
-		cout<<"SystemCalls::getFileEntryFromDir file_name = "<<file_name<<" currFileName = "<<currFileName<<endl;
+//		cout<<"SystemCalls::getFileEntryFromDir file_name = "<<file_name<<" currFileName = "<<currFileName<<endl;
 		if (strcmp(file_name,currFileName) == 0)
 		{
 			found = true;
@@ -178,11 +178,12 @@ int SystemCalls::ls(char *dir_name, char * buf){
 	{
 		FileEntry currEntry = *it;
 		answerString<<currEntry.getFileName();
-		if (this->isDir(currEntry.getFileName()))
+		if (this->isDirFromInode(currEntry.getInodeNum()))
 		{
 			answerString<<"/";
 		}
 		answerString<<"\t"<<currEntry.getFileSize() <<endl;
+		++it;
 	}
 	strcpy(buf,answerString.str().c_str());
 	return 1;
