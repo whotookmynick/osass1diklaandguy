@@ -43,7 +43,7 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	FileEntry *newDirEntry = new FileEntry(newFile_iNode,(char*)new_file_name.c_str(),0);
 	currPWD->push_back(*newDirEntry);
 	_fileSys->d_write(pwdInode,*currPWD);
-	int newFD = this->Open((char*)new_file_name.c_str(),flag_access_permissions);
+	int newFD = this->Open(file_name,flag_access_permissions);
 	return newFD;
 }
 
@@ -72,10 +72,10 @@ int SystemCalls::MakeDir(char* dir_name){
 	list<FileEntry> *currPWD = readPWDDir(pwd,&pwdInode);
 	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
 	int newDir_iNode = _fileSys->createDir();
-	FileEntry newDirEntry(newDir_iNode,(char*)new_dir_name.c_str(),-1);
-	currPWD->push_back(newDirEntry);
+	FileEntry *newDirEntry = new FileEntry(newDir_iNode,(char*)new_dir_name.c_str(),0);
+	currPWD->push_back(*newDirEntry);
 	_fileSys->d_write(pwdInode,*currPWD);
-	return 1;
+	return newDir_iNode;
 }
 
 list<FileEntry>* SystemCalls::readPWDDir(string pwd,int *lastInode)
@@ -211,10 +211,10 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 		_currFD++;
 		_openFileTable[_currFD] = newDesc;
 		ret = _currFD;
-		return ret;
 		pthread_mutex_unlock(&_currFDMutex);
-
+		return ret;
 	}
+	pthread_mutex_unlock(&_currFDMutex);
 	return ret;
 }
 
@@ -258,11 +258,58 @@ bool SystemCalls::isDir(char * fileName){
 	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
 	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
 	int pwdInode = -1;
-	list<FileEntry>* currPWD = readPWDDir(pwd,&pwdInode);
-	FileEntry currEntry = (*getFileEntryFromDir(*currPWD,file_nameShort.c_str()));
-	if (_fileSys->getFileType(currEntry.getInodeNum()) == DIR_TYPE)
-		return true;
-	return false;
+	bool success = readPWDDirForCD(pwd,&pwdInode);
+	//list<FileEntry>::iterator fileEntryIt =getFileEntryFromDir(*currPWD,file_nameShort.c_str());
+	return success;
+//	if (fileEntryIt == currPWD->end())
+//	{
+//		return false;
+//	}
+//	FileEntry currEntry = *fileEntryIt;
+//	return isDirFromInode(currEntry.getInodeNum());
+}
+
+bool SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
+{
+	int pwdInode = ROOT_PWD_INODE;
+	list<FileEntry> *currPWD;
+	bool done = false;
+	while (!done)
+	{
+		string currDir = pwd.substr(0, pwd.find("/"));
+//		cout<<"readPWDDir currDir = "<<currDir<<endl;
+		currPWD = _fileSys->d_read(pwdInode);
+		pwdInode = -1;
+		list<FileEntry>::iterator it = currPWD->begin();
+		while (it != currPWD->end() & pwdInode == -1)
+		{
+			FileEntry curr = *it;
+			string currEntryName(curr.getFileName());
+//			cout<<"readPWDDir currEntryName = "<<currEntryName<<endl;
+//			cout<<"readPWDDir curr.getFileName() = "<<curr.getFileName()<<endl;
+			if (currDir.compare(currEntryName) == 0)
+			{
+				if (isDirFromInode(curr.getInodeNum()))
+				{
+					pwdInode = curr.getInodeNum();
+				}
+				else
+				{
+					return false;
+				}
+			}
+			++it;
+		}
+		pwd = pwd.substr(pwd.find("/") + 1);
+		done = pwd.find("/") == string::npos;
+	}
+	if (pwdInode == -1)
+	{
+		pwdInode = 0;
+	}
+//	currPWD = _fileSys->d_read(pwdInode);
+	*lastInode = pwdInode;
+	return true;
 }
 
 bool SystemCalls::isDirFromInode(int i_node)

@@ -527,15 +527,15 @@ int LowLevelDisk::getInodeType(int i_node){
      else{
          type =_iNodeTable->getFileType(i_node);;
      }
-    return type;
-    pthread_mutex_unlock(&_RecMutex);
+     pthread_mutex_unlock(&_RecMutex);
+     return type;
 }
 
 
 void LowLevelDisk::setInodeType(int i_node, int filetype){
 //    cout<<"setInodeType-  need to finish implement lists "<<endl;
     pthread_mutex_lock(&_RecMutex);
-    if ((filetype<0) | (filetype>2 ) | (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
+    if ((filetype<0) | (filetype>3 ) | (i_node<0) |(i_node>=(_superBlock->numOfInodes)) ){
     //pthread_mutex_unlock(&_RecMutex);
     //    throw invalid_argument("no such file type");//TODO: add exception
     }

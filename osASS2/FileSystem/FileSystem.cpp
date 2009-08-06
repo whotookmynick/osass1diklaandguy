@@ -11,6 +11,8 @@
 FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize):BLOCK_SIZE(dataBlockSize)
 {
 	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
+	char* endOfFileEntriesString = "$";
+	f_write(0,endOfFileEntriesString,0,1);
 }
 
 /*
@@ -129,7 +131,7 @@ list<FileEntry>* FileSystem::d_read(int i_node)
 		ans->push_back(*entry);
 //		cout<<"d_read ans->front().getFileName() = "<<ans->front().getFileName()<<endl;
 		currOffset += 16;
-		this->f_read(i_node,fileEntryBuffer,currOffset,16);
+		bytesRead = this->f_read(i_node,fileEntryBuffer,currOffset,16);
 	}
 	return ans;
 }
@@ -156,7 +158,7 @@ void FileSystem::d_write(int i_node,list<FileEntry> &dlist)
     }
 	char* endOfFileEntriesString = "$";
 	this->f_write(i_node,endOfFileEntriesString,currOffset,1);
-	_lldisk->setFileSize(i_node,currOffset);
+	_lldisk->setFileSize(i_node,_lldisk->getFileSize(i_node) + currOffset);
 
 }
 

@@ -27,6 +27,7 @@ const int DIR_TYPE = 3;
 const int READ_ONLY = 1;
 const int READ_AND_WRITE = 2;
 
+
 	static int turnBytesToInt(char* bytes)
 	{
 //		int Int32 = 0;

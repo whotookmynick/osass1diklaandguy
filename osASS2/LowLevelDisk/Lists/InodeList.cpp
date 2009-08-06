@@ -211,7 +211,7 @@ void InodeList::setFileType(int i_node,int _fileType)
 
 int InodeList::getFileType(int i_node)
 {
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 			//TODO
 		return -1;
 	}

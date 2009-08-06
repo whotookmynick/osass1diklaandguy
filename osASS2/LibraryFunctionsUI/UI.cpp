@@ -113,13 +113,15 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 //				lck_wr(fileToLock);
 			} else if (args[0].compare("ls") == 0)
 			{
-				string &working_directory = _pwd;
+//				cout<<"run working.size() = "<<working_directory.size()<<" working.length() = "<<working_directory.length()<<endl;
 				if (args.size() == 2)
 				{
-					working_directory = args[1];
-					working_directory = _pwd + working_directory;
+					ls(args[1],args.size());
 				}
-				ls(working_directory);
+				else
+				{
+					ls("",args.size());
+				}
 			}
 
 		}
@@ -157,6 +159,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			{
 				flagInt = READ_ONLY;
 			}
+			string temp("/");
+			temp = _pwd + temp;
+			file_name = temp + file_name;
+			file_name = file_name.substr(1);
 			char* file_name_c = (char*)file_name.c_str();
 			int fd = _systemCallsCaller->MakeFile(file_name_c,0,flagInt);
 			_fdTable->push_back(fd);
@@ -171,7 +177,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				string next_dir;
 				if (new_dir.empty() | new_dir.compare("/") == 0)
 					return 1;
-				if (new_dir.compare("..") == 0)
+				if (dir_change.compare("..") == 0)
 				{
 					//		cout<<"cd goDownDir()"<<endl;
 					goDownDir();
@@ -180,12 +186,12 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				{
 					//		cout<<"cd goUpDir"<<endl;
 					string firstDirChange;
-					new_dir = new_dir.substr(1);
+//					new_dir = new_dir.substr(1);
 					firstDirChange = new_dir.substr(0,new_dir.find('/'));
 					_pwd.append("/" + firstDirChange);
 				}
 				int nextDirPlace = new_dir.find('/');
-				if (nextDirPlace == -1)
+				if (nextDirPlace == string::npos)
 					return 1;
 				next_dir = new_dir.substr(nextDirPlace);
 				return this->cd(next_dir);
@@ -237,6 +243,11 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::close(int fd)
 		{
+			vector<int>::iterator place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
+			if ( place != _lockedReadFile.end())
+			{
+				_lockedReadFile.erase(place);
+			}
 			return _systemCallsCaller->Close(fd);
 		}
 
@@ -282,14 +293,23 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			newProc->keepRunning();
 		}
 
-		void OSUI::ls(string dir_name)
+		void OSUI::ls(string dir_name,int numOfArgs)
 		{
-//			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
+			string working_directory = _pwd;
+			if (numOfArgs == 2)
+			{
+				working_directory = dir_name;
+				working_directory = _pwd + working_directory;
+			}
+
+			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
+			{
+				working_directory.append("/");
+				working_directory = working_directory.substr(1);
+			}
+			//			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
 			char buff[5000];
-			string temp;
-			temp = _pwd;
-			temp.append("/" + dir_name);
-			_systemCallsCaller->ls((char*)temp.c_str(),buff);
+			_systemCallsCaller->ls((char*)working_directory.c_str(),buff);
 			cout<<buff<<endl;
 		}
 
@@ -303,6 +323,17 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			char *path = NULL;
 			path = getcwd(NULL, 0); // or _getcwd
 			return string(path);
+		}
+
+		string OSUI::appendPWDToFileName(string fileName){
+			string &working_directory = fileName;
+			working_directory = _pwd + working_directory;
+			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
+			{
+				working_directory.append("/");
+				working_directory = working_directory.substr(1);
+			}
+			return working_directory;
 		}
 
 		OSUI::~OSUI()
