@@ -243,12 +243,12 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::close(int fd)
 		{
-			vector<int>::iterator place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
+			/*vector<int>::iterator place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
 			if ( place != _lockedReadFile.end())
 			{
 				_lockedReadFile.erase(place);
 			}
-			return _systemCallsCaller->Close(fd);
+			return _systemCallsCaller->Close(fd);*/
 		}
 
 		int OSUI::batch(string file_name)

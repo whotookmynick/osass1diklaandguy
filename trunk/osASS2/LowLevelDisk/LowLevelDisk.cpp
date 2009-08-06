@@ -339,19 +339,25 @@ void LowLevelDisk::initSuperBlockFromHardDisk(){
     readDataFromHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
     _superBlock->numOfFreeInodes=buf;
 
-    readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) buf,OFFSET_SIZE_IN_BYTES);
+    readDataFromHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,(void*) &buf,OFFSET_SIZE_IN_BYTES);
     _superBlock->firstFreeInode=buf;
 
     readDataFromHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,(void*)& buf,OFFSET_SIZE_IN_BYTES);
     _superBlock->lastFreeInode=buf;
 
-    _superBlock->firstFreeBlockNumber = getNumOfBlocksInInodeTable()+INODE_TABLE_BLOCK_NUM-1;
+    _superBlock->firstFreeBlockNumber  = _superBlock->numOfBlocks -_superBlock->numOfFreeBlocks;
 
     _superBlock->inodeTableOffset = INODE_TABLE_BLOCK_NUM*(_superBlock->blockSize);
 
     _superBlock->firstBlockOfFreeInodesOffset = FIRST_FREE_INODE_BLOCK*_superBlock->blockSize;
 
     _superBlock->firstBlockOfFreeBlocksOffset = FIRST_FREE_BLOCK_BLOCK*_superBlock->blockSize;
+
+    _numOfBlocksInInodeTable = ((sizeof(InodeStruct)*_superBlock->numOfInodes) / (_superBlock->blockSize))+1;
+    _superBlock->inodeTableOffset = INODE_TABLE_BLOCK_NUM*(_superBlock->blockSize);
+    //_numOfBlocksInInodeTable=n
+
+
 
 }
 
