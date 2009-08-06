@@ -25,3 +25,29 @@
 		return 1;
 	 }
 
+
+	void FreeInodeList::updateHead(){
+	//	if((_head%((_disk.getSuperBlock())->blockSize)) == 0){
+		if(((_head%((_disk.getSuperBlock())->blockSize))-1) == 0){
+			copyNextBlockToSuperBlock();
+		}else{
+			_head=_head+OFFSET_SIZE_IN_BYTES;
+
+		}
+		writeDataToHardDisk(FIRST_EMPTY_INODE_POINTER_OFFSET,&_head,OFFSET_SIZE_IN_BYTES);
+
+	}
+
+	void FreeInodeList::updateTail(){
+		int newBlock;
+		if(((_tail%((_disk.getSuperBlock())->blockSize))-1) == 0){
+			newBlock = _disk.allocateDataBlock();
+			writeDataToHardDisk(_tail,(void*)&newBlock,OFFSET_SIZE_IN_BYTES);
+			_tail=newBlock*_disk.getSuperBlock()->blockSize;
+		}else{
+			_tail=_tail+OFFSET_SIZE_IN_BYTES;
+
+		}
+		writeDataToHardDisk(LAST_EMPTY_INODE_POINTER_OFFSET,&_tail,OFFSET_SIZE_IN_BYTES);
+
+	}

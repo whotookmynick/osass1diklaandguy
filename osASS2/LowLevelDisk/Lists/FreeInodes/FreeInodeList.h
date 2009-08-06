@@ -20,5 +20,8 @@ public:
 //To freeLists to implement
 	virtual void emptyBlock(int blockNum);
 	virtual int  insertBlock();
+	virtual void updateTail();
+	virtual void updateHead();
+
 };
 #endif /* FREEINODELIST_H_ */

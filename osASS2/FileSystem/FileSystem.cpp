@@ -93,7 +93,7 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 		int i,bytesWrittenInIteration = 0;
 		for (i = offsetInFile; i<BLOCK_SIZE & bytesWritten + bytesWrittenInIteration < nBytes; i++)
 		{
-			currBuffer[i] = buffer[bytesWritten+i];
+			currBuffer[i] = buffer[bytesWrittenInIteration];
 			bytesWrittenInIteration++;
 		}
 		bytesWritten += bytesWrittenInIteration;
@@ -108,21 +108,26 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 	return bytesWritten;
 }
 
-list<FileEntry> FileSystem::d_read(int i_node)
+list<FileEntry>* FileSystem::d_read(int i_node)
 {
-	list<FileEntry> ans;
+	list<FileEntry> *ans = new list<FileEntry>();
 	int fileSize = _lldisk->getFileSize(i_node);
 	int currOffset = 0;
 	char fileEntryBuffer[20];
 	int bytesRead = this->f_read(i_node,fileEntryBuffer,currOffset,16);
-	while (fileEntryBuffer[0] != '\0' & bytesRead == 16)
+
+	while (fileEntryBuffer[0] != '$' & bytesRead == 16)
 	{
 		int entryInode = turnBytesToInt(fileEntryBuffer);
-		char entryName[12];
+		char *entryName = (char*)malloc(sizeof(char)*12);
 		strcpy(entryName,fileEntryBuffer+4);
+
+//		cout<<"d_read entryName = "<<entryName<<endl;
+
 		int entrySize = _lldisk->getFileSize(entryInode);
-		FileEntry entry(entryInode,entryName,entrySize);
-		ans.push_back(entry);
+		FileEntry* entry = new FileEntry(entryInode,entryName,entrySize);
+		ans->push_back(*entry);
+//		cout<<"d_read ans->front().getFileName() = "<<ans->front().getFileName()<<endl;
 		currOffset += 16;
 		this->f_read(i_node,fileEntryBuffer,currOffset,16);
 	}
@@ -148,7 +153,8 @@ void FileSystem::d_write(int i_node,list<FileEntry> &dlist)
 		currOffset += 16;
 	    ++it;
     }
-	this->f_write(i_node,"\0",currOffset+1,1);
+	char* endOfFileEntriesString = "$";
+	this->f_write(i_node,endOfFileEntriesString,currOffset,1);
 	/*
 	if (currOffset < _lldisk->getFileSize(i_node))
 	{
@@ -189,8 +195,8 @@ void FileSystem::f_delete(int i_node)
 
 void FileSystem::d_delete(int i_node)
 {
-	list<FileEntry> dListing = this->d_read(i_node);
-	if (dListing.empty())
+	list<FileEntry>* dListing = this->d_read(i_node);
+	if (dListing->empty())
 	{
 		f_delete(i_node);
 	}

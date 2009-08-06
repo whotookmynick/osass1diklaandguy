@@ -29,11 +29,16 @@ const int READ_AND_WRITE = 2;
 
 	static int turnBytesToInt(char* bytes)
 	{
+//		int Int32 = 0;
+//		Int32 = (Int32 << 8) + bytes[3];
+//		Int32 = (Int32 << 8) + bytes[2];
+//		Int32 = (Int32 << 8) + bytes[1];
+//		Int32 = (Int32 << 8) + bytes[0];
 		int Int32 = 0;
-		Int32 = (Int32 << 8) + bytes[3];
-		Int32 = (Int32 << 8) + bytes[2];
-		Int32 = (Int32 << 8) + bytes[1];
 		Int32 = (Int32 << 8) + bytes[0];
+		Int32 = (Int32 << 8) + bytes[1];
+		Int32 = (Int32 << 8) + bytes[2];
+		Int32 = (Int32 << 8) + bytes[3];
 		return Int32;
 	}
 
@@ -51,7 +56,8 @@ const int READ_AND_WRITE = 2;
 		for (int i = 0; i < size;i++)
 			{
 	//			cout<<buff[i];
-				printf("%x",buff[i]);
+				char temp = buff[i];
+				printf("%c",buff[i]);
 			}
 		cout<<endl;
 	}
