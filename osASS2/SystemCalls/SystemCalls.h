@@ -130,6 +130,8 @@ public:
 	 */
 	int releaseLockWrite(int fd);
 
+	int turnFDtoInodeNum(int fd);
+
 };
 
 #endif /*SYSTEMCALLS_H_*/

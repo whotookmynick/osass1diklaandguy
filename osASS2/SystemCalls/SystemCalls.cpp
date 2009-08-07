@@ -457,14 +457,25 @@ bool SystemCalls::isDirFromInode(int i_node)
 }
 
 int SystemCalls::lockRead(int fd){
-	int fd_inode = _openFileTable[fd]->_inode;
+	pthread_mutex_lock(&lock_mutex);
+	map<int,Descriptor*>::iterator it = _openFileTable.find(fd);
+	if (it == _openFileTable.end())
+	{
+		cerr<<"The file does not exist or is not open"<<endl;
+		pthread_mutex_unlock(&lock_mutex);
+		return -1;
+	}
+	Descriptor* desc = (*it).second;
+	int fd_inode = desc->_inode;
 	if (isLockedRead(fd_inode) | isLockedWrite(fd_inode))
 	{
 		cerr<<"File is already locked"<<endl;
+		pthread_mutex_unlock(&lock_mutex);
 		return -1;
 	}
 	_readLocks.push_back(fd_inode);
-	return 1;
+	pthread_mutex_unlock(&lock_mutex);
+	return fd_inode;
 }
 
 bool SystemCalls::isLockedRead(int i_node_num)
@@ -501,7 +512,25 @@ int SystemCalls::lockRead(int fd,int pid)
 }
 
 int SystemCalls::lockWrite(int fd){
-	return 1;
+	pthread_mutex_lock(&lock_mutex);
+	map<int,Descriptor*>::iterator it = _openFileTable.find(fd);
+	if (it == _openFileTable.end())
+	{
+		cerr<<"The file does not exist or is not open"<<endl;
+		pthread_mutex_unlock(&lock_mutex);
+		return -1;
+	}
+	Descriptor* desc = (*it).second;
+	int fd_inode = desc->_inode;
+	if (isLockedRead(fd_inode) | isLockedWrite(fd_inode))
+	{
+		cerr<<"File is already locked"<<endl;
+		pthread_mutex_unlock(&lock_mutex);
+		return -1;
+	}
+	_writeLocks.push_back(fd_inode);
+	pthread_mutex_unlock(&lock_mutex);
+	return fd_inode;
 }
 
 int SystemCalls::releaseLockRead(int fd){
@@ -525,4 +554,16 @@ bool SystemCalls::isFileOpen(int i_node)
 	}
 	return false;
 
+}
+
+int SystemCalls::turnFDtoInodeNum(int fd)
+{
+	map<int,Descriptor*>::iterator it;
+	it = _openFileTable.find(fd);
+	if (it != _openFileTable.end())
+	{
+		Descriptor* desc = (*it).second;
+		return desc->_inode;
+	}
+	return -1;
 }
