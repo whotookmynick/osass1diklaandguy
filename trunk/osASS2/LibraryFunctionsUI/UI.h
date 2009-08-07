@@ -40,6 +40,7 @@ private:
 	pthread_mutex_t _contextMutex;
 	queue<string*> _batchCommandsQueue;
 	vector<int> _lockedReadFile;
+	vector<int> _lockedWriteFile;
 
     string getRealPWD();
     void goDownDir();

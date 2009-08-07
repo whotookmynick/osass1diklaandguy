@@ -107,12 +107,22 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				close(fdToClose);
 			}else if (args[0].compare("lck_rd") == 0)
 			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:lck_rd <fd>"<<endl;
+					return;
+				}
 				int fileToLock = atoi(args[1].c_str());
 				lck_rd(fileToLock);
 			}else if (args[0].compare("lck_wr") == 0)
 			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:lck_rd <fd>"<<endl;
+					return;
+				}
 				int fileToLock = atoi(args[1].c_str());
-				//				lck_wr(fileToLock);
+				lck_wr(fileToLock);
 			} else if (args[0].compare("ls") == 0)
 			{
 				//				cout<<"run working.size() = "<<working_directory.size()<<" working.length() = "<<working_directory.length()<<endl;
@@ -393,11 +403,23 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::lck_rd(int fd)
 		{
-			int ans = _systemCallsCaller->lockRead(fd,_pid);
+//			int ans = _systemCallsCaller->lockRead(fd,_pid);
+			int ans = _systemCallsCaller->lockRead(fd);
 			if (ans > 0)
 			{
 				_lockedReadFile.push_back(fd);
 			}
+			return ans;
+		}
+
+		int OSUI::lck_wr(int fileToLock)
+		{
+			int ans = _systemCallsCaller->lockWrite(fileToLock);
+			if (ans > 0)
+			{
+				_lockedWriteFile.push_back(fileToLock);
+			}
+			return ans;
 		}
 
 		bool OSUI::processExists(int pid)
