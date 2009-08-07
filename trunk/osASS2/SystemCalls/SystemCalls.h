@@ -68,6 +68,8 @@ public:
 	 */
 	int RmFile(char* file_name);
 
+	int RmDir_R(string dir_name);
+
 	/*
 	 * lists the content of the location_directory. Return list in buf.
 	 */

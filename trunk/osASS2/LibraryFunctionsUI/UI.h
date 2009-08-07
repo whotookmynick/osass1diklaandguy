@@ -144,7 +144,8 @@ public:
       */
      void ls (string dir_name,int numOfArgs);
      /*
-      * changes the old_file_name to new file name. This can be just changing its name in the same directory, or even moving the file to a different directory.
+      * changes the old_file_name to new file name.
+      * This can be just changing its name in the same directory, or even moving the file to a different directory.
       */
      int mv(string old_file_name,string new_file_name);
      /*

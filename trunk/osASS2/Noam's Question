@@ -6,3 +6,11 @@ od -Ad -w24 -j0 -N8 -i FILE_SYS
 create test.txt read-only
 
 ls
+
+
+//TODO for saturday.
+*  Take care of relative paths.
+*  Take care of using soft links. Need to identify specific function where this is relevant and adding support.
+*  Take care of updating file size correctly.
+*  Take care of process creation, switching and batch programs.
+

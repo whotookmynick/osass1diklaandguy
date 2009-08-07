@@ -188,13 +188,16 @@ void FileSystem::f_delete(int i_node)
 	_lldisk->freeInode(i_node);
 }
 
-void FileSystem::d_delete(int i_node)
+int FileSystem::d_delete(int i_node)
 {
 	list<FileEntry>* dListing = this->d_read(i_node);
 	if (dListing->empty())
 	{
 		f_delete(i_node);
+		return 1;
 	}
+	cerr<<"Directory is not empty"<<endl;
+	return -1;
 }
 
 int FileSystem::getNumOfHardLinks(int i_node)
