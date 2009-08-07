@@ -31,6 +31,9 @@ private:
 	bool isLockedWrite(int i_node_num);
 
 	bool isDirFromInode(int i_node);
+
+	bool isFileOpen(int i_node);
+
 	/* This is for design pattern arab
 	 *
 	 */

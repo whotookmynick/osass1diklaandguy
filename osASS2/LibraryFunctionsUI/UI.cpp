@@ -95,10 +95,12 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				pthread_mutex_lock(&_contextMutex);
 			}else if(args[0].compare("open") == 0)
 			{
-				string fileName = getFullPath(args[1],_pwd);
-				cout<<"OSUI::open fileName = "<<fileName<<endl;
-				int flags = atoi(args[2].c_str());
-				int ret = open((char*)(fileName.c_str()), flags);
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:Open <file_name> <flags>"<<endl;
+					return;
+				}
+				int ret = open(args[1], args[2]);
 			}else if(args[0].compare("close") == 0)
 			{
 				int fdToClose = atoi(args[1].c_str());
@@ -114,6 +116,11 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			} else if (args[0].compare("ls") == 0)
 			{
 //				cout<<"run working.size() = "<<working_directory.size()<<" working.length() = "<<working_directory.length()<<endl;
+				if (args.size() > 2)
+				{
+					cerr<<"Usage:ls [dir_name]"<<endl;
+					return;
+				}
 				if (args.size() == 2)
 				{
 					ls(args[1],args.size());
@@ -122,8 +129,48 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				{
 					ls("",args.size());
 				}
+			} else if (args[0].compare("read") == 0)
+			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:read <fd> <numOfBytes>"<<endl;
+					return;
+				}
+				int new_fd = atoi(args[1].c_str());
+				int num_bytes_to_read = atoi(args[2].c_str());
+				read(new_fd,num_bytes_to_read);
+			} else if (args[0].compare("write") == 0)
+			{
+				if (args.size() < 3)
+				{
+					cerr<<"Usage:write <fd> <string to write>"<<endl;
+					return;
+				}
+				int new_fd = atoi(args[1].c_str());
+				string string_to_write = args[2];
+				for (int k = 3; k < args.size();k++)
+				{
+					string_to_write.append(" ");
+					string_to_write.append(args[k]);
+				}
+				write(new_fd,string_to_write);
+			}else if (args[0].compare("rm") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:rm <file_name>"<<endl;
+					return;
+				}
+				rm(args[1]);
+			}else if (args[0].compare("rmdir") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:rmdir <dir_name>"<<endl;
+					return;
+				}
+				rmdir(args[1]);
 			}
-
 		}
 
 		void OSUI::run(){
@@ -155,9 +202,21 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		int OSUI::create(string file_name,string flags)
 		{
 			int flagInt = READ_AND_WRITE;
+			bool correct_flage = false;
+			if (flags.compare("read-and-write") == 0)
+			{
+				flagInt = READ_AND_WRITE;
+				correct_flage = true;
+			}
 			if (flags.compare("read-only") == 0)
 			{
 				flagInt = READ_ONLY;
+				correct_flage = true;
+			}
+			if (!correct_flage)
+			{
+				cerr<<"flags not in correct syntax"<<endl;
+				return -1;
 			}
 			string temp("/");
 			temp = _pwd + temp;
@@ -165,7 +224,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			file_name = file_name.substr(1);
 			char* file_name_c = (char*)file_name.c_str();
 			int fd = _systemCallsCaller->MakeFile(file_name_c,0,flagInt);
-			_fdTable->push_back(fd);
+			if (fd != -1)
+			{
+				_fdTable->push_back(fd);
+			}
 			return fd;
 		}
 
@@ -207,23 +269,25 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			//	cout<<"goDownDir _pwd = "<<_pwd<<endl;
 		}
 
-		string OSUI::getFullPath(string path,string newPath)
+		string OSUI::getFullPath(string file_name)
 		{
-//			cout<<"OSUI::getFullPath path = "<<path<<" newPath = "<<newPath<<endl;
-			if (path.find("/") == string::npos)
-				return newPath.append("/" + path);
-			string dir_change = path.substr(0,path.find("/"));
-			if (dir_change.compare("..") == 0)
+//			working_directory = _pwd + working_directory;
+			string working_directory = "";
+			if (_pwd.size() > 0)
 			{
-				newPath = newPath.substr(0,newPath.find_last_of("/"));
+				working_directory = _pwd + "/";
+
 			}
-			else
+			working_directory = working_directory + file_name;
+//			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
+//			{
+//				working_directory.append("/");
+//			}
+			if (working_directory.size() > 0 && working_directory.at(0) == '/')
 			{
-				newPath.append("/" + dir_change);
+				working_directory = working_directory.substr(1);
 			}
-			path = path.substr(path.find("/")+1);
-//			cout<<"OSUI::getFullPath path = "<<path<<" newPath = "<<newPath<<endl;
-			return getFullPath(path,newPath);
+			return working_directory;
 		}
 
 		int OSUI::crprc(int id, int parent)
@@ -236,19 +300,48 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			new OSUI(_systemCallsCaller,_fdTable,id,parent,_pwd,_processTable);
 			return 1;
 		}
-		int OSUI::open(char* file_name,int flags)
+		int OSUI::open(string file_name,string flags)
 		{
-			return _systemCallsCaller->Open(file_name,flags);
+			int flagInt = READ_AND_WRITE;
+			bool correct_flage = false;
+			if (flags.compare("read-and-write") == 0)
+			{
+				flagInt = READ_AND_WRITE;
+				correct_flage = true;
+			}
+			if (flags.compare("read-only") == 0)
+			{
+				flagInt = READ_ONLY;
+				correct_flage = true;
+			}
+			if (!correct_flage)
+			{
+				cerr<<"flags not in correct syntax"<<endl;
+				return -1;
+			}
+			string working_directory = getFullPath(file_name);
+//			cout<<"OSUI::open working_directory = "<<working_directory<<endl;
+			int new_fd = _systemCallsCaller->Open((char*)(working_directory.c_str()),flagInt);
+			cout<<"fd = "<<new_fd<<endl;
+			_fdTable->push_back(new_fd);
+			return new_fd;
 		}
 
 		int OSUI::close(int fd)
 		{
-			/*vector<int>::iterator place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
+			vector<int>::iterator place = find(_fdTable->begin(),_fdTable->end(),fd);
+			if (place == _fdTable->end())
+			{
+				cerr<<"You cannot close this file or it is not open"<<endl;
+				return -1;
+			}
+			_fdTable->erase(place);
+			place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
 			if ( place != _lockedReadFile.end())
 			{
 				_lockedReadFile.erase(place);
 			}
-			return _systemCallsCaller->Close(fd);*/
+			return _systemCallsCaller->Close(fd);
 		}
 
 		int OSUI::batch(string file_name)
@@ -313,6 +406,46 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			cout<<buff<<endl;
 		}
 
+		int OSUI::read(int fd,int num_bytes)
+		{
+			char readBuffer[num_bytes+10];
+			int ans =  _systemCallsCaller->Read(fd,num_bytes,readBuffer);
+			if (ans == -1)
+			{
+				return ans;
+			}
+			readBuffer[ans] = '\0';
+			ostringstream bufferString;
+			bufferString<<readBuffer;
+			bufferString<<"\n";
+			bufferString<<ans;
+			cout<<bufferString.str()<<endl;
+			return ans;
+		}
+
+		int OSUI::write(int fd,string buffer)
+		{
+			int ans = _systemCallsCaller->Write(fd,buffer.size(),(char*)(buffer.c_str()));
+			cout<<"OSUI::write ans = "<<ans<<endl;
+			return ans;
+		}
+
+		int OSUI::rm(string file_name)
+		{
+			string working_directory = getFullPath(file_name);
+//			cout<<"OSUI::rm working_directory = "<<working_directory<<endl;
+			int ans = _systemCallsCaller->RmFile((char*)(working_directory.c_str()));
+			return ans;
+
+		}
+
+		int OSUI::rmdir(string dir_name)
+		{
+			string working_directory = getFullPath(dir_name);
+			int ans = _systemCallsCaller->RmDir((char*)(working_directory.c_str()));
+			return ans;
+		}
+
 		void OSUI::keepRunning()
 		{
 			pthread_mutex_unlock(&_contextMutex);
@@ -325,16 +458,6 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			return string(path);
 		}
 
-		string OSUI::appendPWDToFileName(string fileName){
-			string &working_directory = fileName;
-			working_directory = _pwd + working_directory;
-			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
-			{
-				working_directory.append("/");
-				working_directory = working_directory.substr(1);
-			}
-			return working_directory;
-		}
 
 		OSUI::~OSUI()
 		{

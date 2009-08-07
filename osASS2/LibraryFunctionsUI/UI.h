@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <queue>
+#include <stdlib.h>
 #include "../SystemCalls/SystemCalls.h"
 
 using namespace std;
@@ -46,9 +47,8 @@ private:
     bool processExists(int pid);
     void switchToProcess(int newPid);
     void keepRunning();
-    string getFullPath(string path,string currPath);
+    string getFullPath(string file_name);
 
-    string appendPWDToFileName(string fileName);
 
 public:
     OSUI(SystemCalls *systemCallsCaller);
@@ -75,7 +75,7 @@ public:
      /*
       * opens an existing file returning a file descriptor (fd). The fd returned should always be the lowest one still free. Flag can be set to "read_only" or "read_and_write". Always remember to check when reading or writing that the file was actually opened for that purpose, otherwise return an error. Your flags should be in the exact syntax specified.
       */
-     int open (char* file_name,int flags);
+     int open (string file_name,string flags);
      /*
       *  _ close the file associated with the given file descriptor. Release locks on this file held by this process.
       */
