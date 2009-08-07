@@ -42,7 +42,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller):
 	{
 	_fdTable = new vector<int>();
 	//	_systemCallsCaller = systemCallsCaller;
-//	_pwd = getRealPWD();
+	//	_pwd = getRealPWD();
 	_pwd = "";
 	_processTable = new map<int,OSUI*>();
 	init();
@@ -52,19 +52,19 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		int pid,int fatherPid,string pwd,map<int,OSUI*>* processTable):
 			_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_fatherPid(fatherPid),
 			_pwd(pwd),_processTable(processTable)
-		{
+			{
 			init();
 			pthread_mutex_lock(&_contextMutex);
-		}
+			}
 
 		void OSUI::init()
 		{
 			(*_processTable)[_pid] = this;
-//			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
-//			{
-//				perror("UI thread creation failed");
-//				exit(1);
-//			}
+			//			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
+			//			{
+			//				perror("UI thread creation failed");
+			//				exit(1);
+			//			}
 			pthread_mutex_init(&_contextMutex, NULL);
 		}
 
@@ -112,10 +112,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			}else if (args[0].compare("lck_wr") == 0)
 			{
 				int fileToLock = atoi(args[1].c_str());
-//				lck_wr(fileToLock);
+				//				lck_wr(fileToLock);
 			} else if (args[0].compare("ls") == 0)
 			{
-//				cout<<"run working.size() = "<<working_directory.size()<<" working.length() = "<<working_directory.length()<<endl;
+				//				cout<<"run working.size() = "<<working_directory.size()<<" working.length() = "<<working_directory.length()<<endl;
 				if (args.size() > 2)
 				{
 					cerr<<"Usage:ls [dir_name]"<<endl;
@@ -170,6 +170,39 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 					return;
 				}
 				rmdir(args[1]);
+			}else if (args[0].compare("rmdir_r") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:rmdir <dir_name>"<<endl;
+					return;
+				}
+				rmdir_r(args[1]);
+			}else if (args[0].compare("hdlink") == 0)
+			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:hdlink <orignial_file_name> <new_file_name>"<<endl;
+					return;
+				}
+				hdlink(args[1],args[2]);
+			}else if (args[0].compare("sflink") == 0)
+			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:sflink <orignial_file_name> <new_file_name>"<<endl;
+					return;
+				}
+				sflink(args[1],args[2]);
+			}
+			else if (args[0].compare("mv") == 0)
+			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:mv <orignial_file_name> <new_file_name>"<<endl;
+					return;
+				}
+				mv(args[1],args[2]);
 			}
 		}
 
@@ -191,11 +224,11 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::mkdir (string dir_name)
 		{
-			string temp;
-			temp = _pwd;
-			temp.append("/" + dir_name);
-			//	char* dir_name_c = (char*)dir_name.c_str();
-			int i_nodeNum = _systemCallsCaller->MakeDir((char*)temp.c_str());
+			//			string temp;
+			//			temp = _pwd;
+			//			temp.append("/" + dir_name);
+			dir_name = getFullPath(dir_name);
+			int i_nodeNum = _systemCallsCaller->MakeDir((char*)dir_name.c_str());
 			return i_nodeNum;
 		}
 
@@ -223,7 +256,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			file_name = temp + file_name;
 			file_name = file_name.substr(1);
 			char* file_name_c = (char*)file_name.c_str();
-			int fd = _systemCallsCaller->MakeFile(file_name_c,0,flagInt);
+			int fd = _systemCallsCaller->MakeFile(file_name_c,REGULARE_FILE,flagInt);
 			if (fd != -1)
 			{
 				_fdTable->push_back(fd);
@@ -248,7 +281,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				{
 					//		cout<<"cd goUpDir"<<endl;
 					string firstDirChange;
-//					new_dir = new_dir.substr(1);
+					//					new_dir = new_dir.substr(1);
 					firstDirChange = new_dir.substr(0,new_dir.find('/'));
 					_pwd.append("/" + firstDirChange);
 				}
@@ -271,7 +304,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		string OSUI::getFullPath(string file_name)
 		{
-//			working_directory = _pwd + working_directory;
+			//			working_directory = _pwd + working_directory;
 			string working_directory = "";
 			if (_pwd.size() > 0)
 			{
@@ -279,10 +312,10 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 			}
 			working_directory = working_directory + file_name;
-//			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
-//			{
-//				working_directory.append("/");
-//			}
+			//			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
+			//			{
+			//				working_directory.append("/");
+			//			}
 			if (working_directory.size() > 0 && working_directory.at(0) == '/')
 			{
 				working_directory = working_directory.substr(1);
@@ -320,7 +353,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				return -1;
 			}
 			string working_directory = getFullPath(file_name);
-//			cout<<"OSUI::open working_directory = "<<working_directory<<endl;
+			//			cout<<"OSUI::open working_directory = "<<working_directory<<endl;
 			int new_fd = _systemCallsCaller->Open((char*)(working_directory.c_str()),flagInt);
 			cout<<"fd = "<<new_fd<<endl;
 			_fdTable->push_back(new_fd);
@@ -433,7 +466,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		int OSUI::rm(string file_name)
 		{
 			string working_directory = getFullPath(file_name);
-//			cout<<"OSUI::rm working_directory = "<<working_directory<<endl;
+			//			cout<<"OSUI::rm working_directory = "<<working_directory<<endl;
 			int ans = _systemCallsCaller->RmFile((char*)(working_directory.c_str()));
 			return ans;
 
@@ -444,6 +477,52 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			string working_directory = getFullPath(dir_name);
 			int ans = _systemCallsCaller->RmDir((char*)(working_directory.c_str()));
 			return ans;
+		}
+
+		int OSUI::rmdir_r(string dir_name)
+		{
+			string working_directory = getFullPath(dir_name);
+			int ans = _systemCallsCaller->RmDir_R(working_directory);
+			return ans;
+		}
+
+		int OSUI::hdlink(string file_to_link_to,string new_file_name)
+		{
+			string working_dircetory = getFullPath(file_to_link_to);
+			string new_file_path = getFullPath(new_file_name);
+			int ret = _systemCallsCaller->MakeHLink((char*)(working_dircetory.c_str()),(char*)(new_file_path.c_str()));
+			return ret;
+		}
+
+		int OSUI::sflink(string file_to_link_to,string new_file_name)
+		{
+			string working_dircetory = getFullPath(file_to_link_to);
+			string new_file_path = getFullPath(new_file_name);
+			int fd = _systemCallsCaller->MakeFile((char*)(new_file_path.c_str()), SOFT_LINK, READ_AND_WRITE);
+			if (fd != -1)
+			{
+				write(fd,file_to_link_to);
+				return 1;
+			}
+			return -1;
+		}
+
+		int OSUI::mv(string old_file_name,string new_file_name)
+		{
+//			string original_file_path = getFullPath(old_file_name);
+//			string new_file_path = getFullPath(new_file_name);
+			int ret = hdlink(old_file_name,new_file_name);
+			if (ret < 0)
+			{
+				cerr<<"Cannot rename"<<endl;
+				return ret;
+			}
+			ret = rm(old_file_name);
+			if (ret < 0)
+			{
+				cerr<<"Cannot rename"<<endl;
+				return ret;
+			}
 		}
 
 		void OSUI::keepRunning()

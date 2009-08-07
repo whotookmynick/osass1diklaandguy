@@ -51,20 +51,37 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 
 
 int SystemCalls::MakeHLink(char* target_file_name, char *sourcefile_name){
-	string targetFileNameString(targetFileNameString);
-	string sourceFileNameString(sourcefile_name);
+	string targetFileNameString(target_file_name);
 	string targetPwdString = targetFileNameString.substr(0,targetFileNameString.find_last_of("/"));
 	int pwdInode = -1;
 	list<FileEntry> *targetPWD = readPWDDir(targetPwdString,&pwdInode);
 	string targetShortName = targetFileNameString.substr(targetFileNameString.find_last_of("/") + 1);
-	FileEntry targetFileEntry = (*getFileEntryFromDir(*targetPWD,targetShortName.c_str()));
+	list<FileEntry>::iterator targetIt = getFileEntryFromDir(*targetPWD,targetShortName.c_str());
+	if (targetIt == targetPWD->end())
+	{
+		cerr<<"Target file does not exist"<<endl;
+		return -1;
+	}
+	FileEntry targetFileEntry = (*targetIt);
+	int targetInode = targetFileEntry.getInodeNum();
+	if (_fileSys->getFileType(targetInode) == DIR_TYPE)
+	{
+		cerr<<"Cannot make hard link to directory"<<endl;
+		return -1;
+	}
+
+	string sourceFileNameString(sourcefile_name);
 	string sourcePwdString = sourceFileNameString.substr(0,sourceFileNameString.find_last_of("/"));
 	list<FileEntry> *sourcePWD = readPWDDir(sourcePwdString,&pwdInode);
-	string sourceShortName = sourceFileNameString.substr(sourceFileNameString.find_last_of("/") + 1);;
-	targetFileEntry.setFileName((char*)sourceShortName.c_str());
-	sourcePWD->push_back(targetFileEntry);
+	string sourceShortName = sourceFileNameString.substr(sourceFileNameString.find_last_of("/") + 1);
+		char* sourceShortNameChar = (char*)(sourceShortName.c_str());
+	int targetFileSize = targetFileEntry.getFileSize();
+	FileEntry* sourceFileEntry = new FileEntry(targetInode,sourceShortNameChar,targetFileSize);
+	sourcePWD->push_back(*sourceFileEntry);
+	int numOfHlinks = _fileSys->getNumOfHardLinks(targetInode);
+	_fileSys->setNumOfHardLinks(targetInode,numOfHlinks+1);
 	_fileSys->d_write(pwdInode,*sourcePWD);
-	return this->Open(sourcefile_name,READ_AND_WRITE);
+	return 1;
 }
 
 int SystemCalls::MakeDir(char* dir_name){
@@ -127,14 +144,66 @@ list<FileEntry>* SystemCalls::readPWDDir(string pwd,int *lastInode)
 
 int SystemCalls::RmDir(char* dir_name){
 	string dir_nameString(dir_name);
+//	dir_nameString = "/" + dir_nameString;
 	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
+	if (pwd.compare(dir_nameString) == 0)
+	{
+		pwd = "";
+	}
 	string dir_nameShort = dir_nameString.substr(dir_nameString.find_last_of("/")+1);
-	list<FileEntry>* currPWD;
 	int pwdInode;
+	list<FileEntry>* currPWD;
 	currPWD = readPWDDir(pwd,&pwdInode);
-	list<FileEntry>::iterator it;// = currPWD.begin();
+	list<FileEntry>::iterator it;
 	it = getFileEntryFromDir(*currPWD,dir_nameShort.c_str());
+	if (it == currPWD->end())
+	{
+		cerr<<"Directory not found"<<endl;
+		return -1;
+	}
+	FileEntry currEntry = (*it);
+	int currInode = currEntry.getInodeNum();
+	int currNumOfHardLinks = _fileSys->getNumOfHardLinks(currInode);
+	_fileSys->setNumOfHardLinks(currEntry.getInodeNum(),currNumOfHardLinks - 1);
+	if (currNumOfHardLinks == 1)
+	{
+		int ret = _fileSys->d_delete(currInode);
+		if (ret == -1)
+		{
+			return -1;
+		}
+	}
+	currPWD->erase(it);
 	_fileSys->d_write(pwdInode,*currPWD);
+}
+
+int SystemCalls::RmDir_R(string dir_name)
+{
+	int pwdInode;
+	list<FileEntry>* currPWD;
+	string tempDirName = dir_name + "/";
+	currPWD = readPWDDir(tempDirName,&pwdInode);
+	while (!currPWD->empty())
+	{
+		list<FileEntry>::iterator it;
+		it = currPWD->begin();
+		FileEntry currEntry = *it;
+		string newFileName = dir_name + "/";
+		newFileName = newFileName + currEntry.getFileName();
+		int fileType = _fileSys->getFileType(currEntry.getInodeNum());
+		int ret = 0;
+		if (fileType == DIR_TYPE)
+		{
+			ret = RmDir_R(newFileName);
+		}
+		if (fileType < DIR_TYPE)
+		{
+			ret = RmFile((char*)(newFileName.c_str()));
+		}
+		currPWD = readPWDDir(dir_name,&pwdInode);
+	}
+	RmDir((char*)(dir_name.c_str()));
+
 
 }
 
@@ -171,7 +240,7 @@ int SystemCalls::RmFile(char* fileName){
 		return -1;
 	}
 	FileEntry currEntry = (*currEntryIterator);
-	if (_fileSys->getFileType(currEntry.getInodeNum()) <= DIR_TYPE)
+	if (_fileSys->getFileType(currEntry.getInodeNum()) >= DIR_TYPE)
 	{
 		cerr<<"Name is a directory"<<endl;
 		return -1;
@@ -343,6 +412,10 @@ bool SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
 		string currDir = pwd.substr(0, pwd.find("/"));
 //		cout<<"readPWDDir currDir = "<<currDir<<endl;
 		currPWD = _fileSys->d_read(pwdInode);
+		if (currPWD->empty())
+		{
+			return false;
+		}
 		pwdInode = -1;
 		list<FileEntry>::iterator it = currPWD->begin();
 		while (it != currPWD->end() & pwdInode == -1)

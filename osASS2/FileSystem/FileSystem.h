@@ -85,7 +85,7 @@ public:
 	/**
 	 ** delete the directory if it is empty.
 	 **/
-	virtual void d_delete(int i_node);
+	virtual int d_delete(int i_node);
 
 	virtual int getNumOfHardLinks(int i_node);
 
