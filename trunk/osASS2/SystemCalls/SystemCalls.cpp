@@ -37,12 +37,14 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	int newFile_iNode  = _fileSys->createFile(type);
 	if ( newFile_iNode == -1)
 	{
-		cout<<"Could not create file"<<endl;
+		cerr<<"Could not create file"<<endl;
+		return -1;
 	}
 	string new_file_name = file_nameString.substr(file_nameString.find_last_of("/") + 1);
 	FileEntry *newDirEntry = new FileEntry(newFile_iNode,(char*)new_file_name.c_str(),0);
 	currPWD->push_back(*newDirEntry);
 	_fileSys->d_write(pwdInode,*currPWD);
+	_fileSys->setNumOfHardLinks(newFile_iNode,1);
 	int newFD = this->Open(file_name,flag_access_permissions);
 	return newFD;
 }
@@ -72,9 +74,15 @@ int SystemCalls::MakeDir(char* dir_name){
 	list<FileEntry> *currPWD = readPWDDir(pwd,&pwdInode);
 	string new_dir_name = dir_nameString.substr(dir_nameString.find_last_of("/") + 1);
 	int newDir_iNode = _fileSys->createDir();
+	if (newDir_iNode == -1)
+	{
+		cerr<<"Could not create dir"<<endl;
+		return newDir_iNode;
+	}
 	FileEntry *newDirEntry = new FileEntry(newDir_iNode,(char*)new_dir_name.c_str(),0);
 	currPWD->push_back(*newDirEntry);
 	_fileSys->d_write(pwdInode,*currPWD);
+	_fileSys->setNumOfHardLinks(newDir_iNode,1);
 	return newDir_iNode;
 }
 
@@ -155,14 +163,33 @@ int SystemCalls::RmFile(char* fileName){
 	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
 	int pwdInode = -1;
 	list<FileEntry>* currPWD = readPWDDir(pwd,&pwdInode);
-	FileEntry currEntry = (*getFileEntryFromDir(*currPWD,file_nameShort.c_str()));
+	list<FileEntry>::iterator currEntryIterator;
+	currEntryIterator = getFileEntryFromDir(*currPWD,file_nameShort.c_str());
+	if (currEntryIterator == currPWD->end())
+	{
+		cerr<<"File not found or is a directory"<<endl;
+		return -1;
+	}
+	FileEntry currEntry = (*currEntryIterator);
+	if (_fileSys->getFileType(currEntry.getInodeNum()) <= DIR_TYPE)
+	{
+		cerr<<"Name is a directory"<<endl;
+		return -1;
+	}
 	int numOfHardLinks = _fileSys->getNumOfHardLinks(currEntry.getInodeNum());
 	if (numOfHardLinks == 1)
 	{
+		if (isFileOpen(currEntry.getInodeNum()))
+		{
+			cerr<<"Could not delete file because it is being used by some program"<<endl;
+			return -1;
+		}
 		_fileSys->f_delete(currEntry.getInodeNum());
 	}
 	numOfHardLinks--;
 	_fileSys->setNumOfHardLinks(currEntry.getInodeNum(),numOfHardLinks);
+	currPWD->erase(currEntryIterator);
+	_fileSys->d_write(pwdInode,*currPWD);
 	return 1;
 }
 
@@ -214,6 +241,10 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 		pthread_mutex_unlock(&_currFDMutex);
 		return ret;
 	}
+	else
+	{
+		cerr<<"filename not found"<<endl;
+	}
 	pthread_mutex_unlock(&_currFDMutex);
 	return ret;
 }
@@ -227,14 +258,31 @@ int SystemCalls::Close(int fd){
 
 int SystemCalls::Seek(int fd, int location){
 	pthread_mutex_lock(&_currFDMutex);
-	Descriptor *desc = _openFileTable[fd];
+	map<int,Descriptor*>::iterator it = _openFileTable.find(fd);
+	if (it == _openFileTable.end())
+	{
+		cerr<<"The file does not exist or is not open"<<endl;
+		return -1;
+	}
+	Descriptor* desc = it->second;
 	desc->_filePosition = location;
 	pthread_mutex_unlock(&_currFDMutex);
 	return 1;
 }
 
 int SystemCalls::Read (int fd, int nBytes, char *Buffer){
-	Descriptor* desc = _openFileTable[fd];
+	map<int,Descriptor*>::iterator it = _openFileTable.find(fd);
+	if (it == _openFileTable.end())
+	{
+		cerr<<"The file does not exist or is not open"<<endl;
+		return -1;
+	}
+	Descriptor* desc = it->second;
+	if (isLockedWrite(desc->_inode))
+	{
+		cerr<<"The file is locked for write"<<endl;
+		return -1;
+	}
 	int bytesRead = _fileSys->f_read(desc->_inode,Buffer,desc->_filePosition,nBytes);
 	desc->_filePosition += bytesRead;
 	return bytesRead;
@@ -242,7 +290,23 @@ int SystemCalls::Read (int fd, int nBytes, char *Buffer){
 
 
 int SystemCalls::Write (int fd, int nBytes,char * Buffer){
-	Descriptor* desc = _openFileTable[fd];
+	map<int,Descriptor*>::iterator it = _openFileTable.find(fd);
+	if (it == _openFileTable.end())
+	{
+		cerr<<"The file does not exist or is not open"<<endl;
+		return -1;
+	}
+	Descriptor* desc = it->second;
+	if (isLockedRead(desc->_inode) | isLockedWrite(desc->_inode))
+	{
+		cerr<<"The file is locked. Please try again later"<<endl;
+		return -1;
+	}
+	if (desc->_flag <= READ_ONLY)
+	{
+		cerr<<"Cannot write the file is read-only"<<endl;
+		return -1;
+	}
 	int bytesWritten = _fileSys->f_write(desc->_inode,Buffer,desc->_filePosition,nBytes);
 	desc->_filePosition += bytesWritten;
 	return bytesWritten;
@@ -373,4 +437,19 @@ int SystemCalls::releaseLockRead(int fd){
 
 int SystemCalls::releaseLockWrite(int fd){
 	return 1;
+}
+
+bool SystemCalls::isFileOpen(int i_node)
+{
+	map<int,Descriptor*>::iterator it;
+	for ( it=_openFileTable.begin() ; it != _openFileTable.end(); it++ )
+	{
+		Descriptor* currDesc = it->second;
+		if (currDesc->_inode == i_node)
+		{
+			return true;
+		}
+	}
+	return false;
+
 }

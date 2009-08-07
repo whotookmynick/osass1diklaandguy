@@ -173,7 +173,10 @@ void LowLevelDisk::initSuperBlock(int dataBlockSize,int numberOfInodes,int diskS
         _superBlock->numOfInodes=numberOfInodes;//in offset 6
         writeDataToHardDisk(INODE_TABLE_SIZE_OFFSET,(void*)&_superBlock->numOfInodes,OFFSET_SIZE_IN_BYTES);
 
-        _superBlock->numOfFreeInodes=numberOfInodes;//in offset 7
+        /* Changes here by noam
+         * added "-1 at end of next line
+         * */
+        _superBlock->numOfFreeInodes=numberOfInodes - 1;//in offset 7
         writeDataToHardDisk(NUM_OF_FREE_INODES_OFFSET,(void*)&_superBlock->numOfFreeInodes,OFFSET_SIZE_IN_BYTES);
 
 

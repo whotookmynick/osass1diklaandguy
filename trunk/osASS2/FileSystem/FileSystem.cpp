@@ -11,8 +11,11 @@
 FileSystem::FileSystem(int dataBlockSize,int numberOfInodes,int diskSize):BLOCK_SIZE(dataBlockSize)
 {
 	_lldisk = new LowLevelDisk(dataBlockSize,numberOfInodes,diskSize);
-	char* endOfFileEntriesString = "$";
-	f_write(0,endOfFileEntriesString,0,1);
+	if (_lldisk->existHardDisk())
+	{
+		char* endOfFileEntriesString = "$";
+		f_write(0,endOfFileEntriesString,0,1);
+	}
 }
 
 /*
@@ -23,6 +26,11 @@ int FileSystem::createFile(int flag)
 {
 	int ans = 0;
 	ans = _lldisk->allocateInode();
+	if (ans == -1)
+	{
+		cerr<<"there are no free i-nodes"<<endl;
+		return ans;
+	}
 	if (flag)
 	{
 		_lldisk->setInodeType(ans,SOFT_LINK);
@@ -38,6 +46,11 @@ int FileSystem::createFile(int flag)
 int FileSystem::createDir()
 {
 	int newDirNum = _lldisk->allocateInode();
+	if (newDirNum == -1)
+	{
+		cerr<<"there are no free i-nodes"<<endl;
+		return newDirNum;
+	}
 	_lldisk->setInodeType(newDirNum,DIR_TYPE);
 	return newDirNum;
 }
