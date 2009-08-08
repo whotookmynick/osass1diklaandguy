@@ -32,7 +32,7 @@ int FileSystem::createFile(int flag)
 		return ans;
 	}
 //	cout<<"FS::createFile flag = "<<flag<<endl;
-	if (flag)
+	if (flag == SOFT_LINK)
 	{
 		_lldisk->setInodeType(ans,SOFT_LINK);
 	}
@@ -95,6 +95,7 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 	int blockNumInFile = offset/BLOCK_SIZE;
 	char currBuffer[BLOCK_SIZE];
 	int offsetInFile = offset - (BLOCK_SIZE*blockNumInFile);
+	int originalOffsetInFile = offsetInFile;
 	while (bytesWritten < nBytes )
 	{
 		int physicalBlock = _lldisk->getDataBlock(i_node,blockNumInFile);
@@ -121,6 +122,13 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 		_lldisk->writeBlock(physicalBlock,currBuffer);
 		blockNumInFile++;
 		offsetInFile = 0;
+	}
+	int originalFileSize = _lldisk->getFileSize(i_node);
+	int bytes_added_during_write = bytesWritten + originalOffsetInFile - originalFileSize;
+	if (bytes_added_during_write > 0)
+	{
+		int newFileSize = bytes_added_during_write + originalFileSize;
+		_lldisk->setFileSize(i_node,newFileSize);
 	}
 	return bytesWritten;
 }
@@ -171,13 +179,13 @@ void FileSystem::d_write(int i_node,list<FileEntry> &dlist)
 //		cout<<"d_write currEntryBuffer = ";
 //		printBuffer(currEntryBuffer,16);
 		this->f_write(i_node,currEntryBuffer,currOffset,16);
-		_lldisk->setFileSize(currEntry.getInodeNum(),currEntry.getFileSize());
+//		_lldisk->setFileSize(currEntry.getInodeNum(),currEntry.getFileSize());
 		currOffset += 16;
 	    ++it;
     }
 	char* endOfFileEntriesString = "$";
 	this->f_write(i_node,endOfFileEntriesString,currOffset,1);
-	_lldisk->setFileSize(i_node,_lldisk->getFileSize(i_node) + currOffset);
+//	_lldisk->setFileSize(i_node,_lldisk->getFileSize(i_node) + currOffset);
 
 }
 

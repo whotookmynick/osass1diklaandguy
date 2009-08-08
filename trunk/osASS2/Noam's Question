@@ -9,8 +9,7 @@ ls
 
 
 //TODO for saturday.
-*  Take care of relative paths.
-*  Take care of updating file size correctly.
-*  Take care of batch programs.
 *  Error handling as much as I can
+
+Also made sure that the fd given is the lowest one available
 

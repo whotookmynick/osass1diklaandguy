@@ -1,0 +1,5 @@
+create t read-and-write
+write 1 something
+close 1
+open t read-only
+read 1 8
