@@ -7,6 +7,7 @@
 
 #ifndef UI_H_
 #define UI_H_
+
 #include <iostream>
 #include <string>
 #include <list>
@@ -37,7 +38,7 @@ private:
 	int _fatherPid;
 	string _pwd;
 	map<int,OSUI*>* _processTable;
-	queue<string*> _batchCommandsQueue;
+	queue<string> _batchCommandsQueue;
 	vector<int> _lockedReadFile;
 	vector<int> _lockedWriteFile;
 
@@ -48,7 +49,8 @@ private:
 	void switchToProcess(int newPid);
 	void keepRunning();
 	string getFullPath(string file_name);
-
+	string dealWithRelativePath(string file_name);
+	vector<string> getFullPathAndShortName(string file_name);
 
 public:
 
@@ -184,9 +186,9 @@ public:
 
 	/********* MY HELPER FUNCTION *********************/
 	void parseAndRunMethod(string & input);
-	string* getNextBatchCommand()
+	string& getNextBatchCommand()
 	{
-		string* comm = _batchCommandsQueue.front();
+		string& comm = _batchCommandsQueue.front();
 		_batchCommandsQueue.pop();
 		return comm;
 	}

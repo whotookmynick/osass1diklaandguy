@@ -633,7 +633,7 @@ void LowLevelDisk::setFileSize(int i_node, int newSize){
         //return -1;
     }
     int new_size_in_blocks = roundUpNumber(((float)newSize) / _superBlock->blockSize);
-    _iNodeTable->setFileSize(i_node,new_size_in_blocks);
+    _iNodeTable->setFileSize(i_node,newSize);
     pthread_mutex_unlock(&_RecMutex);
 }
 

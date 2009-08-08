@@ -6,6 +6,7 @@
 #include "FileSystem.h"
 #include "Descriptor.h"
 #include "TooManyFilesException.h"
+#include "CurrentFDHandler.h"
 
 const int ROOT_PWD_INODE = 0;
 const int MAX_OPEN_FILES = 128;
@@ -17,7 +18,9 @@ private:
 	FileSystem *_fileSys;
 	int _currUI;//keeps the PID of the current UI
 
-	int _currFD;
+//	int _currFD;
+	CurrentFDHandler _currFD;
+
 	pthread_mutex_t _currFDMutex;	//protects the _currFD and the _openFileTable.
 	map<int,Descriptor*> _openFileTable;//maps between the file descriptor number and the descriptor itself
 	map<int,int> _readLocks;

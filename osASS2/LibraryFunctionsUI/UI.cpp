@@ -13,9 +13,9 @@ extern "C"
 	void *wrapper_func(void *args)
 	{
 		OSUI *curThread = (OSUI *)args;
-		cout<<"wrapper_fucn before locking"<<endl;
+		//		cout<<"wrapper_fucn before locking"<<endl;
 		pthread_mutex_lock(&curThread->_contextMutex);
-		cout<<"wrapper_fucn after locking"<<endl;
+		//		cout<<"wrapper_fucn after locking"<<endl;
 		curThread->run();
 		return 0;
 	}
@@ -23,8 +23,9 @@ extern "C"
 	void *batch_Command_Wrapper(void *args)
 	{
 		OSUI *curThread = (OSUI *)args;
-		string* comm = curThread->getNextBatchCommand();
-		curThread->parseAndRunMethod(*comm);
+		string& comm = curThread->getNextBatchCommand();
+		//		cout<<"batch_command_wrapper comm = "<<comm<<endl;
+		curThread->parseAndRunMethod(comm);
 		return 0;
 	}
 }
@@ -69,11 +70,13 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			//			pthread_mutex_init(&_contextMutex, NULL);
 			//			pthread_mutex_lock(&_contextMutex);
 			(*_processTable)[_pid] = this;
-			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
-			{
-				perror("UI thread creation failed");
-				exit(1);
-			}
+
+/****************** I HAVE TO GET THESE LINES BACK, this is just for testing *////
+//			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
+//			{
+//				perror("UI thread creation failed");
+//				exit(1);
+//			}
 		}
 
 		void OSUI::parseAndRunMethod(string & input)
@@ -84,6 +87,11 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				this->mkdir(args[1]);
 			}else if(args[0].compare("create") == 0)
 			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:create <file_name> <flags>"<<endl;
+					return;
+				}
 				int ret;
 				ret = this->create(args[1], args[2]);
 				cout<<"fd = "<<ret<<endl;
@@ -234,8 +242,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 					return;
 				}
 				mv(args[1],args[2]);
-			}
-			if (args[0].compare("writeFile") == 0)
+			}else if (args[0].compare("writeFile") == 0)
 			{
 				if (args.size() != 3)
 				{
@@ -244,7 +251,35 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				}
 				int fdToWriteTo = atoi(args[1].c_str());
 				writeFile(fdToWriteTo,args[2]);
+			}else if (args[0].compare("rlslck_rd") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:rlslck_rd <fd>"<<endl;
+					return;
+				}
+				int fdToRelease = atoi(args[1].c_str());
+				rlslck_rd(fdToRelease);
+			}else if (args[0].compare("rlslck_wr") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:rlslck_wr <fd>"<<endl;
+					return;
+				}
+				int fdToRelease = atoi(args[1].c_str());
+				rlslck_wr(fdToRelease);
+			}else if (args[0].compare("batch") == 0)
+			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:batch <file_name>"<<endl;
+					return;
+				}
+				batch(args[1]);
 			}
+
+
 		}
 
 		void OSUI::run(){
@@ -267,11 +302,13 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::mkdir (string dir_name)
 		{
-			//			string temp;
-			//			temp = _pwd;
-			//			temp.append("/" + dir_name);
-			dir_name = getFullPath(dir_name);
-			int i_nodeNum = _systemCallsCaller->MakeDir((char*)dir_name.c_str());
+			string originalPWD = _pwd;
+			vector<string> pathAndShortName = getFullPathAndShortName(dir_name);
+			dir_name = pathAndShortName[0];
+			this->cd(dir_name);
+			string finalToSendToFile = _pwd + pathAndShortName.at(1);
+			int i_nodeNum = _systemCallsCaller->MakeDir((char*)finalToSendToFile.c_str());
+			_pwd = originalPWD;
 			return i_nodeNum;
 		}
 
@@ -349,27 +386,6 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			//	cout<<"goDownDir _pwd = "<<_pwd<<endl;
 		}
 
-		string OSUI::getFullPath(string file_name)
-		{
-			//			working_directory = _pwd + working_directory;
-			string working_directory = "";
-			if (_pwd.size() > 0)
-			{
-				working_directory = _pwd + "/";
-
-			}
-			working_directory = working_directory + file_name;
-			//			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
-			//			{
-			//				working_directory.append("/");
-			//			}
-			if (working_directory.size() > 0 && working_directory.at(0) == '/')
-			{
-				working_directory = working_directory.substr(1);
-			}
-			return working_directory;
-		}
-
 		int OSUI::crprc(int id, int parent)
 		{
 			if (processExists(id))
@@ -404,9 +420,14 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				cerr<<"flags not in correct syntax"<<endl;
 				return -1;
 			}
-			string working_directory = getFullPath(file_name);
+//			string working_directory = getFullPath(file_name);
+			string originalPWD = _pwd;
+			vector<string> pathAndShortName = getFullPathAndShortName(file_name);
+			file_name = pathAndShortName[0];
+			this->cd(file_name);
+			string finalToSendToFile = _pwd + pathAndShortName.at(1);
 			//			cout<<"OSUI::open working_directory = "<<working_directory<<endl;
-			int new_fd = _systemCallsCaller->Open((char*)(working_directory.c_str()),flagInt);
+			int new_fd = _systemCallsCaller->Open((char*)(finalToSendToFile.c_str()),flagInt);
 			cout<<"fd = "<<new_fd<<endl;
 			_fdTable->push_back(new_fd);
 			return new_fd;
@@ -421,26 +442,36 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				return -1;
 			}
 			_fdTable->erase(place);
-			place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
-			if ( place != _lockedReadFile.end())
-			{
-				_lockedReadFile.erase(place);
-			}
+			rlslck_rd(fd);
+			rlslck_wr(fd);
 			return _systemCallsCaller->Close(fd);
 		}
 
 		int OSUI::batch(string file_name)
 		{
-			ifstream *myfile = new ifstream(file_name.c_str());
-			while (!myfile->eof())
+			ifstream myfile(file_name.c_str());
+			if (myfile.is_open())
 			{
-				string *command;
-				getline(*myfile,*command);
-				pthread_t* batchCommandThread;
-				_batchCommandsQueue.push(command);
-				pthread_create(batchCommandThread, NULL, batch_Command_Wrapper, this);
+				while (!myfile.eof())
+				{
+					string command;
+					getline(myfile,command);
+					string *commPointer = new string(command.c_str());
+					cout<<"OSUI::batch command = "<<(command)<<endl;
+					if (command.size() > 0)
+					{
+						pthread_t batchCommandThread;
+						_batchCommandsQueue.push(*commPointer);
+						pthread_create(&batchCommandThread, NULL, batch_Command_Wrapper, this);
+					}
+				}
+				return 1;
 			}
-			return 1;
+			else
+			{
+				cerr<<"Could not open file"<<endl;
+				return -1;
+			}
 		}
 
 		int OSUI::lck_rd(int fd)
@@ -624,6 +655,80 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				cout << "Unable to open file"<<endl;
 				return -1;
 			}
+		}
+
+		int OSUI::rlslck_rd(int fd)
+		{
+			vector<int>::iterator place = find(_lockedReadFile.begin(),_lockedReadFile.end(),fd);
+			if ( place != _lockedReadFile.end())
+			{
+				_lockedReadFile.erase(place);
+				return _systemCallsCaller->releaseLockRead(fd);
+			}
+			cerr<<"File is not locked by you or is not open"<<endl;
+			return -1;
+		}
+
+		int OSUI::rlslck_wr(int fd)
+		{
+			vector<int>::iterator place = find(_lockedWriteFile.begin(),_lockedWriteFile.end(),fd);
+			if ( place != _lockedWriteFile.end())
+			{
+				_lockedWriteFile.erase(place);
+				return _systemCallsCaller->releaseLockWrite(fd);
+			}
+			cerr<<"File is not locked by you or is not open"<<endl;
+			return -1;
+		}
+
+		vector<string> OSUI::getFullPathAndShortName(string file_name)
+		{
+			vector<string> ans;
+			string fullPath = getFullPath(file_name);
+			string shortName = file_name;
+			if (fullPath.size()>0)
+			{
+				shortName = file_name.substr(file_name.find_last_of('/') + 1);
+			}
+			ans.push_back(fullPath);
+			ans.push_back(shortName);
+			return ans;
+		}
+
+		string OSUI::getFullPath(string file_name)
+		{
+			if (file_name.find("./") == 0)
+			{
+				file_name = dealWithRelativePath(file_name.substr(2));
+			}
+			int slashPlace = file_name.find_last_of('/');
+			if (slashPlace == string::npos)
+			{
+				return "";
+			}
+			return file_name.substr(0,slashPlace);
+
+		}
+
+		string OSUI::dealWithRelativePath(string file_name)
+		{
+			//			working_directory = _pwd + working_directory;
+			string working_directory = "";
+			if (_pwd.size() > 0)
+			{
+				working_directory = _pwd + "/";
+
+			}
+			working_directory = working_directory + file_name;
+			//			if (working_directory.size() > 0 && working_directory.at(working_directory.size()-1) != '/')
+			//			{
+			//				working_directory.append("/");
+			//			}
+			if (working_directory.size() > 0 && working_directory.at(0) == '/')
+			{
+				working_directory = working_directory.substr(1);
+			}
+			return working_directory;
 		}
 
 		void OSUI::keepRunning()

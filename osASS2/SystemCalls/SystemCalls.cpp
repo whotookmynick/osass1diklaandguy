@@ -12,7 +12,7 @@
 //							constarctors and distractor and inits
 //--------------------------------- -----------------------------------------------
 
-SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize):_currFD(1)
+SystemCalls::SystemCalls(int dataBlockSize,int numberOfInodes,int diskSize)//:_currFD(1)
 {
 	pthread_mutex_init(&_currFDMutex, NULL);
 	_fileSys = new FileSystem(dataBlockSize,numberOfInodes,diskSize);
@@ -53,6 +53,7 @@ int SystemCalls::MakeFile(char* file_name,int type,int flag_access_permissions){
 	{
 		_fileSys->setFileType(newFile_iNode,SOFT_LINK);
 	}
+//	cout<<"SC::makefile file type = "<<_fileSys->getFileType(newFile_iNode)<< endl;
 	return newFD;
 }
 
@@ -275,9 +276,9 @@ int SystemCalls::ls(char *dir_name, char * buf){
 	string pwd = dir_nameString.substr(0,dir_nameString.find_last_of("/"));
 	list<FileEntry>* currPWD;
 	int pwdInode;
-	//cout<<"SystemCalls:ls trying readPWDDir on pwd = "<<pwd<<endl;
+//	cout<<"SystemCalls:ls trying readPWDDir on pwd = "<<pwd<<endl;
 	currPWD = readPWDDir(pwd,&pwdInode);
-	//cout<<"SystemCalls:ls finished readPWDDir"<<endl;
+	cout<<"SystemCalls:ls finished readPWDDir"<<endl;
 	ostringstream answerString;
 	list<FileEntry>::iterator it = currPWD->begin();
 	while (it != currPWD->end())
@@ -317,11 +318,9 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
 	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
 	int pwdInode = -1;
-	cout<<"SC::Open starting readPWDDIR on pwd = "<<pwd<<endl;
+//	cout<<"SC::Open starting readPWDDIR on pwd = "<<pwd<<endl;
 	list<FileEntry>* currPWD = readPWDDir(pwd,&pwdInode);
-	cout<<"SC::Open finished readPWDDIR"<<endl;
 	list<FileEntry>::iterator it = getFileEntryFromDir(*currPWD,file_nameShort.c_str());
-	cout<<"SC::Open finished getFileEntry"<<endl;
 	int ret = -1;
 	if (it != currPWD->end())
 	{
@@ -329,9 +328,9 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 		int file_inode = currEntry.getInodeNum();
 		Descriptor* newDesc = new Descriptor(flag_access_permissions,file_inode);
 		pthread_mutex_lock(&_currFDMutex);
-		_currFD++;
-		_openFileTable[_currFD] = newDesc;
-		ret = _currFD;
+		ret = _currFD.getUnusedFD();
+		_openFileTable[ret] = newDesc;
+//		ret = _currFD;
 		if (_fileSys->getFileType(file_inode) == SOFT_LINK)
 		{
 			cout<<"SC::Open found SOFT_LINK file_inode = "<<file_inode<<endl;
@@ -362,6 +361,7 @@ int SystemCalls::Open(char* file_name, int flag_access_permissions){
 int SystemCalls::Close(int fd){
 	pthread_mutex_lock(&_currFDMutex);
 	_openFileTable.erase(fd);
+	_currFD.freeFD(fd);
 	pthread_mutex_unlock(&_currFDMutex);
 	return 1;
 }
@@ -428,13 +428,24 @@ int SystemCalls::moveFile(char* parendDir, char * new_dest){
 }
 
 bool SystemCalls::isDir(char * fileName){
+//	cout<<"SC::isDir fileName = "<<fileName<<endl;
 	return myIsDir(fileName) != NULL;
-//	if (fileEntryIt == currPWD->end())
-//	{
-//		return false;
-//	}
-//	FileEntry currEntry = *fileEntryIt;
-//	return isDirFromInode(currEntry.getInodeNum());
+//	string file_nameString(fileName);
+//	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
+//	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
+//	cout<<"SC::isDir finished cutting up string"<<endl;
+//	int pwdInode = -1;
+//	cout<<"SC::isDir readPWD(pwd...) pwd = "<<pwd<<endl;
+//	list<FileEntry>* currPWD = readPWDDir(pwd,&pwdInode);
+//	cout<<"SC::isDir pwdInode = "<<pwdInode<<endl;
+//	list<FileEntry>::iterator currEntryIterator;
+//	currEntryIterator = getFileEntryFromDir(*currPWD,file_nameShort.c_str());
+//	bool temp = currEntryIterator == currPWD->end() ;
+//	cout<<"SC::isDir currEntryIterator == currPWD->end()"<< temp <<endl;
+//	FileEntry currEntry = *currEntryIterator;
+//	cout<<"SC::isDir currFileName = "<<currEntry.getFileName()<<endl;
+//	cout<<"SC::isDir _fileSys->getFileType(currEntry.getInodeNum())"<<_fileSys->getFileType(currEntry.getInodeNum())<<endl;
+//	return _fileSys->getFileType(currEntry.getInodeNum()) == DIR_TYPE;
 }
 
 string* SystemCalls::myIsDir(char* fileName)
@@ -443,7 +454,7 @@ string* SystemCalls::myIsDir(char* fileName)
 	string pwd = file_nameString.substr(0,file_nameString.find_last_of("/"));
 	string file_nameShort = file_nameString.substr(file_nameString.find_last_of("/")+1);
 	int pwdInode = -1;
-	string* success = readPWDDirForCD(pwd,&pwdInode);
+	string* success = readPWDDirForCD(file_nameString, &pwdInode);
 	//list<FileEntry>::iterator fileEntryIt =getFileEntryFromDir(*currPWD,file_nameShort.c_str());
 	return success;
 }
@@ -457,12 +468,9 @@ string* SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
 	bool foundFile = false;
 	while (!done)
 	{
-		cout<<"SC::isDir here4"<<endl;
+		foundFile = false;
 		string currDir = pwd.substr(0, pwd.find("/"));
-//		cout<<"readPWDDir currDir = "<<currDir<<endl;
-		cout<<"SC::isDir here5"<<endl;
 		currPWD = _fileSys->d_read(pwdInode);
-		cout<<"SC::isDir here6"<<endl;
 		if (currPWD->empty())
 		{
 			return NULL;
@@ -473,21 +481,15 @@ string* SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
 		{
 			FileEntry curr = *it;
 			string currEntryName(curr.getFileName());
-			cout<<"SC::isDir here10"<<endl;
-//			cout<<"readPWDDir currEntryName = "<<currEntryName<<endl;
-//			cout<<"readPWDDir curr.getFileName() = "<<curr.getFileName()<<endl;
-			cout<<"SC::isDir here11"<<endl;
 			if (currDir.compare(currEntryName) == 0)
 			{
 				foundFile = true;
-				cout<<"SC::isDir here12"<<endl;
 				if (isDirFromInode(curr.getInodeNum()))
 				{
 					pwdInode = curr.getInodeNum();
 				}
 				else if (_fileSys->getFileType(curr.getInodeNum()) == SOFT_LINK)
 				{
-					cout<<"SC::isDir found soft link"<<endl;
 					ostringstream fileNamePointedTo;
 					char bufOfOne[2];
 					int offsetToReadSoftLink = 0;
@@ -500,6 +502,7 @@ string* SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
 						_fileSys->f_read(curr.getInodeNum(),bufOfOne,offsetToReadSoftLink,1);
 					}
 					char* file_name_of_soft_link = (char*)(fileNamePointedTo.str().c_str());
+
 					return myIsDir(file_name_of_soft_link);
 				}
 				else
@@ -507,14 +510,15 @@ string* SystemCalls::readPWDDirForCD(string pwd,int *lastInode)
 					return NULL;
 				}
 			}
+			currDir.compare("..") == 0;
 			if (currDir.compare("..") == 0)
 			{
 				foundFile = true;
 			}
 			++it;
 		}
-		pwd = pwd.substr(pwd.find("/") + 1);
 		done = pwd.find("/") == string::npos;
+		pwd = pwd.substr(pwd.find("/") + 1);
 	}
 	if (!foundFile)
 	{
@@ -637,10 +641,48 @@ int SystemCalls::lockWrite(int fd){
 }
 
 int SystemCalls::releaseLockRead(int fd){
+	int lockedInode = turnFDtoInodeNum(fd);
+	pthread_mutex_lock(&lock_mutex);
+	map<int,int>::iterator place = _readLocks.find(lockedInode);
+	if (place != _readLocks.end())
+	{
+		int lockerPID = (*place).second;
+		if (lockerPID == _currUI)
+		{
+			_readLocks.erase(place);
+			pthread_mutex_unlock(&lock_mutex);
+			return 1;
+		}
+		else
+		{
+			cerr<<"this lock is not yours to release"<<endl;
+		}
+	}
+	cerr<<"File is not locked"<<endl;
+	pthread_mutex_unlock(&lock_mutex);
 	return 1;
 }
 
 int SystemCalls::releaseLockWrite(int fd){
+	int lockedInode = turnFDtoInodeNum(fd);
+	pthread_mutex_lock(&lock_mutex);
+	map<int,int>::iterator place = _writeLocks.find(lockedInode);
+	if (place != _writeLocks.end())
+	{
+		int lockerPID = (*place).second;
+		if (lockerPID == _currUI)
+		{
+			_writeLocks.erase(place);
+			pthread_mutex_unlock(&lock_mutex);
+			return 1;
+		}
+		else
+		{
+			cerr<<"this lock is not yours to release"<<endl;
+		}
+	}
+	cerr<<"File is not locked"<<endl;
+	pthread_mutex_unlock(&lock_mutex);
 	return 1;
 }
 
