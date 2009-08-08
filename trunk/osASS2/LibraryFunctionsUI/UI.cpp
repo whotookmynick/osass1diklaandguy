@@ -430,6 +430,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			int new_fd = _systemCallsCaller->Open((char*)(finalToSendToFile.c_str()),flagInt);
 			cout<<"fd = "<<new_fd<<endl;
 			_fdTable->push_back(new_fd);
+			_pwd = originalPWD;
 			return new_fd;
 		}
 
@@ -570,9 +571,15 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::rm(string file_name)
 		{
-			string working_directory = getFullPath(file_name);
+//			string working_directory = getFullPath(file_name);
+			string originalPWD = _pwd;
+			vector<string> pathAndShortName = getFullPathAndShortName(file_name);
+			file_name = pathAndShortName[0];
+			this->cd(file_name);
+			string finalToSendToFile = _pwd + pathAndShortName.at(1);
 			//			cout<<"OSUI::rm working_directory = "<<working_directory<<endl;
-			int ans = _systemCallsCaller->RmFile((char*)(working_directory.c_str()));
+			int ans = _systemCallsCaller->RmFile((char*)(finalToSendToFile.c_str()));
+			_pwd = originalPWD;
 			return ans;
 
 		}
