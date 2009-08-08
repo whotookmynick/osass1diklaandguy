@@ -31,6 +31,7 @@ int FileSystem::createFile(int flag)
 		cerr<<"there are no free i-nodes"<<endl;
 		return ans;
 	}
+//	cout<<"FS::createFile flag = "<<flag<<endl;
 	if (flag)
 	{
 		_lldisk->setInodeType(ans,SOFT_LINK);
@@ -57,6 +58,7 @@ int FileSystem::createDir()
 
 int FileSystem::getFileType(int i_node)
 {
+//	cout<<"FS::getFileType entry i_node = "<<i_node<<endl;
 	return _lldisk->getInodeType(i_node);
 }
 
@@ -126,13 +128,17 @@ int FileSystem::f_write(int i_node,char* buffer,int offset,int nBytes )
 list<FileEntry>* FileSystem::d_read(int i_node)
 {
 	list<FileEntry> *ans = new list<FileEntry>();
+	//cout<<"FileSystem::d_read before getFileSize"<<endl;
 	int fileSize = _lldisk->getFileSize(i_node);
+	//cout<<"FileSystem::d_read after getFileSize"<<endl;
 	int currOffset = 0;
 	char fileEntryBuffer[20];
+	//cout<<"FileSystem::d_read before f_read"<<endl;
 	int bytesRead = this->f_read(i_node,fileEntryBuffer,currOffset,16);
-
+	//cout<<"FileSystem::d_read after f_read"<<endl;
 	while (fileEntryBuffer[0] != '$' & bytesRead == 16)
 	{
+		//cout<<"FileSystem::d_read begin of loop first char is '"<<fileEntryBuffer[0]<<"'"<<endl;
 		int entryInode = turnBytesToInt(fileEntryBuffer);
 		char *entryName = (char*)malloc(sizeof(char)*12);
 		strcpy(entryName,fileEntryBuffer+4);

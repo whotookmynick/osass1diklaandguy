@@ -13,6 +13,9 @@ extern "C"
 	void *wrapper_func(void *args)
 	{
 		OSUI *curThread = (OSUI *)args;
+		cout<<"wrapper_fucn before locking"<<endl;
+		pthread_mutex_lock(&curThread->_contextMutex);
+		cout<<"wrapper_fucn after locking"<<endl;
 		curThread->run();
 		return 0;
 	}
@@ -40,32 +43,37 @@ static vector<string> splitAroundWhiteSpaces(string line)
 OSUI::OSUI(SystemCalls* systemCallsCaller):
 	_systemCallsCaller(systemCallsCaller),_pid(0),_fatherPid(-1)
 	{
+	_systemCallsCaller->setCurrPID(_pid);
 	_fdTable = new vector<int>();
 	//	_systemCallsCaller = systemCallsCaller;
 	//	_pwd = getRealPWD();
 	_pwd = "";
 	_processTable = new map<int,OSUI*>();
+	pthread_mutex_init(&_contextMutex, NULL);
 	init();
 	}
 
 OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
-		int pid,int fatherPid,string pwd,map<int,OSUI*>* processTable):
+		int pid,int fatherPid,map<int,OSUI*>* processTable):
 			_systemCallsCaller(systemCallsCaller),_fdTable(fdTable),_pid(pid),_fatherPid(fatherPid),
-			_pwd(pwd),_processTable(processTable)
+			_processTable(processTable)
 			{
-			init();
+			pthread_mutex_init(&_contextMutex, NULL);
 			pthread_mutex_lock(&_contextMutex);
+			_pwd = "";
+			init();
 			}
 
 		void OSUI::init()
 		{
+			//			pthread_mutex_init(&_contextMutex, NULL);
+			//			pthread_mutex_lock(&_contextMutex);
 			(*_processTable)[_pid] = this;
-			//			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
-			//			{
-			//				perror("UI thread creation failed");
-			//				exit(1);
-			//			}
-			pthread_mutex_init(&_contextMutex, NULL);
+			if (pthread_create(&ui_thread, NULL, wrapper_func, this) != 0)
+			{
+				perror("UI thread creation failed");
+				exit(1);
+			}
 		}
 
 		void OSUI::parseAndRunMethod(string & input)
@@ -80,16 +88,29 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				ret = this->create(args[1], args[2]);
 				cout<<"fd = "<<ret<<endl;
 			}else if(args[0].compare("cd") == 0){
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:cd <dir>"<<endl;
+					return;
+				}
 				this->cd(args[1]);
 			}else if(args[0].compare("crprc") == 0)
 			{
-				int newPid;
-				newPid = atoi(args[1].c_str());
-				int newParentPid;
-				newParentPid = atoi(args[2].c_str());
-				this->crprc(newPid, _pid);
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:crprc <new pid> <parent>"<<endl;
+					return;
+				}
+				int newPid = atoi(args[1].c_str());
+				int newParentPid = atoi(args[2].c_str());
+				crprc(newPid, _pid);
 			}else if(args[0].compare("swprc") == 0)
 			{
+				if (args.size() != 2)
+				{
+					cerr<<"Usage:swprc <new pid>"<<endl;
+					return;
+				}
 				int newPid = atoi(args[1].c_str());
 				switchToProcess(newPid);
 				pthread_mutex_lock(&_contextMutex);
@@ -214,6 +235,16 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				}
 				mv(args[1],args[2]);
 			}
+			if (args[0].compare("writeFile") == 0)
+			{
+				if (args.size() != 3)
+				{
+					cerr<<"Usage:writeFile <fd> <file_name>"<<endl;
+					return;
+				}
+				int fdToWriteTo = atoi(args[1].c_str());
+				writeFile(fdToWriteTo,args[2]);
+			}
 		}
 
 		void OSUI::run(){
@@ -223,6 +254,8 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			{
 				cout<<_pwd<<"> ";
 				getline(cin,input);
+				cout<<"OSUI::run currentpid = "<<_pid<<endl;
+				//				cout<<"OSUI::run input = "<<input<<endl;
 				parseAndRunMethod(input);
 				stopWhile = input.compare("Exit") == 0;
 			}
@@ -267,7 +300,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			file_name = file_name.substr(1);
 			char* file_name_c = (char*)file_name.c_str();
 			int fd = _systemCallsCaller->MakeFile(file_name_c,REGULARE_FILE,flagInt);
-			if (fd != -1)
+			if (fd >= 0)
 			{
 				_fdTable->push_back(fd);
 			}
@@ -277,8 +310,12 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		int OSUI::cd(string new_dir)
 		{
 			string dir_change = new_dir.substr(0,new_dir.find('/'));
-			if (_systemCallsCaller->isDir((char*)dir_change.c_str()))
+			string* realFileName = _systemCallsCaller->myIsDir((char*)dir_change.c_str());
+			if (realFileName != NULL)
 			{
+				string new_dir = *realFileName;
+				dir_change = new_dir.substr(0,new_dir.find('/'));
+				cout<<"OSUI::cd isADir realFileName = "<<*realFileName<<endl;
 				string next_dir;
 				if (new_dir.empty() | new_dir.compare("/") == 0)
 					return 1;
@@ -337,10 +374,15 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 		{
 			if (processExists(id))
 			{
-				cout<<"process id already exists"<<endl;
+				cerr<<"process id already exists"<<endl;
 				return -1;
 			}
-			new OSUI(_systemCallsCaller,_fdTable,id,parent,_pwd,_processTable);
+			vector<int>* newProcessFdTable = _fdTable;
+			if (parent == -1)
+			{
+				newProcessFdTable = new vector<int>();
+			}
+			new OSUI(_systemCallsCaller,newProcessFdTable,id,parent,_processTable);
 			return 1;
 		}
 		int OSUI::open(string file_name,string flags)
@@ -403,7 +445,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::lck_rd(int fd)
 		{
-//			int ans = _systemCallsCaller->lockRead(fd,_pid);
+			//			int ans = _systemCallsCaller->lockRead(fd,_pid);
 			int ans = _systemCallsCaller->lockRead(fd);
 			if (ans > 0)
 			{
@@ -437,8 +479,18 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		void OSUI::switchToProcess(int newPid)
 		{
-			OSUI* newProc = (*_processTable)[newPid];
-			newProc->keepRunning();
+			if (processExists(newPid))
+			{
+				OSUI* newProc = (*_processTable)[newPid];
+				_systemCallsCaller->setCurrPID(newPid);
+				newProc->keepRunning();
+				cout<<"Current process ID is "<<newPid<<endl;
+			}
+			else
+			{
+				cerr<<"Could not find pid"<<endl;
+				return;
+			}
 		}
 
 		void OSUI::ls(string dir_name,int numOfArgs)
@@ -455,7 +507,7 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 				working_directory.append("/");
 				working_directory = working_directory.substr(1);
 			}
-			//			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
+			cout<<"OSUI::ls dir_name = "<<dir_name<<endl;
 			char buff[5000];
 			_systemCallsCaller->ls((char*)working_directory.c_str(),buff);
 			cout<<buff<<endl;
@@ -523,7 +575,9 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			int fd = _systemCallsCaller->MakeFile((char*)(new_file_path.c_str()), SOFT_LINK, READ_AND_WRITE);
 			if (fd != -1)
 			{
+				file_to_link_to.append("$");
 				write(fd,file_to_link_to);
+				_systemCallsCaller->Close(fd);
 				return 1;
 			}
 			return -1;
@@ -531,8 +585,8 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 
 		int OSUI::mv(string old_file_name,string new_file_name)
 		{
-//			string original_file_path = getFullPath(old_file_name);
-//			string new_file_path = getFullPath(new_file_name);
+			//			string original_file_path = getFullPath(old_file_name);
+			//			string new_file_path = getFullPath(new_file_name);
 			int ret = hdlink(old_file_name,new_file_name);
 			if (ret < 0)
 			{
@@ -544,6 +598,31 @@ OSUI::OSUI(SystemCalls* systemCallsCaller,vector<int>* fdTable,
 			{
 				cerr<<"Cannot rename"<<endl;
 				return ret;
+			}
+		}
+
+		int OSUI::writeFile (int fd,string fileName)
+		{
+			cout<<"OSUI::writeFile fd = "<<fd<<" fileName = "<<fileName<<endl;
+			ifstream myfile(fileName.c_str(),ios::in);
+			if (myfile.is_open())
+			{
+				cout<<"OSUI::writeFile file is opened"<<endl;
+				string line,value;
+				while (! myfile.eof() )
+				{
+					getline (myfile,line);
+					line.append("\n");
+					this->write(fd,line);
+					cout << line << endl;
+				}
+				myfile.close();
+				return 1;
+			}
+			else
+			{
+				cout << "Unable to open file"<<endl;
+				return -1;
 			}
 		}
 

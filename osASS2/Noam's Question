@@ -10,7 +10,7 @@ ls
 
 //TODO for saturday.
 *  Take care of relative paths.
-*  Take care of using soft links. Need to identify specific function where this is relevant and adding support.
 *  Take care of updating file size correctly.
-*  Take care of process creation, switching and batch programs.
+*  Take care of batch programs.
+*  Error handling as much as I can
 

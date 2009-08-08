@@ -564,13 +564,11 @@ int LowLevelDisk::getDataBlock (int i_node, int dblock){
         return -1 ;
     }
     else{
-
+        pthread_mutex_unlock(&_RecMutex);
         return _iNodeTable->getDataBlockNum(i_node,dblock);
         //getNumOfDataBlock(i_node,dblock);
         //TODO: if not allocated yet??? allocate and delete the block in the file?????
     }
-    pthread_mutex_unlock(&_RecMutex);
-
 }
 
 
@@ -612,13 +610,15 @@ void LowLevelDisk::writeBlock(int dblockNum, char* newdata){
 
 int LowLevelDisk::getFileSize(int i_node){
 //    cout<<"getFileSize - need to finish implement lists "<<endl;
+	//cout<<"LLD::getfilesize before getting lock"<<endl;
     pthread_mutex_lock(&_RecMutex);
     if ((i_node<0) | (i_node>=(_superBlock->numOfInodes))){
         pthread_mutex_unlock(&_RecMutex);
         return -1;
     }
-    return _iNodeTable->getFileSize(i_node);
+    //cout<<"LLD getfilesize I have lock"<<endl;
     pthread_mutex_unlock(&_RecMutex);
+    return _iNodeTable->getFileSize(i_node);
 }
 
 

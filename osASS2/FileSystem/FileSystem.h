@@ -91,6 +91,11 @@ public:
 
 	virtual void setNumOfHardLinks(int i_node,int num);
 
+	void setFileType(int i_node,int type)
+	{
+		_lldisk->setInodeType(i_node,type);
+	}
+
 };
 
 #endif /**FILESYSTEM_H_**/
