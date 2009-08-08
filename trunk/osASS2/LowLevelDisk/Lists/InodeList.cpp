@@ -200,7 +200,7 @@ int InodeList::getNumOfTotalBlocks(){
 //--------------------------------------------------------------------------//
 void InodeList::setFileType(int i_node,int _fileType)
 {
-	if((i_node<_disk.getNumOfInodes())|(i_node<0)){
+	if((i_node>_disk.getNumOfInodes())|(i_node<0)){
 				//TODO
 	}
 	InodeStruct* is=readInodeToStruct(i_node);

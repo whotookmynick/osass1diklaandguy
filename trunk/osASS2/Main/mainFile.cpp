@@ -53,7 +53,7 @@ int main(int argc,char** argv)
 	cout<<"Creating system calls layer"<<endl;
 	SystemCalls* systemCallsCaller = new SystemCalls(configargs[0],configargs[1],configargs[2]);
 	OSUI* mainUI = new OSUI(systemCallsCaller);
-	mainUI->run();
+//	mainUI->run();
 	pthread_exit(0);
 }
 

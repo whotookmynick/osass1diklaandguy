@@ -15,17 +15,19 @@ class SystemCalls
 private:
 
 	FileSystem *_fileSys;
+	int _currUI;//keeps the PID of the current UI
+
 	int _currFD;
 	pthread_mutex_t _currFDMutex;	//protects the _currFD and the _openFileTable.
 	map<int,Descriptor*> _openFileTable;//maps between the file descriptor number and the descriptor itself
-//	map<int,int> _readLocks;
-//	map<int,int> _writeLocks;
-	vector<int> _readLocks; //remembers all the i_node of the read locked files;
-	vector<int> _writeLocks; //remembers all the i_node of the write locked files;
+	map<int,int> _readLocks;
+	map<int,int> _writeLocks;
+//	vector<int> _readLocks; //remembers all the i_node of the read locked files;
+//	vector<int> _writeLocks; //remembers all the i_node of the write locked files;
 
 	list<FileEntry>* readPWDDir(string pwd,int *lastInode);
 	list<FileEntry>::iterator getFileEntryFromDir(list<FileEntry>& currPWD,const char* file_name);
-	bool readPWDDirForCD(string pwd,int *lastInode);
+	string* readPWDDirForCD(string pwd,int *lastInode);
 
 	bool isLockedRead(int i_node_num);
 	bool isLockedWrite(int i_node_num);
@@ -106,6 +108,8 @@ public:
 	 * Returns whether this address is a directory or not. Needs to deal with soft_links.
 	 */
 	bool isDir(char * address);
+
+	string* myIsDir(char* file_name);
 	/*
 	 * locks file, so that only read operations are allowed.
 	 * There is no limit on the number of processes that are allowed to concurrently read the file.
@@ -131,6 +135,11 @@ public:
 	int releaseLockWrite(int fd);
 
 	int turnFDtoInodeNum(int fd);
+
+	void setCurrPID(int newPID)
+	{
+		_currUI = newPID;
+	}
 
 };
 
